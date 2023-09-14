@@ -1,0 +1,1 @@
+// Idea is to organize routes separate files in this folder rather than list them all in one file
