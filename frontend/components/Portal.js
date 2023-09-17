@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Rect } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Rect } from 'react-native'
+import { useRoute } from '@react-navigation/native';
 
 class Portal extends Component {
    state = {
@@ -7,10 +8,21 @@ class Portal extends Component {
    render() {
       return (
          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
-            <TouchableOpacity style={styles.menuItem}><Text style={styles.menuItemText}>{'\n'}Alerts</Text></TouchableOpacity> 
-            <TouchableOpacity style={styles.menuItem}><Text style={styles.menuItemText}>{'\n'}Reports</Text></TouchableOpacity> 
-            <TouchableOpacity style={styles.menuItem}><Text style={styles.menuItemText}>{'\n'}View Patients</Text></TouchableOpacity> 
-            <TouchableOpacity style={styles.menuItem}><Text style={styles.menuItemText}>{'\n'}Edit Survey Responses</Text></TouchableOpacity> 
+            <TouchableOpacity style={styles.menuItem}
+            onPress={() =>
+               navigation.navigate('Alerts')
+             }>
+               <Text style={styles.menuItemText}>{'\n'}Alerts</Text>
+            </TouchableOpacity> 
+            <TouchableOpacity style={styles.menuItem}>
+               <Text style={styles.menuItemText}>{'\n'}Reports</Text>
+            </TouchableOpacity> 
+            <TouchableOpacity style={styles.menuItem}>
+               <Text style={styles.menuItemText}>{'\n'}View Patients</Text>
+            </TouchableOpacity> 
+            <TouchableOpacity style={styles.menuItem}>
+               <Text style={styles.menuItemText}>{'\n'}Edit Survey Responses</Text>
+            </TouchableOpacity> 
          </View>
       )
    }
