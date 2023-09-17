@@ -1,27 +1,29 @@
 import React, { Component } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
+import {Dimensions} from 'react-native';
+import { Avatar, Card, Button, Menu, Provider as PaperProvider } from 'react-native-paper';
 
 class Alerts extends Component {
    state = {
    }
    render() {
       return (
-         <View style = {styles.container}>
+         <View>
             <Text style = {styles.topBar}>{'\n'}Alerts</Text>
-            <TouchableOpacity
-               style = {styles.menuItem}
-               onPress = {
-                  () => this.portal()
-               }>
-               <Text style = {styles.menuItemText}>Alerts </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-               style = {styles.menuItem}
-               onPress = {
-                  () => this.portal()
-               }>
-               <Text style = {styles.menuItemText}>Alerts </Text>
-            </TouchableOpacity>
+            <Card style = {styles.alert}>
+               <Card.Title titleStyle={{ color: "white" }} subtitleStyle={{color:"white"}}
+                  title="Sample Alert 1"
+                  subtitle="9/17/2023"
+                  right={(props) => <Avatar.Icon {...props} backgroundColor='#5791F3' icon="trash-can-outline"/>}
+               />
+            </Card>
+            <Card style = {styles.alert}>
+               <Card.Title titleStyle={{ color: "white" }} subtitleStyle={{color:"white"}}
+                  title="Sample Alert 2"
+                  subtitle="9/17/2023"
+                  right={(props) => <Avatar.Icon {...props} backgroundColor='#5791F3' icon="trash-can-outline"/>}
+               />
+            </Card>
          </View>
       )
    }
@@ -29,24 +31,19 @@ class Alerts extends Component {
 export default Alerts
 
 const styles = StyleSheet.create({
-   container: {
-      paddingTop: 23
-   },
    topBar: {
       height: 50,
-      width: 300,
+      width: Dimensions.get('window').width,
       backgroundColor: '#1059d5',
       textAlign: 'center',
-      color: 'white'
+      color: 'white',
+      fontSize: 20,
+      fontWeight: 'bold',
    },
-   menuItem: {
-      backgroundColor: '#5791F3',
-      padding: 10,
-      margin: 15,
-      height: 50,
-      width: 270
-   },
-   menuItemText:{
-      color: 'white'
+   alert: {
+      backgroundColor:'#5791F3',
+      width: Dimensions.get('window').width - 30,
+      marginLeft: 15,
+      marginTop: 15
    }
 })
