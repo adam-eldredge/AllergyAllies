@@ -33,9 +33,14 @@ exports.getAllPatients = async (req, res) => {
 exports.deletePatient = async (req, res) => {
     try {
         const id = req.params.id;
-        const data = await patient.findByIdAndDelete(id)
-        // data.username shows up as undefined:
-        res.send(`Document with ${data.username} has been deleted..`)
+        const patientToDelete = await patient.findById(id);
+        if(!patientToDelete) {
+            res.status(404).json({ message: "Patient not found"});
+        }
+        const firstname = patientToDelete.firstname;
+        
+        await patient.findByIdAndDelete(id);
+        res.status(200).json({ message: `Document with ${firstname} has been deleted..`});
     }
     catch (error) {
         res.status(400).json({ message: error.message })

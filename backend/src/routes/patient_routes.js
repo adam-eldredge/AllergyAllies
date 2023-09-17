@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router()
-module.exports = router;
 const patientController = require('../controllers/patient_controller');
 
 // POST localhost:5000/api/addPatient

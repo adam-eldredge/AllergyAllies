@@ -1,19 +1,21 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv').config(); //use npm run server (restarts serv when changed)
+const dotenv = require('dotenv').config(); 
+// Use "npm run server" to have BE server restart when changed (requires nodemon)
 
 const app = express();
+
+// CORS
+const corsMiddleware = require('./middleware/cors');
+app.use(corsMiddleware);
+
 app.use(express.json());
 
 // Port
 const PORT = process.env.PORT;
 
-// MongoDB username and pass
-const user = process.env.USER;
-const pass = process.env.PASS;
-
 // Database uri
-const uri = `mongodb+srv://${user}:${pass}@allergyallies.xuzdner.mongodb.net/Accounts?retryWrites=true&w=majority`;
+const uri = process.env.URI;
 
 // Routes
 const patient_routes = require('./routes/patient_routes');
@@ -23,9 +25,10 @@ const report_routes = require('./routes/report_routes');
 app.use('/api', patient_routes);
 app.use('/api', report_routes);
 
-app.listen(PORT, () => {
+
+const server = app.listen(PORT, () => {
   console.log(`Hello AllergyAllies - Listening on Port ${PORT}`);
-})
+});
 
 // Connect through mongoose
 mongoose.connect(uri);
@@ -33,16 +36,19 @@ const database = mongoose.connection;
 
 // Test connection
 database.on('error', (error) => {
-    console.log(error)
-  })
-  database.once('connected', () => {
-    console.log('Database Connected');
-  })
+  console.log(error)
+});
+
+database.once('connected', () => {
+  console.log('Database Connected');
+})
 
 // Clean shutdown
 process.on('SIGINT', function() {
-    console.log( "\nClean Server Shutdown Initiating... (Ctrl-C)" );
-    database.close(false, () => {});
-    console.log('\nDatabase connection has been closed.')
-    process.exit(0);
-  });
+  console.log( "\nClean Server Shutdown Initiating... (Ctrl-C)" );
+  database.close(false, () => {});
+  console.log('\nDatabase connection has been closed.')
+  process.exit(0);
+});
+
+module.exports = {app, server};
