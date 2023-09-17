@@ -6,35 +6,11 @@ class Portal extends Component {
    }
    render() {
       return (
-         <View style = {styles.container}>
-            <TouchableOpacity
-               style = {styles.menuItem}
-               onPress = {
-                  () => this.portal()
-               }>
-               <Text style = {styles.menuItemText}>Alerts </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-               style = {styles.menuItem}
-               onPress = {
-                  () => this.portal()
-               }>
-               <Text style = {styles.menuItemText}>Reports </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-               style = {styles.menuItem}
-               onPress = {
-                  () => this.portal()
-               }>
-               <Text style = {styles.menuItemText}>View Patients </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-               style = {styles.menuItem}
-               onPress = {
-                  () => this.portal()
-               }>
-               <Text style = {styles.menuItemText}>Edit Survey Responses </Text>
-            </TouchableOpacity>
+         <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
+            <TouchableOpacity style={styles.menuItem}><Text style={styles.menuItemText}>{'\n'}Alerts</Text></TouchableOpacity> 
+            <TouchableOpacity style={styles.menuItem}><Text style={styles.menuItemText}>{'\n'}Reports</Text></TouchableOpacity> 
+            <TouchableOpacity style={styles.menuItem}><Text style={styles.menuItemText}>{'\n'}View Patients</Text></TouchableOpacity> 
+            <TouchableOpacity style={styles.menuItem}><Text style={styles.menuItemText}>{'\n'}Edit Survey Responses</Text></TouchableOpacity> 
          </View>
       )
    }
@@ -53,6 +29,7 @@ const styles = StyleSheet.create({
       width: 100
    },
    menuItemText:{
-      color: 'white'
+      color: 'white',
+      textAlign: 'center',
    }
 })
