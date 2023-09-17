@@ -1,25 +1,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const dotenv = require('dotenv').config(); //use npm run server (restarts serv when changed)
+
+const app = express();
+app.use(express.json());
 
 // Port
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 // MongoDB username and pass
-const user = "allergyallies23"
-const pass = "ZGZTYOUiZ9dkqFbs"
+const user = process.env.USER;
+const pass = process.env.PASS;
 
 // Database uri
 const uri = `mongodb+srv://${user}:${pass}@allergyallies.xuzdner.mongodb.net/Accounts?retryWrites=true&w=majority`;
 
 // Routes
-const routes = require('./Routes');
+const patient_routes = require('./routes/patient_routes');
+const report_routes = require('./routes/report_routes');
 
+// Use statements
+app.use('/api', patient_routes);
+app.use('/api', report_routes);
 
-const app = express();
-app.use(express.json());
-app.use('/api', routes);
 app.listen(PORT, () => {
-    console.log(`Hello AllergyAllies - Listening on Port ${PORT}`)
+  console.log(`Hello AllergyAllies - Listening on Port ${PORT}`);
 })
 
 // Connect through mongoose
