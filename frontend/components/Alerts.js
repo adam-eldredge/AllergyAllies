@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
    },
    alert: {
-      backgroundColor:'#5791F3',
+      backgroundColor:'#72a2f2',
       width: Dimensions.get('window').width - 30,
       height: 80,
       marginLeft: 15,
