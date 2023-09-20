@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView } from 'react-native'
 import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, DefaultTheme, ThemeProvider} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import LogIn from './components/LogIn.js';
 import Portal from './components/Portal.js';
@@ -9,15 +9,20 @@ import HomeScreen from './components/HomeScreen.js';
 
 const Stack = createNativeStackNavigator();
 
-
 export default function App({navigation}) {
   return (
     <NavigationContainer>
-    <Stack.Navigator initialRouteName="HomeScreen">
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={() => ({
+        headerTitleStyle: styles.headerTitleStyle,
+        headerStyle: { backgroundColor: '#1059d5'},
+        headerTintColor: 'white'
+      })}>
         <Stack.Screen
-          name="HomeScreen"
+          name="Home"
           component={HomeScreen}
-          options={{title: 'HomeScreen'}}
+          options={{title: 'Home'}}
         />
         <Stack.Screen
           name="Alerts"
@@ -45,5 +50,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerTitleStyle: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    alignSelf: 'center',
+    color: 'white',
+    flex: 1,
   },
 });
