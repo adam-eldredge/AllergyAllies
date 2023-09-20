@@ -18,7 +18,7 @@ class LogIn extends Component {
    render() {
       return (
          <View style = {styles.container}>
-         <Text style = {{textAlign: 'center'}}>Allergy Ally</Text>
+         <Text style = {styles.title}>Allergy Ally</Text>
             <TextInput style = {styles.input}
                underlineColorAndroid = "transparent"
                placeholder = "  Email"
@@ -39,9 +39,9 @@ class LogIn extends Component {
                <Text style = {styles.logInButtonText}> Log In </Text>
             </TouchableOpacity>
 
-            <Text>{'\n'}Forgot password? {'\n'}</Text>
-            <Text>Sign up as a patient {'\n'}</Text>
-            <Text>Sign up as a medical practice {'\n'}</Text>
+            <Text style = {styles.bottomText}>Forgot password?</Text>
+            <Text style = {styles.bottomText}>Sign up as a patient</Text>
+            <Text style = {styles.bottomText}>Sign up as a medical practice</Text>
          </View>
       )
    }
@@ -51,6 +51,12 @@ export default LogIn
 const styles = StyleSheet.create({
    container: {
       paddingTop: 23
+   },
+   title :{
+      textAlign: 'center',
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: '#1059d5',
    },
    input: {
       margin: 15,
@@ -63,9 +69,18 @@ const styles = StyleSheet.create({
       padding: 10,
       margin: 15,
       height: 40,
+      justifyContent: 'center',
+      marginBottom: 30,
    },
    logInButtonText:{
       color: 'white',
       textAlign: 'center'
-   }
+   },
+   bottomText:{
+      color: '#1059d5',
+      marginLeft: 15,
+      marginBottom: 5,
+      fontSize: 17,
+      textAlign: 'center',
+   },
 })
