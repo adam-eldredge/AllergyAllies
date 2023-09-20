@@ -9,22 +9,6 @@ class Portal extends Component {
    render() {
       return (
          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
-            <View style = {styles.topBar}>
-               <IconButton
-                  icon="menu"
-                  iconColor="white"
-                  size={20}
-                  onPress={() => console.log('Pressed')}
-               />
-               <Text style = {styles.topBarText}>Portal</Text>
-               <IconButton
-               //take this out and fix spacing
-                  icon="menu"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={() => console.log('Pressed')}
-               />
-            </View>
             <TouchableOpacity style={styles.menuItem}
             onPress={() =>
                navigation.navigate('Alerts')
@@ -97,22 +81,6 @@ export default Portal
 const styles = StyleSheet.create({
    container: {
       paddingTop: 23
-   },
-   topBar: {
-      height: 50,
-      width: Dimensions.get('window').width,
-      backgroundColor: '#1059d5',
-      textAlign: 'center',
-      justifyContent: 'center',
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-   },
-   topBarText: {
-      color: 'white',
-      textAlign: 'center',
-      fontSize: 20,
-      fontWeight: 'bold',
    },
    menuItem: {
       padding: 10,
