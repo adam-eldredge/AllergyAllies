@@ -1,44 +1,75 @@
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView } from 'react-native'
 import * as React from 'react';
-import {NavigationContainer, DefaultTheme, ThemeProvider} from '@react-navigation/native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView } from 'react-native'
+import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import LogIn from './components/LogIn.js';
-import Portal from './components/Portal.js';
-import Alerts from './components/Alerts.js';
-import HomeScreen from './components/HomeScreen.js';
+import Portal from './screens/Portal.js';
+import Alerts from './screens/Alerts.js';
+import HomeScreen from './screens/HomeScreen.js';
+import SignInScreen from './screens/SignInScreen';
+import LoadingScreen from './screens/LoadingScreen.js';
+import SignUpScreen from './screens/SignUpScreen';
+
 
 const Stack = createNativeStackNavigator();
 
 export default function App({navigation}) {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [userToken, setUserToken] = React.useState(null);
+
+  const getUserToken = async () => {
+    // testing purposes
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    try {
+      // custom logic
+      await sleep(2000);
+      const token = null;
+      setUserToken(token);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    getUserToken();
+  }, []);
+
+  if (isLoading) {
+    // We haven't finished checking for the token yet
+    return <LoadingScreen />;
+  }
+
+
   return (
     <NavigationContainer>
     <Stack.Navigator
-      initialRouteName="Home"
       screenOptions={() => ({
         headerTitleStyle: styles.headerTitleStyle,
         headerStyle: { backgroundColor: '#1059d5'},
         headerTintColor: 'white'
       })}>
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{title: 'Home'}}
-        />
-        <Stack.Screen
-          name="Alerts"
-          component={Alerts}
-          options={{title: 'Alerts'}}
-        />
-        <Stack.Screen
-          name="Login"
-          component={LogIn}
-          options={{title: 'Login'}}
-        />
-        <Stack.Screen
-          name="Portal"
-          component={Portal}
-          options={{title: 'Portal'}}
-        />
+         {userToken == null ? (
+          // No token found, user isn't signed in
+          <>
+          <Stack.Screen
+            name="SignIn"
+            component={SignInScreen}
+            options={{
+              title: 'Sign in',
+            }}
+            initialParams={{ setUserToken }}
+          />
+          <Stack.Screen name="SignUp" component={SignUpScreen} />
+          </>
+          
+        ) : (
+          // User is signed in
+          <>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Alerts" component={Alerts} />
+          <Stack.Screen name="Portal" component={Portal} />
+          </>
+          
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -58,4 +89,7 @@ const styles = StyleSheet.create({
     color: 'white',
     flex: 1,
   },
+  root: {
+    flex: 1,
+  }
 });
