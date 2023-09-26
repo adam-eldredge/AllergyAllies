@@ -4,6 +4,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Portal from './screens/Portal.js';
 import Alerts from './screens/Alerts.js';
+import AllAlerts from './screens/AllAlerts.js';
+import Reports from './screens/Reports.js';
 import HomeScreen from './screens/HomeScreen.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
@@ -67,6 +69,8 @@ export default function App({navigation}) {
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Alerts" component={Alerts} />
           <Stack.Screen name="Portal" component={Portal} />
+          <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
+          <Stack.Screen name="Reports" component={Reports}/>
           </>
           
         )}
