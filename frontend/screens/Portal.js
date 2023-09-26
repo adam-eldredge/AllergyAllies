@@ -15,17 +15,18 @@ export default function Portal({navigation}){
                   icon="alert"
                   iconColor="#1059d5"
                   size={30}
-                  onPress={() => console.log('Pressed')}
                   alignItems='center'
                />
             </TouchableOpacity> 
-            <TouchableOpacity style={styles.menuItem}>
+            <TouchableOpacity style={styles.menuItem}
+            onPress={() =>
+               navigation.navigate('Reports')
+             }>
                <Text style={styles.menuItemText}>Reports</Text>
                <IconButton
                   icon="newspaper-check"
                   iconColor="#1059d5"
                   size={30}
-                  onPress={() => console.log('Pressed')}
                   alignItems='center'
                />
             </TouchableOpacity> 
@@ -35,7 +36,6 @@ export default function Portal({navigation}){
                   icon="face-man-shimmer-outline"
                   iconColor="#1059d5"
                   size={30}
-                  onPress={() => console.log('Pressed')}
                   alignItems='center'
                />
             </TouchableOpacity> 
@@ -45,7 +45,6 @@ export default function Portal({navigation}){
                   icon="pencil"
                   iconColor="#1059d5"
                   size={30}
-                  onPress={() => console.log('Pressed')}
                   alignItems='center'
                />
             </TouchableOpacity> 
@@ -55,7 +54,6 @@ export default function Portal({navigation}){
                   icon="close"
                   iconColor="#1059d5"
                   size={30}
-                  onPress={() => console.log('Pressed')}
                   alignItems='center'
                />
             </TouchableOpacity> 
@@ -65,7 +63,6 @@ export default function Portal({navigation}){
                   icon="close"
                   iconColor="#1059d5"
                   size={30}
-                  onPress={() => console.log('Pressed')}
                   alignItems='center'
                />
             </TouchableOpacity> 

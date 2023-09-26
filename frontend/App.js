@@ -10,6 +10,8 @@ import HomeScreen from './screens/HomeScreen.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
 import SignUpScreen from './screens/SignUpScreen';
+import PatientHome from './screens/PatientHome.js';
+import Upcoming from './screens/Upcoming.js';
 import AuthContext from './AuthContext';
 import { useMemo, useReducer, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
@@ -113,6 +115,10 @@ export default function App({navigation}) {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="Portal" component={Portal} />
+            <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
+            <Stack.Screen name="Reports" component={Reports} />
+            <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Patient Home'}} />
+            <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
             </>
           )}
         </Stack.Navigator>

@@ -28,6 +28,13 @@ export default function HomeScreen({navigation}){
         }
       />
       <Button
+        title="PatientHome"
+        color="#1059d5"
+        onPress={() =>
+          navigation.navigate('PatientHome')
+        }
+      />
+      <Button
        title="Sign out"
        color="#1059d5"
        onPress={signOut} 
