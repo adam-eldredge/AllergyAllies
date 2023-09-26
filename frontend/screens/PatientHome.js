@@ -7,6 +7,7 @@ export default function PatientHome({navigation}){
       return (
          <ScrollView>
             <Text style = {styles.title}>Upcoming Walk-in Dates</Text>
+            <Text style = {styles.subtitle}>Tap for more info</Text>
             <TouchableOpacity style = {styles.appointment}
             onPress={() =>
                 navigation.navigate('Upcoming')
@@ -51,6 +52,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textDecorationLine: 'underline',
     },
+    subtitle :{
+        paddingTop: 20,
+        paddingBottom: 18,
+        textAlign: 'center',
+        fontSize: 14,
+        },
     appointment: {
         width: Dimensions.get('window').width - 30,
         marginLeft: 15,
@@ -65,6 +72,7 @@ const styles = StyleSheet.create({
     appointmentText: {
         fontSize: 17,
         marginBottom: 4,
+        textDecorationLine: 'underline',
     },
     appointmentSubtext: {
         fontSize: 12,
