@@ -1,13 +1,12 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
+import { useRoute } from '@react-navigation/native';
 
-class Alerts extends Component {
-   state = {
-   }
-   render() {
-      return (
-         <View>
+
+export default function Alerts({navigation}){
+   return (
+      <ScrollView>
             <Card style = {styles.alert}>
                <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
                   title="Patient Bob is at risk for attrition!"
@@ -69,13 +68,15 @@ class Alerts extends Component {
                />
             </Card>
             <View>
-            <Button style = {styles.bottomText}>View More Alerts</Button>
+            <Button
+            onPress={() =>
+            navigation.navigate('AllAlerts') }
+            textColor="#1059d5">
+               All Alerts</Button>
             </View>
-         </View>
-      )
-   }
-}
-export default Alerts
+         </ScrollView>
+   );
+ }
 
 const styles = StyleSheet.create({
    alert: {
@@ -86,19 +87,13 @@ const styles = StyleSheet.create({
       borderRadius: 8,
       borderWidth: 3,
       borderColor: '#1059d5'
-   },
-   bottomText: {
-      color: '#1059d5',
-      fontSize: 80,
-      textAlign: 'center',
-      marginTop: 20,
    }
 })
 
 const showAlert = () =>
   Alert.alert(
     'Delete this alert?',
-    'This action cannot be undone.',
+    'It will still be accessible in "All Alerts"',
     [
       {
         text: 'Cancel',
