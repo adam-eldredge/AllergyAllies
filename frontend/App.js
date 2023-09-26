@@ -19,62 +19,7 @@ import * as SecureStore from 'expo-secure-store';
 const Stack = createNativeStackNavigator();
 
 
-  /* function HomeScreen() {
-  const { signOut } = React.useContext(AuthContext);
-
-  return (
-    <View>
-      <Text>Signed in!</Text>
-      <Button title="Sign out" onPress={signOut} />
-    </View>
-  );
-}
-
-
-function SignInScreen() {
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-
-  const { signIn } = React.useContext(AuthContext);
-
-  return (
-    <View>
-      <TextInput
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <Button title="Sign in" onPress={() => signIn({ username, password })} />
-    </View>
-  );
-}   */
-
-
 export default function App({navigation}) {
-  // Get authentication state and restoreToken function
-  //const { state, restoreToken } = useAuth(); 
-
- /* useEffect(() => {
-    // Check if the user is already authenticated when the app starts
-    const bootstrapAsync = async () => {
-      try {
-        const userToken = await SecureStore.getItemAsync('userToken');
-        if (userToken) {
-          restoreToken(userToken);
-        }
-      } catch (e) {
-        // Handle errors
-      }
-    };
-
-    bootstrapAsync();
-  }, [restoreToken]); */
 
   const initialState = {
     isLoading: true,
@@ -138,14 +83,6 @@ export default function App({navigation}) {
   );
 
   return (
-   /* <AuthProvider>
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="SignIn" component={SignInScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  </AuthProvider> */
 
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
