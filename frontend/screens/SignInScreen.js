@@ -1,32 +1,42 @@
-import * as React from 'react';
-import {Text, TextInput, View, TouchableOpacity, Button, ActivityIndicator, StyleSheet,} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useContext, useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import AuthContext from '../AuthContext';
 
-export default function SignInScreen({navigation, route}) {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const { setUserToken } = route.params;
+export default function SignInScreen({navigation}) {
+  const { signIn } = useContext(AuthContext);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignIn = () => {
+    if (email && password) {
+      signIn(email, password); // Authenticate the user
+    } else {
+      // Handle validation error
+    }
+  };
 
   return (
+    <AuthContext.Provider>
     <View style = {styles.container}>
     <Text style = {styles.title}>Allergy Ally</Text>
        <TextInput style = {styles.input}
                underlineColorAndroid = "transparent"
                placeholder = "Email"
+               value = {email}
                autoCapitalize = "none"
                onChangeText = {setEmail}/>
             
             <TextInput style = {styles.input}
                underlineColorAndroid = "transparent"
                placeholder = "Password"
+               value = {password}
                autoCapitalize = "none"
                onChangeText = {setPassword}
                secureTextEntry={true}/>
 
             <TouchableOpacity
                style = {styles.logInButton}
-               onPress={() => setUserToken('token')}>
+               onPress={handleSignIn}>
                <Text style = {styles.logInButtonText}> Log In </Text>
             </TouchableOpacity>
 
@@ -42,6 +52,7 @@ export default function SignInScreen({navigation, route}) {
             </TouchableOpacity>
             </View>
     </View>
+    </AuthContext.Provider>
   );
 }
 

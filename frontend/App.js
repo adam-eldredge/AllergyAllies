@@ -10,73 +10,179 @@ import HomeScreen from './screens/HomeScreen.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
 import SignUpScreen from './screens/SignUpScreen';
+import AuthContext from './AuthContext';
+import { useMemo, useReducer, useEffect } from 'react';
+import * as SecureStore from 'expo-secure-store';
+
 
 
 const Stack = createNativeStackNavigator();
 
-export default function App({navigation}) {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [userToken, setUserToken] = React.useState(null);
 
-  const getUserToken = async () => {
-    // testing purposes
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-    try {
-      // custom logic
-      await sleep(2000);
-      const token = null;
-      setUserToken(token);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    getUserToken();
-  }, []);
-
-  if (isLoading) {
-    // We haven't finished checking for the token yet
-    return <LoadingScreen />;
-  }
-
+  /* function HomeScreen() {
+  const { signOut } = React.useContext(AuthContext);
 
   return (
+    <View>
+      <Text>Signed in!</Text>
+      <Button title="Sign out" onPress={signOut} />
+    </View>
+  );
+}
+
+
+function SignInScreen() {
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const { signIn } = React.useContext(AuthContext);
+
+  return (
+    <View>
+      <TextInput
+        placeholder="Username"
+        value={username}
+        onChangeText={setUsername}
+      />
+      <TextInput
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <Button title="Sign in" onPress={() => signIn({ username, password })} />
+    </View>
+  );
+}   */
+
+
+export default function App({navigation}) {
+  // Get authentication state and restoreToken function
+  //const { state, restoreToken } = useAuth(); 
+
+ /* useEffect(() => {
+    // Check if the user is already authenticated when the app starts
+    const bootstrapAsync = async () => {
+      try {
+        const userToken = await SecureStore.getItemAsync('userToken');
+        if (userToken) {
+          restoreToken(userToken);
+        }
+      } catch (e) {
+        // Handle errors
+      }
+    };
+
+    bootstrapAsync();
+  }, [restoreToken]); */
+
+  const initialState = {
+    isLoading: true,
+    isSignout: false,
+    userToken: null,
+  };
+
+  const [state, dispatch] = useReducer(
+    (prevState, action) => {
+      switch (action.type) {
+        case 'RESTORE_TOKEN':
+          return {
+            ...prevState,
+            userToken: action.token,
+            isLoading: false,
+          };
+        case 'SIGN_IN':
+          return {
+            ...prevState,
+            isSignout: false,
+            userToken: action.token,
+          };
+        case 'SIGN_OUT':
+          return {
+            ...prevState,
+            isSignout: true,
+            userToken: null,
+          };
+      }
+    },
+    initialState // Use the initial state here
+  );
+
+  useEffect(() => {
+    const bootstrapAsync = async () => {
+      let userToken;
+
+      try {
+        // Restore token stored in `SecureStore` or any other encrypted storage
+        // userToken = await SecureStore.getItemAsync('userToken');
+      } catch (e) {
+        // Restoring token failed
+      }
+
+      dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+    };
+
+    bootstrapAsync();
+  }, []);
+
+
+  const authContext = useMemo(
+    () => ({
+      signIn: async (data) => {
+        // In a production app, you would implement sign-in logic here
+        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
+      },
+      signOut: () => dispatch({ type: 'SIGN_OUT' }),
+    }),
+    []
+  );
+
+  return (
+   /* <AuthProvider>
     <NavigationContainer>
-    <Stack.Navigator
-      screenOptions={() => ({
+      <Stack.Navigator>
+        <Stack.Screen name="SignIn" component={SignInScreen} />
+        <Stack.Screen name="Home" component={HomeScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  </AuthProvider> */
+
+    <AuthContext.Provider value={authContext}>
+      <NavigationContainer>
+        <Stack.Navigator  screenOptions={() => ({
         headerTitleStyle: styles.headerTitleStyle,
         headerStyle: { backgroundColor: '#1059d5'},
         headerTintColor: 'white'
-      })}>
-         {userToken == null ? (
-          // No token found, user isn't signed in
-          <>
-          <Stack.Screen
-            name="SignIn"
-            component={SignInScreen}
-            options={{
-              title: 'Sign in',
-            }}
-            initialParams={{ setUserToken }}
-          />
-          <Stack.Screen name="SignUp" component={SignUpScreen} />
-          </>
-          
-        ) : (
-          // User is signed in
-          <>
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Alerts" component={Alerts} />
-          <Stack.Screen name="Portal" component={Portal} />
-          <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
-          <Stack.Screen name="Reports" component={Reports}/>
-          </>
-          
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+        })}>
+          {state.isLoading ? (
+            // We haven't finished checking for the token yet
+            <Stack.Screen name="Loading" component={LoadingScreen} />
+          ) : state.userToken == null ? (
+            // No token found, user isn't signed in
+            <>
+            <Stack.Screen
+              name="SignIn"
+              component={SignInScreen}
+              options={{
+                title: 'Sign in',
+                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+              }}
+            />
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            </>
+          ) : (
+            // User is signed in
+            <>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="Alerts" component={Alerts} />
+            <Stack.Screen name="Portal" component={Portal} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthContext.Provider> 
   );
+
 }
 
 const styles = StyleSheet.create({

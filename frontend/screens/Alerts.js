@@ -3,10 +3,9 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert,
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 
-
 export default function Alerts({navigation}){
-   return (
-      <ScrollView>
+      return (
+         <View>
             <Card style = {styles.alert}>
                <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
                   title="Patient Bob is at risk for attrition!"
@@ -74,9 +73,9 @@ export default function Alerts({navigation}){
             textColor="#1059d5">
                All Alerts</Button>
             </View>
-         </ScrollView>
-   );
- }
+         </View>
+      )
+   }
 
 const styles = StyleSheet.create({
    alert: {

@@ -6,8 +6,10 @@ import { AuthContext } from '../App.js'
 
 export default function SignUpScreen() {
   return (
+    <AuthProvider>
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
     <Text>Placeholder</Text>
   </View>
+  </AuthProvider>
   );
   }
