@@ -12,6 +12,7 @@ import LoadingScreen from './screens/LoadingScreen.js';
 import SignUpScreen from './screens/SignUpScreen';
 import PatientHome from './screens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
+import UpcomingInfo from './screens/UpcomingInfo.js';
 import AuthContext from './AuthContext';
 import { useMemo, useReducer, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
@@ -119,6 +120,7 @@ export default function App({navigation}) {
             <Stack.Screen name="Reports" component={Reports} />
             <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Patient Home'}} />
             <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
+            <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
             </>
           )}
         </Stack.Navigator>

@@ -5,7 +5,7 @@ import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react
 
 export default function Portal({navigation}){
       return (
-         <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap'}}>
+         <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 22}}>
             <TouchableOpacity style={styles.menuItem}
             onPress={() =>
                navigation.navigate('Alerts')
@@ -77,17 +77,19 @@ const styles = StyleSheet.create({
    menuItem: {
       padding: 10,
       margin: 15,
-      height: 120,
-      width: 100,
+      height: 150,
+      width: 150,
       justifyContent: "center",
       alignItems: "center",
       borderRadius: 8,
       borderWidth: 3,
-      borderColor: '#1059d5'
+      backgroundColor: '#d1ddf2',
+      borderColor: '#1059d5',
    },
    menuItemText:{
       color: '#1059d5',
       textAlign: 'center',
-      fontSize: 16,
+      fontSize: 20,
+      fontWeight: '600',
    }
 })

@@ -6,35 +6,53 @@ import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react
 export default function PatientHome({navigation}){
       return (
          <ScrollView>
-            <Text style = {styles.title}>Upcoming Walk-in Dates</Text>
-            <Text style = {styles.subtitle}>Tap for more info</Text>
+            <Text style = {styles.title1}>Upcoming Walk-in Dates</Text>
+            <Text style = {styles.subtitle}>Tap on a time range for more info:</Text>
             <TouchableOpacity style = {styles.appointment}
             onPress={() =>
                 navigation.navigate('Upcoming')
               }>
                 <Text style={styles.appointmentText}>Monday 10/9/2023 - Friday 10/13/2023</Text>
             </TouchableOpacity>
-            <TouchableOpacity style = {styles.appointment}>
-                <Text style={styles.appointmentText}>Monday 10/9/2023 - Friday 10/13/2023</Text>
+            <TouchableOpacity style = {styles.appointment}
+            onPress={() =>
+                navigation.navigate('Upcoming')
+              }>
+                <Text style={styles.appointmentText}>Monday 10/16/2023 - Friday 10/20/2023</Text>
             </TouchableOpacity>
-            <TouchableOpacity style = {styles.appointment}>
-                <Text style={styles.appointmentText}>Monday 10/9/2023 - Friday 10/13/2023</Text>
+            <TouchableOpacity style = {styles.appointment}
+            onPress={() =>
+                navigation.navigate('Upcoming')
+              }>
+                <Text style={styles.appointmentText}>Monday 10/30/2023 - Friday 11/03/2023</Text>
             </TouchableOpacity>
 
             <Text style={styles.container}></Text>
-            <Text style = {styles.title}>Past Appointment Dates</Text>
-            <View style = {styles.appointmentAttended}>
-                <Text style={styles.appointmentText}>Monday 9/25/2023</Text>
+            <Text style = {styles.title2}>Past Appointment Dates</Text>
+            <View style = {styles.pastAppointment}>
+                <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
+                <View style={styles.flags}>
+                    <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended </Text>
+                </View>
             </View>
-            <View style = {styles.appointmentAdverse}>
-                <Text style={styles.appointmentText}>Thursday 9/14/2023</Text>
+            <View style = {styles.pastAppointment}>
+                <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
+                <View style={styles.flags}>
+                    <Text style={{color: 'white', backgroundColor:'#e55555', marginRight: 10}}> Missed </Text>
+                </View>
             </View>
-            <View style = {styles.appointmentAttended}>
-                <Text style={styles.appointmentText}>Thursday 9/14/2023</Text>
+            <View style = {styles.pastAppointment}>
+                <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
+                <View style={styles.flags}>
+                    <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended </Text>
+                    <Text style={{color: 'white', backgroundColor:'#e66624', marginRight: 10}}> Adverse Reaction </Text>
+                </View>
             </View>
-            <View style = {styles.appointmentAttended}>
-                <Text style={styles.appointmentText}>Thursday 9/14/2023</Text>
-                <Text style={styles.appointmentSubtext}>Thursday 9/14/2023</Text>
+            <View style = {styles.pastAppointment}>
+                <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
+                <View style={styles.flags}>
+                    <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended </Text>
+                </View>
             </View>
          </ScrollView>
       )
@@ -44,27 +62,34 @@ const styles = StyleSheet.create({
    container: {
       paddingTop: 30
    },
-   title :{
+    title1 :{
     paddingTop: 20,
-    paddingBottom: 18,
+    marginBottom: 5,
     textAlign: 'center',
-    fontSize: 20,
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
+    fontSize: 22,
+    fontWeight: '600',
+    },
+    title2 :{
+        paddingTop: 20,
+        marginBottom: 15,
+        textAlign: 'center',
+        fontSize: 22,
+        fontWeight: '600',
     },
     subtitle :{
-        paddingTop: 20,
-        paddingBottom: 18,
+        paddingBottom: 15,
         textAlign: 'center',
-        fontSize: 14,
-        },
+        fontSize: 16,
+        color: '#545454',
+        fontStyle: 'italic',
+    },
     appointment: {
         width: Dimensions.get('window').width - 30,
         marginLeft: 15,
-        marginBottom: 2,
-        height: 50,
+        marginBottom: 8,
+        height: 60,
         borderRadius: 8,
-        backgroundColor: '#b3caf2',
+        backgroundColor: '#d1ddf2',
         justifyContent: 'center',
         paddingLeft: 20,
         textstyle:{fontsize: 60}
@@ -72,31 +97,33 @@ const styles = StyleSheet.create({
     appointmentText: {
         fontSize: 17,
         marginBottom: 4,
-        textDecorationLine: 'underline',
+        fontWeight: '500',
     },
-    appointmentSubtext: {
-        fontSize: 12,
+    pastAppointmentText: {
+        fontSize: 17,
+        marginBottom: 10,
+        fontWeight: '500',
+        marginTop: 12,
     },
-    appointmentAdverse: {
+    pastAppointment: {
         width: Dimensions.get('window').width - 30,
         marginLeft: 15,
-        marginBottom: 2,
-        height: 50,
+        marginBottom: 10,
+        height: 70,
         borderRadius: 8,
-        backgroundColor: '#f39aac',
-        justifyContent: 'center',
+        backgroundColor: '#d1ddf2',
         paddingLeft: 20,
         textstyle:{fontsize: 60}
     },
-    appointmentAttended: {
-        width: Dimensions.get('window').width - 30,
-        marginLeft: 15,
-        marginBottom: 2,
-        height: 50,
-        borderRadius: 8,
-        backgroundColor: '#a7cf91',
-        justifyContent: 'center',
-        paddingLeft: 20,
-        textstyle:{fontsize: 60}
+    flags: {
+        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        //marginTop: 10,
+    },
+    flagText: {
+        backgroundColor: 'red',
+        color: 'white',
     },
 })

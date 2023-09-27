@@ -9,7 +9,7 @@ class AllAlerts extends Component {
       return (
          <ScrollView style={styles.container}>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Patient Bob is at risk for attrition!"
                   subtitle="9/17/2023"
                   right={(props) => <IconButton
@@ -21,7 +21,7 @@ class AllAlerts extends Component {
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Patient Rob’s injections are expiring or will soon need to be mixed"
                   subtitle="9/17/2023"
                   right={(props) => <IconButton
@@ -33,7 +33,7 @@ class AllAlerts extends Component {
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 3"
                   subtitle="9/16/2023"
                   right={(props) => <IconButton
@@ -45,7 +45,7 @@ class AllAlerts extends Component {
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 4"
                   subtitle="9/15/2023"
                   right={(props) => <IconButton
@@ -57,7 +57,7 @@ class AllAlerts extends Component {
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 5"
                   subtitle="9/15/2023"
                   right={(props) => <IconButton
@@ -69,7 +69,7 @@ class AllAlerts extends Component {
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 6"
                   subtitle="9/14/2023"
                   right={(props) => <IconButton
@@ -81,7 +81,7 @@ class AllAlerts extends Component {
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 7"
                   subtitle="9/12/2023"
                   right={(props) => <IconButton
@@ -93,7 +93,7 @@ class AllAlerts extends Component {
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 8"
                   subtitle="9/10/2023"
                   right={(props) => <IconButton
@@ -113,11 +113,11 @@ export default AllAlerts
 const styles = StyleSheet.create({
    alert: {
       width: Dimensions.get('window').width - 30,
-      height: 80,
+      height: 70,
       marginLeft: 15,
-      marginTop: 15,
+      marginTop: 20,
       borderRadius: 8,
-      borderWidth: 3,
+      borderWidth: 2,
       borderColor: '#1059d5'
    },
 })

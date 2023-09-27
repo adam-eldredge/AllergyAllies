@@ -7,7 +7,7 @@ export default function Alerts({navigation}){
       return (
          <View>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Patient Bob is at risk for attrition!"
                   subtitle="9/17/2023"
                   right={(props) => <IconButton
@@ -19,7 +19,7 @@ export default function Alerts({navigation}){
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Patient Rob’s injections are expiring or will soon need to be mixed"
                   subtitle="9/17/2023"
                   right={(props) => <IconButton
@@ -31,7 +31,7 @@ export default function Alerts({navigation}){
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 3"
                   subtitle="9/16/2023"
                   right={(props) => <IconButton
@@ -43,7 +43,7 @@ export default function Alerts({navigation}){
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 4"
                   subtitle="9/15/2023"
                   right={(props) => <IconButton
@@ -55,7 +55,7 @@ export default function Alerts({navigation}){
                />
             </Card>
             <Card style = {styles.alert}>
-               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"bold" }} subtitleStyle={{color:"#1059d5"}}
+               <Card.Title titleStyle={{ color: "#1059d5", fontWeight:"600" }} subtitleStyle={{color:"#1059d5"}}
                   title="Sample Alert 5"
                   subtitle="9/15/2023"
                   right={(props) => <IconButton
@@ -67,11 +67,11 @@ export default function Alerts({navigation}){
                />
             </Card>
             <View>
-            <Button
-            onPress={() =>
-            navigation.navigate('AllAlerts') }
-            textColor="#1059d5">
-               All Alerts</Button>
+            <TouchableOpacity
+               onPress={() =>
+               navigation.navigate('AllAlerts') }>
+               <Text style = {styles.bottomText}>Tap to View All Alerts</Text>
+            </TouchableOpacity>
             </View>
          </View>
       )
@@ -80,12 +80,20 @@ export default function Alerts({navigation}){
 const styles = StyleSheet.create({
    alert: {
       width: Dimensions.get('window').width - 30,
-      height: 80,
+      height: 70,
       marginLeft: 15,
-      marginTop: 15,
+      marginTop: 20,
       borderRadius: 8,
-      borderWidth: 3,
+      borderWidth: 2,
       borderColor: '#1059d5'
+   },
+   bottomText: {
+      paddingTop: 20,
+      color: '#1059d5',
+      alignSelf: 'center',
+      fontSize: 17,
+      fontWeight: '500',
+      textDecorationLine: 'underline',
    }
 })
 
