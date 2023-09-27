@@ -9,7 +9,7 @@ import Reports from './screens/Reports.js';
 import HomeScreen from './screens/HomeScreen.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
-import SignUpScreen from './screens/SignUpScreen';
+import PatientSignUpScreen from './screens/PatientSignUpScreen';
 import PatientHome from './screens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
 import UpcomingInfo from './screens/UpcomingInfo.js';
@@ -108,7 +108,7 @@ export default function App({navigation}) {
                 animationTypeForReplace: state.isSignout ? 'pop' : 'push',
               }}
             />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} />
             </>
           ) : (
             // User is signed in
@@ -121,6 +121,7 @@ export default function App({navigation}) {
             <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Patient Home'}} />
             <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
             <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
+            <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
             </>
           )}
         </Stack.Navigator>

@@ -43,7 +43,9 @@ export default function SignInScreen({navigation}) {
       <Text style = {styles.bottomText2}>Don't have an account yet?</Text>
             <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
             <TouchableOpacity
-               style = {styles.signUpButton}>
+               style = {styles.signUpButton}
+               onPress={() =>
+                  navigation.navigate('PatientSignUpScreen') }>
                <Text style = {styles.logInButtonText}>I am a patient</Text>
             </TouchableOpacity>
             <TouchableOpacity
