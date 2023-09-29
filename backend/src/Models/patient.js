@@ -9,12 +9,12 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
-    password: {
+    email: {
         required: true,
         type: String
     },
-    email: {
-        required: false,
+    password: {
+        required: true,
         type: String
     },
     DoB: {

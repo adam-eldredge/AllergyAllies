@@ -1,22 +1,47 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import AuthContext from '../AuthContext';
+import axios from 'axios';
+import jwt_decode from 'jwt-decode';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 export default function SignInScreen({navigation}) {
   const { signIn } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     if (email && password) {
-      signIn(email, password); // Authenticate the user
-    } else {
-      // Handle validation error
-    }
+      try {
+         const authData = {
+            email,
+            password
+         };
+         
+         const response = await axios.post('http://127.0.0.1:5000/auth/', authData);
+         console.log(response);
+         // response successful
+         if (response.status === 200) {
+            const userToken = response.data.accessToken;
+            const decodedToken = jwt_decode(userToken);
+  
+            await AsyncStorage.setItem('userToken', userToken);
+            // data from token
+            // const userEmail = decodedToken.UserInfo.email;
+            // console.log(userEmail)
+            signIn(userToken);
+         } else {
+            console.log("Error with response ", response.status);
+         }
+
+      } catch (error) {
+         console.log(error, " Error"); 
+      }
+    } 
   };
 
   return (
-    <AuthContext.Provider>
     <View style = {styles.container}>
     <Text style = {styles.title}>Allergy Ally</Text>
        <TextInput style = {styles.input}
@@ -54,7 +79,6 @@ export default function SignInScreen({navigation}) {
             </TouchableOpacity>
             </View>
     </View>
-    </AuthContext.Provider>
   );
 }
 

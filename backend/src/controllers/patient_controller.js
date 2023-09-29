@@ -3,13 +3,14 @@ const patient = require('../Models/patient');
 
 // Post method
 exports.addPatient = async (req, res) => {
-    const data = new patient({
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        password: req.body.password
-    });
-
     try {
+        const data = new patient({
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            password: req.body.password,
+            email: req.body.email
+        });
+        
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
     }

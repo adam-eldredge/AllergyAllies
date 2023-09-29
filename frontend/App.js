@@ -1,5 +1,6 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView } from 'react-native'
+// import axios from 'axios';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView, Platform} from 'react-native'
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Portal from './screens/Portal.js';
@@ -15,9 +16,11 @@ import Upcoming from './screens/Upcoming.js';
 import UpcomingInfo from './screens/UpcomingInfo.js';
 import AuthContext from './AuthContext';
 import { useMemo, useReducer, useEffect } from 'react';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+// import * as SecureStore from 'expo-secure-store';
+import jwt_decode from 'jwt-decode';
 
-
+// Secure store doesn't work on web, only iOS and android ^
 
 const Stack = createNativeStackNavigator();
 
@@ -61,13 +64,19 @@ export default function App({navigation}) {
       let userToken;
 
       try {
-        // Restore token stored in `SecureStore` or any other encrypted storage
-        // userToken = await SecureStore.getItemAsync('userToken');
+        // restore token - see SignInScreen for how to decrypt
+        userToken = await AsyncStorage.getItem('userToken');
       } catch (e) {
         // Restoring token failed
+        console.error('Error:', e);
       }
 
-      dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+      if (userToken) {
+        dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+      } 
+      else {
+        dispatch({ type: 'RESTORE_TOKEN', token: null });
+      }
     };
 
     bootstrapAsync();
@@ -77,10 +86,13 @@ export default function App({navigation}) {
   const authContext = useMemo(
     () => ({
       signIn: async (data) => {
-        // In a production app, you would implement sign-in logic here
-        dispatch({ type: 'SIGN_IN', token: 'dummy-auth-token' });
+        await AsyncStorage.setItem('userToken', data);
+        dispatch({ type: 'SIGN_IN', token: data });
       },
-      signOut: () => dispatch({ type: 'SIGN_OUT' }),
+      signOut: async () => {
+        await AsyncStorage.removeItem('userToken');
+        dispatch({ type: 'SIGN_OUT'});
+      },
     }),
     []
   );

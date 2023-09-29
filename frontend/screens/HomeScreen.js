@@ -11,7 +11,6 @@ export default function HomeScreen({navigation}){
   const { signOut } = useContext(AuthContext);
 
     return (
-      <AuthContext.Provider>
        <View>
         <Button
         title="Alerts"
@@ -40,6 +39,5 @@ export default function HomeScreen({navigation}){
        onPress={signOut} 
        />
        </View> 
-       </AuthContext.Provider>
     );
   }

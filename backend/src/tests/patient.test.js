@@ -1,6 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const {app, server} = require('../index');
+const {app} = require('../index');
 
 /* npx jest file/path/.js */
 
@@ -32,5 +32,5 @@ describe('/api/addPatient and /api/deletePatient', () => {
 
 afterAll(async () => {
     await mongoose.connection.close();
-    await server.close();
+    //await server.close();
 });

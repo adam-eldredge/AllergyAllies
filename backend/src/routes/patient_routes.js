@@ -1,5 +1,5 @@
 const express = require('express');
-const router = express.Router()
+const router = express.Router();
 const patientController = require('../controllers/patient_controller');
 
 // POST localhost:5000/api/addPatient
