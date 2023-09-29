@@ -19,7 +19,9 @@ export default function SignInScreen({navigation}) {
             password
          };
          
-         const response = await axios.post('http://127.0.0.1:5000/auth/', authData);
+         // this needs to have your ip address for android (probably iOS too). 
+         // get ip quickly from "Metro waiting on exp://<ip>:port"
+         const response = await axios.post('http://localhost:5000/auth/', authData);
          console.log(response);
          // response successful
          if (response.status === 200) {
