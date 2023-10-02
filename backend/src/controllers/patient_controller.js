@@ -4,29 +4,44 @@ const patient = require('../Models/patient');
 // Post method
 exports.addPatient = async (req, res) => {
     try {
+        const { firstName, lastName, email, password } = req.body;
         const data = new patient({
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            password: req.body.password,
-            email: req.body.email
+            firstName, lastName, email, password
         });
-        
+
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
     }
     catch (error) {
-        res.status(400).json({message: error.message});
+        res.status(400).json({ message: error.message });
     }
 }
 
 // Get all method
 exports.getAllPatients = async (req, res) => {
-    try{
+    try {
         const data = await patient.find();
         res.json(data)
     }
-    catch(error){
-        res.status(500).json({message: error.message})
+    catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
+// Get patient by email
+exports.getPatient = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const data = await patient.findOne({ email: email })
+        if (data === null) {
+            res.sendStatus(200);
+        }
+        else {
+            res.sendStatus(201);
+        }
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
     }
 }
 
@@ -35,13 +50,13 @@ exports.deletePatient = async (req, res) => {
     try {
         const id = req.params.id;
         const patientToDelete = await patient.findById(id);
-        if(!patientToDelete) {
-            res.status(404).json({ message: "Patient not found"});
+        if (!patientToDelete) {
+            res.status(404).json({ message: "Patient not found" });
         }
         const firstname = patientToDelete.firstname;
-        
+
         await patient.findByIdAndDelete(id);
-        res.status(200).json({ message: `Document with ${firstname} has been deleted..`});
+        res.status(200).json({ message: `Document with ${firstname} has been deleted..` });
     }
     catch (error) {
         res.status(400).json({ message: error.message })
