@@ -11,6 +11,7 @@ import HomeScreen from './screens/HomeScreen.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
 import PatientSignUpScreen from './screens/PatientSignUpScreen';
+import ProviderSignUpScreen from './screens/ProviderSignUpScreen';
 import PatientHome from './screens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
 import UpcomingInfo from './screens/UpcomingInfo.js';
@@ -121,6 +122,7 @@ export default function App({navigation}) {
               }}
             />
             <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} />
+            <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} />
             </>
           ) : (
             // User is signed in
@@ -134,6 +136,7 @@ export default function App({navigation}) {
             <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
             <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
             <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
+            <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
             </>
           )}
         </Stack.Navigator>
