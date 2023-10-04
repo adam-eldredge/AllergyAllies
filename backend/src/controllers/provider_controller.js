@@ -30,7 +30,7 @@ exports.getAllProviders = async (req, res) => {
 // Get provider by email
 exports.getProvider = async (req, res) => {
     try {
-        const { email } = req.body;
+        const email = req.body.email.toString();
         const data = await provider.findOne({ email: email })
         if (data === null) {
             res.sendStatus(200);

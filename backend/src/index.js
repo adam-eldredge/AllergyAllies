@@ -4,6 +4,8 @@ const dotenv = require('dotenv').config();
 // Use "npm run server" to have BE server restart when changed (requires nodemon)
 
 const app = express();
+// To protect version information
+app.disable('x-powered=by');
 
 // CORS
 const corsMiddleware = require('./middleware/cors');

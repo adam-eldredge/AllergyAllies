@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken')
 // const asyncHandler = require('express-async-handler')
 
 exports.login = async(req, res) => {
-    const { email, password } = req.body;
+    const email = req.body.email.toString();
+    const password = req.body.password.toString();
 
     // input verification
     if (!email || !password) {
