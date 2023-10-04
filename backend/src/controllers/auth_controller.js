@@ -18,14 +18,14 @@ exports.login = async(req, res) => {
 
     if (!foundUser) { 
         console.log("User not found")
-        return res.status(401).json({ message: 'Unauthorized_1' });
+        return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const match = password == foundUser.password ? true : false;
 
     if (!match) {
         console.log("Password doesn't match")
-        return res.status(401).json({ message: 'Unauthorized_2' });
+        return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const accessToken = jwt.sign(

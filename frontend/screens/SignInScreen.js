@@ -8,11 +8,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignInScreen({navigation}) {
   const { signIn } = useContext(AuthContext);
+  const [display, setDisplay] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
 
   const handleSignIn = async () => {
+   setDisplay('Loading...');
     if (email && password) {
       try {
          const authData = {
@@ -39,9 +41,13 @@ export default function SignInScreen({navigation}) {
          }
 
       } catch (error) {
+         setDisplay(error.response.data.message);
          console.log(error, " Error"); 
       }
-    } 
+    }
+    else {
+      setDisplay('All fields required!');
+    }
   };
 
   return (
@@ -62,6 +68,7 @@ export default function SignInScreen({navigation}) {
                onChangeText = {setPassword}
                secureTextEntry={true}/>
 
+            <Text style = {styles.message}>{display}</Text>
             <TouchableOpacity
                style = {styles.logInButton}
                onPress={handleSignIn}>
@@ -101,6 +108,11 @@ const styles = StyleSheet.create({
      fontSize: 20,
      fontWeight: 'bold',
      color: '#1059d5',
+  },
+  message: {
+      textAlign: 'center',
+      fontSize: 12,
+      color: '#DC143C',
   },
   input: {
      margin: 15,

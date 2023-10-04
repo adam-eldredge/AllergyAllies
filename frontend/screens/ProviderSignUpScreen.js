@@ -39,7 +39,6 @@ export default function ProviderSignUpScreen() {
           const emailExists = await axios.post('http://localhost:5000/api/getProvider', { email });
 
           if (emailExists.status === 200) {
-            setDisplay('Account created!');
             const response = await axios.post('http://localhost:5000/api/addProvider', data);
             console.log(response);
           }
@@ -121,7 +120,7 @@ export default function ProviderSignUpScreen() {
         secureTextEntry={true} />
 
 
-      {display}
+      <Text style={styles.message}>{display}</Text>
       <TouchableOpacity
         style={styles.logInButton}
         onPress={handleSignUp}>
@@ -142,6 +141,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1059d5',
   },
+  message: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#DC143C',
+},
   shortInput: {
     margin: 15,
     flexGrow: 1,
