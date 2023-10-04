@@ -5,7 +5,7 @@ const dotenv = require('dotenv').config();
 
 const app = express();
 // To protect version information
-app.disable('x-powered=by');
+app.disable('x-powered-by');
 
 // CORS
 const corsMiddleware = require('./middleware/cors');
