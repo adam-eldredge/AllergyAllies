@@ -117,6 +117,8 @@ export default function App({navigation}) {
               component={SignInScreen}
               options={{
                 title: 'Sign in',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
                 animationTypeForReplace: state.isSignout ? 'pop' : 'push',
               }}
             />
