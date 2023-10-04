@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { Dimensions, View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import AuthContext from '../AuthContext';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
@@ -10,6 +10,7 @@ export default function SignInScreen({navigation}) {
   const { signIn } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
 
   const handleSignIn = async () => {
     if (email && password) {
@@ -84,9 +85,14 @@ export default function SignInScreen({navigation}) {
   );
 }
 
+const { width, height } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
-     paddingTop: 23
+     paddingTop: 23, 
+     alignItems: height > width ? null : 'center',
+     justifyContent: height > width ? null : 'center',
+     flex: 1
   },
   title :{
      textAlign: 'center',
@@ -97,6 +103,7 @@ const styles = StyleSheet.create({
   input: {
      margin: 15,
      height: 40,
+     width: height > width ? null : 300,
      borderColor: '#1059d5',
      borderWidth: 1,
      padding: 10
@@ -106,6 +113,7 @@ const styles = StyleSheet.create({
      padding: 10,
      margin: 15,
      height: 40,
+     width: height > width ? null : 300,
      justifyContent: 'center',
      borderRadius: 8,
   },
