@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken')
 // const asyncHandler = require('express-async-handler')
 
 exports.login = async(req, res) => {
-    const { email, password } = req.body;
+    const email = req.body.email.toString();
+    const password = req.body.password.toString();
 
     // input verification
     if (!email || !password) {
@@ -17,14 +18,14 @@ exports.login = async(req, res) => {
 
     if (!foundUser) { 
         console.log("User not found")
-        return res.status(401).json({ message: 'Unauthorized_1' });
+        return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const match = password == foundUser.password ? true : false;
 
     if (!match) {
         console.log("Password doesn't match")
-        return res.status(401).json({ message: 'Unauthorized_2' });
+        return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     const accessToken = jwt.sign(

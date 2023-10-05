@@ -29,7 +29,6 @@ export default function PatientSignUpScreen() {
           const emailExists = await axios.post('http://localhost:5000/api/getPatient', { email });
 
           if (emailExists.status === 200) {
-            setDisplay('Account created!');
             const response = await axios.post('http://localhost:5000/api/addPatient', data);
             console.log(response);
           }
@@ -95,7 +94,7 @@ export default function PatientSignUpScreen() {
         secureTextEntry={true} />
 
 
-      {display}
+      <Text style={styles.message}>{display}</Text>
       <TouchableOpacity
         style={styles.logInButton}
         onPress={handleSignUp}>
@@ -116,6 +115,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1059d5',
   },
+  message: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#DC143C',
+},
   shortInput: {
     margin: 15,
     flexGrow: 1,

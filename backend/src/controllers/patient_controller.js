@@ -31,7 +31,7 @@ exports.getAllPatients = async (req, res) => {
 // Get patient by email
 exports.getPatient = async (req, res) => {
     try {
-        const { email } = req.body;
+        const email = req.body.email.toString();
         const data = await patient.findOne({ email: email })
         if (data === null) {
             res.sendStatus(200);
