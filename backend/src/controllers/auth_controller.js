@@ -14,8 +14,10 @@ exports.login = async(req, res) => {
     }
 
     // find user in database - update for providers
-    const foundUser = await patient.findOne({ email }).exec();
-    const role = 2;
+    const foundPatient = await patient.findOne({ email }).exec();
+    const foundProvider = await patient.findOne({ email }).exec();
+    let foundUser = foundPatient;
+    let role = 0;
 
     if (!foundUser && !foundProvider) { 
         console.log("Patient/Provider not found.")
@@ -27,7 +29,6 @@ exports.login = async(req, res) => {
     } else {
         console.log("Patient found.")
         role = 2;
-        foundUser = foundPatient;
     }
 
     const match = password == foundUser.password ? true : false;
