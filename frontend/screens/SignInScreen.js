@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   message: {
       textAlign: 'center',
       fontSize: 12,
-      color: '#DC143C',
+      color: '#1e7d09',
   },
   input: {
      margin: 15,

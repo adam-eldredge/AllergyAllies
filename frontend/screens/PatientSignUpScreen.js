@@ -1,12 +1,11 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { AuthContext, AuthProvider } from '../App.js'
 import axios from 'axios';
 
-
 export default function PatientSignUpScreen() {
-
+  var success = true;
   const [display, setDisplay] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -15,6 +14,7 @@ export default function PatientSignUpScreen() {
   const [confirmPass, setConfirmPass] = useState('');
 
   const handleSignUp = async () => {
+
     setDisplay('')
     if (firstName && lastName && email && password && confirmPass) {
       if (password == confirmPass) {
@@ -34,19 +34,30 @@ export default function PatientSignUpScreen() {
           }
           else if (emailExists.status === 201) {
             setDisplay('This email is already associated with an account!');
+            success = false;
           }
 
         }
         catch (error) {
+          success = false;
           console.log(error, " Error");
         }
       }
       else {
         setDisplay('Passwords do not match!');
+        success = false;
       }
     }
     else {
-      setDisplay('Please fill out all fields!')
+      setDisplay('Please fill out all fields!');
+      success = false;
+    }
+    if (success) {
+      setDisplay('Account successfully created! Returning to sign in screen...');
+      setTimeout(() => {
+        navigation.navigate('SignIn');
+        }, 3000);
+       
     }
   }
 
@@ -118,7 +129,7 @@ const styles = StyleSheet.create({
   message: {
     textAlign: 'center',
     fontSize: 12,
-    color: '#DC143C',
+    color: '#000000'
 },
   shortInput: {
     margin: 15,
