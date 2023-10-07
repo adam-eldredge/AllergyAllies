@@ -6,7 +6,7 @@ import axios from 'axios';
 
 
 export default function ProviderSignUpScreen() {
-
+  var success = true;
   const [display, setDisplay] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -44,19 +44,29 @@ export default function ProviderSignUpScreen() {
           }
           else if (emailExists.status === 201) {
             setDisplay('This email is already associated with an account!');
+            success = false;
           }
 
         }
         catch (error) {
+          success = false;
           console.log(error, " Error");
         }
       }
       else {
         setDisplay('Passwords do not match!');
+        success = false;
       }
     }
     else {
       setDisplay('Please fill out all fields!')
+      success = false;
+    }
+    if (success) {
+      setDisplay('Account successfully created! Returning to sign in screen...');
+      setTimeout(() => {
+        navigation.navigate('SignIn');
+        }, 3000);
     }
   }
 
