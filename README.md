@@ -5,6 +5,7 @@ Frontend instructions:
 2. Install Expo CLI globally by running the command npm i -g expo cli
 3. cd into frontend
 4. run (one time): 
+
         npm install @react-navigation/native
 
         npx expo install react-native-screens react-native-safe-area-context
