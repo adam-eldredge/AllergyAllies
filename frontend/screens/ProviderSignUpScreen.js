@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { AuthContext, AuthProvider } from '../App.js'
 import axios from 'axios';
@@ -78,6 +78,7 @@ export default function ProviderSignUpScreen() {
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
           placeholder="First Name"
+          placeholderTextColor="#7a7a7a"
           value={firstName}
           autoCapitalize="none"
           onChangeText={setFirstName} />
@@ -85,6 +86,7 @@ export default function ProviderSignUpScreen() {
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
           placeholder="Last Name"
+          placeholderTextColor="#7a7a7a"
           value={lastName}
           autoCapitalize="none"
           onChangeText={setLastName} />
@@ -93,6 +95,7 @@ export default function ProviderSignUpScreen() {
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Email"
+        placeholderTextColor="#7a7a7a"
         value={email}
         autoCapitalize="none"
         onChangeText={setEmail} />
@@ -100,6 +103,7 @@ export default function ProviderSignUpScreen() {
     <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="National Provider Identifier"
+        placeholderTextColor="#7a7a7a"
         value={NPI}
         autoCapitalize="none"
         onChangeText={setNPI}/>
@@ -109,6 +113,7 @@ export default function ProviderSignUpScreen() {
     <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Name of Practice"
+        placeholderTextColor="#7a7a7a"
         value={nameOfPractice}
         autoCapitalize="none"
         onChangeText={setNameOfPractice}/>
@@ -116,6 +121,7 @@ export default function ProviderSignUpScreen() {
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Password"
+        placeholderTextColor="#7a7a7a"
         value={password}
         autoCapitalize="none"
         onChangeText={setPassword}
@@ -124,6 +130,7 @@ export default function ProviderSignUpScreen() {
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Confirm Password"
+        placeholderTextColor="#7a7a7a"
         value={confirmPass}
         autoCapitalize="none"
         onChangeText={setConfirmPass}
@@ -141,9 +148,12 @@ export default function ProviderSignUpScreen() {
   );
 }
 
+const { width, height } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 23
+    paddingTop: 23,
+    alignItems: height > width ? null : 'center',
   },
   title: {
     textAlign: 'center',
@@ -158,6 +168,7 @@ const styles = StyleSheet.create({
 },
   shortInput: {
     margin: 15,
+    width: height > width ? null : 136,
     flexGrow: 1,
     height: 40,
     borderColor: '#1059d5',
@@ -167,6 +178,7 @@ const styles = StyleSheet.create({
   input: {
     margin: 15,
     height: 40,
+    width: height > width ? null : 300,
     borderColor: '#1059d5',
     borderWidth: 1,
     padding: 10
