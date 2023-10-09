@@ -1,30 +1,26 @@
 const mongoose = require('mongoose');
 
 const dataSchema = new mongoose.Schema({
-    firstName: {
+    practiceName: {
         required: true,
         type: String
     },
-    lastName: {
+    practiceAddress: {
         required: true,
         type: String
     },
-    email: {
+    antigensTested: {
         required: true,
         type: String
     },
-    password: {
-        required: true,
+    logo: {
+        required: false,
         type: String
     },
-    NPI: {
-        required: true,
-        type: Number
-    },
-    nameOfPractice: {
-        required: true,
+    scrollingAds: {
+        required: false,
         type: String
     },
-}, { collection: 'Providers' })
+}, { collection: 'Practices' })
 
-module.exports = mongoose.model('provider', dataSchema)
+module.exports = mongoose.model('practice', dataSchema)

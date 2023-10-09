@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv').config(); 
-// Use "npm run server" to have BE server restart when changed (requires nodemon)
 
 const app = express();
 // To protect version information
@@ -23,11 +22,14 @@ const uri = process.env.URI;
 const patient_routes = require('./routes/patient_routes');
 const provider_routes = require('./routes/provider_routes');
 const report_routes = require('./routes/report_routes');
+const practice_routes = require('./routes/practice_routes')
 const auth_routes = require('./routes/auth_routes');
 
 // Use statements
 app.use('/api', patient_routes);
 app.use('/api', provider_routes);
+app.use('/api', practice_routes);
+
 app.use('/api', report_routes);
 app.use('/auth', auth_routes);
 
