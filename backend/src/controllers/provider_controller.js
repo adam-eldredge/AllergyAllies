@@ -3,9 +3,9 @@ const provider = require('../Models/provider');
 // Post method
 exports.addProvider = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, NPI, nameOfPractice } = req.body;
+        const { firstName, lastName, email, password, NPI, nameOfPractice, practiceAddress } = req.body;
         const data = new provider({
-            firstName, lastName, email, password, NPI, nameOfPractice
+            firstName, lastName, email, password, NPI, nameOfPractice, practiceAddress
         });
 
         const dataToSave = await data.save();
