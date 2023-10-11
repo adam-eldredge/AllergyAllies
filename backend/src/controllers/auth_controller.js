@@ -15,7 +15,7 @@ exports.login = async(req, res) => {
 
     // find user in database - update for providers
     const foundPatient = await patient.findOne({ email }).exec();
-    const foundProvider = await patient.findOne({ email }).exec();
+    const foundProvider = await provider.findOne({ email }).exec();
     let foundUser = foundPatient;
     let role = 0;
 

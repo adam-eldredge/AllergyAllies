@@ -101,6 +101,16 @@ export default function PatientSignUpScreen() {
         <Text style={styles.logInButtonText}> Create Account </Text>
       </TouchableOpacity>
 
+      <Text style = {styles.bottomText2}>Already have an account?</Text>
+            <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
+            <TouchableOpacity
+               style = {styles.logInButton}
+               onPress={() =>
+                  navigation.navigate('SignInScreen') }>
+               <Text style = {styles.logInButtonText}>Log in here!</Text>
+            </TouchableOpacity>
+            </View>
+
     </View>
   );
 }

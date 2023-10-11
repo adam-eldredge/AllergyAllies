@@ -1,8 +1,8 @@
 import * as React from 'react';
 // import axios from 'axios';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView, Platform} from 'react-native'
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView, Platform } from 'react-native'
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Portal from './screens/Portal.js';
 import Alerts from './screens/Alerts.js';
 import AllAlerts from './screens/AllAlerts.js';
@@ -26,7 +26,7 @@ import jwt_decode from 'jwt-decode';
 const Stack = createNativeStackNavigator();
 
 
-export default function App({navigation}) {
+export default function App({ navigation }) {
 
   const initialState = {
     isLoading: true,
@@ -74,7 +74,7 @@ export default function App({navigation}) {
 
       if (userToken) {
         dispatch({ type: 'RESTORE_TOKEN', token: userToken });
-      } 
+      }
       else {
         dispatch({ type: 'RESTORE_TOKEN', token: null });
       }
@@ -92,7 +92,7 @@ export default function App({navigation}) {
       },
       signOut: async () => {
         await AsyncStorage.removeItem('userToken');
-        dispatch({ type: 'SIGN_OUT'});
+        dispatch({ type: 'SIGN_OUT' });
       },
     }),
     []
@@ -102,10 +102,10 @@ export default function App({navigation}) {
 
     <AuthContext.Provider value={authContext}>
       <NavigationContainer>
-        <Stack.Navigator  screenOptions={() => ({
-        headerTitleStyle: styles.headerTitleStyle,
-        headerStyle: { backgroundColor: '#1059d5'},
-        headerTintColor: 'white'
+        <Stack.Navigator screenOptions={() => ({
+          headerTitleStyle: styles.headerTitleStyle,
+          headerStyle: { backgroundColor: '#1059d5' },
+          headerTintColor: 'white'
         })}>
           {state.isLoading ? (
             // We haven't finished checking for the token yet
@@ -113,37 +113,45 @@ export default function App({navigation}) {
           ) : state.userToken == null ? (
             // No token found, user isn't signed in
             <>
-            <Stack.Screen
-              name="SignIn"
-              component={SignInScreen}
-              options={{
-                title: 'Sign in',
-                headerTitleAlign: 'center',
-                headerTitleStyle: {textAlign: 'center'},
-                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
-              }}
-            />
-            <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} />
-            <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} />
+              <Stack.Screen
+                name="SignIn"
+                component={SignInScreen}
+                options={{
+                  title: 'Sign in',
+                  headerTitleAlign: 'center',
+                  headerTitleStyle: { textAlign: 'center' },
+                  animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+                }}
+              />
+              <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} />
+              <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} />
             </>
+          ) : state.userToken.role == 1 ? (
+            // Provider is signed in
+                <>
+                  <Stack.Screen name="Home" component={HomeScreen} />
+                  <Stack.Screen name="Alerts" component={Alerts} />
+                  <Stack.Screen name="Portal" component={Portal} />
+                  <Stack.Screen name="AllAlerts" component={AllAlerts} options={{ title: 'All Alerts' }} />
+                  <Stack.Screen name="Reports" component={Reports} />
+                  <Stack.Screen name="PatientHome" component={PatientHome} options={{ title: 'Patient Home' }} />
+                  <Stack.Screen name="Upcoming" component={Upcoming} options={{ title: 'Upcoming Appointment' }} />
+                  <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{ title: 'Additional Info' }} />
+                  <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{ title: 'Patient Sign Up' }} />
+                  <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{ title: 'Provider Sign Up' }} />
+                </>
           ) : (
-            // User is signed in
+            // Patient is signed in
             <>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="Portal" component={Portal} />
-            <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
-            <Stack.Screen name="Reports" component={Reports} />
-            <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Patient Home'}} />
-            <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
-            <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
-            <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
-            <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
-            </>
+            <Stack.Screen name="PatientHome" component={PatientHome} options={{ title: 'Patient Home' }} />
+          </>
           )}
         </Stack.Navigator>
       </NavigationContainer>
-    </AuthContext.Provider> 
+    </AuthContext.Provider>
   );
 
 }
