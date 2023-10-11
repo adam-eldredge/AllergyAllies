@@ -80,7 +80,7 @@ exports.refresh = async(req, res) => {
         async (err, decoded) => {
             if (err) return res.status(403).json({ message: 'Forbidden' })
 
-            const foundUser = await patient.findOne({ id: decoded.id})
+            let foundUser = await patient.findOne({ id: decoded.id})
 
             if (!foundUser) {
                 foundUser = await provider.findOne({ id: decoded.id });
