@@ -6,13 +6,15 @@ import AuthContext from '../AuthContext';
 import jwt_decode from 'jwt-decode';
 
 export default function Portal({navigation}){
-   /*
+
    const authContext = useContext(AuthContext);
    const decodedToken = jwt_decode(authContext.userToken);
-   console.log(decodedToken.UserInfo.id);
-   console.log(decodedToken.UserInfo.role);
-   */
-   return (
+   const role = decodedToken.UserInfo.role;
+   const firstName = decodedToken.UserInfo.firstName;
+
+   return role == 2 ? (
+      <View style = {styles.container}>
+      <Text style={styles.header}>Welcome, {firstName}</Text>
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 22}}>
          <TouchableOpacity style={styles.menuItem}
          onPress={() =>
@@ -56,19 +58,48 @@ export default function Portal({navigation}){
                alignItems='center'
             />
          </TouchableOpacity> 
-         <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>Other Feature</Text>
+      </View>
+      </View>
+   ) : (
+      <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 22}}>
+         <h1>decodedToken : {role}</h1>
+         <TouchableOpacity style={styles.menuItem}
+         onPress={() =>
+            navigation.navigate('Alerts')
+         }>
+            <Text style={styles.menuItemText}>Alerts</Text>
             <IconButton
-               icon="close"
+               icon="alert"
+               iconColor="#1059d5"
+               size={30}
+               alignItems='center'
+            />
+         </TouchableOpacity> 
+         <TouchableOpacity style={styles.menuItem}
+         onPress={() =>
+            navigation.navigate('Reports')
+         }>
+            <Text style={styles.menuItemText}>Reports</Text>
+            <IconButton
+               icon="newspaper-check"
                iconColor="#1059d5"
                size={30}
                alignItems='center'
             />
          </TouchableOpacity> 
          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>Other Feature</Text>
+            <Text style={styles.menuItemText}>View Patients</Text>
             <IconButton
-               icon="close"
+               icon="face-man-shimmer-outline"
+               iconColor="#1059d5"
+               size={30}
+               alignItems='center'
+            />
+         </TouchableOpacity> 
+         <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemText}>Edit Survey Responses</Text>
+            <IconButton
+               icon="pencil"
                iconColor="#1059d5"
                size={30}
                alignItems='center'
@@ -79,6 +110,13 @@ export default function Portal({navigation}){
 }
 
 const styles = StyleSheet.create({
+   header:{
+      color: '#606060',
+      marginLeft: 15,
+      fontSize: 25,
+      textAlign: 'center',
+      fontWeight: '600'
+   },
    container: {
       paddingTop: 23
    },

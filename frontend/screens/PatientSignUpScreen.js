@@ -26,7 +26,7 @@ export default function PatientSignUpScreen() {
             password
           }
 
-          const emailExists = await axios.post('http://localhost:5000/api/getPatient', { email });
+          const emailExists = await axios.post('http://localhost:5000/api/checkEmail', { email });
 
           if (emailExists.status === 200) {
             const response = await axios.post('http://localhost:5000/api/addPatient', data);
