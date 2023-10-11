@@ -8,13 +8,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function SignInScreen({navigation}) {
   const { signIn } = useContext(AuthContext);
-  const [display, setDisplay] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
 
   const handleSignIn = async () => {
-   setDisplay('Loading...');
     if (email && password) {
       try {
          const authData = {
@@ -41,13 +39,9 @@ export default function SignInScreen({navigation}) {
          }
 
       } catch (error) {
-         setDisplay(error.response.data.message);
          console.log(error, " Error"); 
       }
-    }
-    else {
-      setDisplay('All fields required!');
-    }
+    } 
   };
 
   return (
@@ -56,6 +50,7 @@ export default function SignInScreen({navigation}) {
        <TextInput style = {styles.input}
                underlineColorAndroid = "transparent"
                placeholder = "Email"
+               placeholderTextColor="#7a7a7a"
                value = {email}
                autoCapitalize = "none"
                onChangeText = {setEmail}/>
@@ -63,12 +58,12 @@ export default function SignInScreen({navigation}) {
             <TextInput style = {styles.input}
                underlineColorAndroid = "transparent"
                placeholder = "Password"
+               placeholderTextColor="#7a7a7a"
                value = {password}
                autoCapitalize = "none"
                onChangeText = {setPassword}
                secureTextEntry={true}/>
 
-            <Text style = {styles.message}>{display}</Text>
             <TouchableOpacity
                style = {styles.logInButton}
                onPress={handleSignIn}>
@@ -85,7 +80,7 @@ export default function SignInScreen({navigation}) {
             </TouchableOpacity>
             <TouchableOpacity
                style = {styles.signUpButton}
-               onPress={() =>
+                  onPress={() =>
                   navigation.navigate('ProviderSignUpScreen') }>
                <Text style = {styles.logInButtonText}>I am a practice</Text>
             </TouchableOpacity>
@@ -108,11 +103,6 @@ const styles = StyleSheet.create({
      fontSize: 20,
      fontWeight: 'bold',
      color: '#1059d5',
-  },
-  message: {
-      textAlign: 'center',
-      fontSize: 12,
-      color: '#DC143C',
   },
   input: {
      margin: 15,

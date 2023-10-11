@@ -117,14 +117,32 @@ export default function App({navigation}) {
               name="SignIn"
               component={SignInScreen}
               options={{
-                title: 'Sign in',
+                title: 'Sign In',
                 headerTitleAlign: 'center',
                 headerTitleStyle: {textAlign: 'center'},
                 animationTypeForReplace: state.isSignout ? 'pop' : 'push',
               }}
             />
-            <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} />
-            <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} />
+            <Stack.Screen
+              name="PatientSignUpScreen"
+              component={PatientSignUpScreen}
+              options={{
+                title: 'Patient Sign Up',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
+                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+              }}
+            />
+            <Stack.Screen
+              name="ProviderSignUpScreen"
+              component={ProviderSignUpScreen}
+              options={{
+                title: 'Provider Sign Up',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
+                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+              }}
+            />
             </>
           ) : (
             // User is signed in
