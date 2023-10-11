@@ -1,5 +1,4 @@
 import * as React from 'react';
-// import axios from 'axios';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView, Platform} from 'react-native'
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -67,36 +66,32 @@ export default function App({navigation}) {
       try {
         // restore token - see SignInScreen for how to decrypt
         userToken = await AsyncStorage.getItem('userToken');
+        if (userToken) {
+          dispatch({ type: 'RESTORE_TOKEN', token: userToken });
+        } 
+        else {
+          dispatch({ type: 'RESTORE_TOKEN', token: null });
+        } 
       } catch (e) {
         // Restoring token failed
         console.error('Error:', e);
-      }
-
-      if (userToken) {
-        dispatch({ type: 'RESTORE_TOKEN', token: userToken });
-      } 
-      else {
-        dispatch({ type: 'RESTORE_TOKEN', token: null });
       }
     };
 
     bootstrapAsync();
   }, []);
 
-
-  const authContext = useMemo(
-    () => ({
-      signIn: async (data) => {
-        await AsyncStorage.setItem('userToken', data);
-        dispatch({ type: 'SIGN_IN', token: data });
-      },
-      signOut: async () => {
-        await AsyncStorage.removeItem('userToken');
-        dispatch({ type: 'SIGN_OUT'});
-      },
-    }),
-    []
-  );
+  const authContext = useMemo(() => ({
+    signIn: async (data) => {
+      await AsyncStorage.setItem('userToken', data);
+      dispatch({ type: 'SIGN_IN', token: data });
+    },
+    signOut: async () => {
+      await AsyncStorage.removeItem('userToken');
+      dispatch({ type: 'SIGN_OUT'});
+    },
+    userToken: state.userToken, 
+  }), [state.userToken]);
 
   return (
 
