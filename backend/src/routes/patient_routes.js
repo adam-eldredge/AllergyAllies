@@ -11,6 +11,9 @@ router.get('/getAllPatients', patientController.getAllPatients);
 // GET localhost:5000/api/getPatient
 router.get('/getPatient/:id', patientController.getPatient);
 
+// GET localhost:5000/api/checkEmail
+router.post('/checkEmail/', patientController.checkEmail);
+
 // DELETE localhost:5000/api/addPatient
 router.delete('/deletePatient/:id', patientController.deletePatient);
 
