@@ -28,10 +28,6 @@ const dataSchema = new mongoose.Schema({
     doseAdjustmentDefaults: {
         required: true,
         type: Number,
-    },
-    antigensTested: {
-        required: true,
-        type: String
     }
 }, { collection: 'Protocols' })
 

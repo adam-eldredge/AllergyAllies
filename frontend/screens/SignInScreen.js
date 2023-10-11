@@ -33,8 +33,8 @@ export default function SignInScreen({navigation}) {
   
             await AsyncStorage.setItem('userToken', userToken);
             // data from token
-            // const userEmail = decodedToken.UserInfo.email;
-            // console.log(userEmail)
+            const userID = decodedToken.UserInfo;
+            console.log(userID)
             signIn(userToken);
          } else {
             console.log("Error with response ", response.status);
