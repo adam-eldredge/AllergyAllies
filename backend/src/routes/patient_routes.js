@@ -9,7 +9,7 @@ router.post('/addPatient', patientController.addPatient);
 router.get('/getAllPatients', patientController.getAllPatients);
 
 // GET localhost:5000/api/getPatient
-router.post('/getPatient', patientController.getPatient);
+router.get('/getPatient/:id', patientController.getPatient);
 
 // DELETE localhost:5000/api/addPatient
 router.delete('/deletePatient/:id', patientController.deletePatient);

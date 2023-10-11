@@ -42,31 +42,32 @@ exports.login = async(req, res) => {
     const accessToken = jwt.sign(
         {
             "UserInfo": {
-                "email": foundUser.email,
+                "id": foundUser.id,
                 "role": role
             }
         },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '10s'}
+        { expiresIn: '5m'}
     )
 
     const refreshToken = jwt.sign(
-        { "email": foundUser.email },
+        { "id": foundUser.id },
         process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: '5m'}
+        { expiresIn: '30m'}
     )
 
     res.cookie('jwt', refreshToken, {
         httpOnly: false,
         secure: true,
         sameSite: 'None',
-        maxAge: 5 * 60 * 1000
+        maxAge: 7*24*60*60*1000
     })
 
     res.json({ accessToken })
 }
 
 exports.refresh = async(req, res) => {
+    console.log("Refresh auth func triggered");
     const cookies = req.cookies;
 
     if (!cookies?.jwt) return res.status(401).json({ message: 'Unauthorized_3' });
@@ -75,22 +76,28 @@ exports.refresh = async(req, res) => {
 
     jwt.verify(
         refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
         async (err, decoded) => {
             if (err) return res.status(403).json({ message: 'Forbidden' })
 
-            const foundUser = await patient.findOne({ email: decoded.email})
+            let foundUser = await patient.findOne({ id: decoded.id})
 
-            if (!foundUser) return res.status(401).json({ message: 'Unauthorized_4' });
+            if (!foundUser) {
+                foundUser = await provider.findOne({ id: decoded.id });
+                if (!foundUser) {
+                    return res.status(401).json({ message: 'User not found (Refresh Token)' });
+                }
+            }
 
             const accessToken = jwt.sign(
                 {
                     "UserInfo": {
-                        "email": foundUser.email,
+                        "id": foundUser.id,
                         "roles": 1
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '10s' }
+                { expiresIn: '5m' }
             )
 
             res.json({ accessToken })
