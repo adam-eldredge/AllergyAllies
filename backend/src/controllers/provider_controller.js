@@ -3,9 +3,9 @@ const provider = require('../Models/provider');
 // Post method
 exports.addProvider = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, NPI, nameOfPractice } = req.body;
+        const { firstName, lastName, email, password, NPI, nameOfPractice, practiceAddress } = req.body;
         const data = new provider({
-            firstName, lastName, email, password, NPI, nameOfPractice
+            firstName, lastName, email, password, NPI, nameOfPractice, practiceAddress
         });
 
         const dataToSave = await data.save();
@@ -31,9 +31,16 @@ exports.getAllProviders = async (req, res) => {
 exports.getProvider = async (req, res) => {
     try {
         const email = req.body.email.toString();
-        const data = await provider.findOne({ email: email })
+        const NPI = req.body.NPI.toString();
+        const data = await provider.findOne({ email: email });
+        const data2 = await provider.findOne({ NPI: NPI});
         if (data === null) {
-            res.sendStatus(200);
+            if(data2 === null){
+                res.sendStatus(200);
+            }
+            else{
+                res.sendStatus(208);
+            }
         }
         else {
             res.sendStatus(201);
@@ -52,7 +59,7 @@ exports.deleteProvider = async (req, res) => {
         if (!providerToDelete) {
             res.status(404).json({ message: "Provider not found" });
         }
-        const firstname = providerToDelete.firstname;
+        const firstname = providerToDelete.firstName;
 
         await provider.findByIdAndDelete(id);
         res.status(200).json({ message: `Document with ${firstname} has been deleted..` });

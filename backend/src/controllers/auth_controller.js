@@ -1,5 +1,5 @@
 const patient = require('../Models/patient')
-const Provider = require('../Models/provider')
+const provider = require('../Models/provider')
 const jwt = require('jsonwebtoken')
 // const asyncHandler = require('express-async-handler')
 
@@ -14,11 +14,21 @@ exports.login = async(req, res) => {
     }
 
     // find user in database - update for providers
-    const foundUser = await patient.findOne({ email }).exec();
+    const foundPatient = await patient.findOne({ email }).exec();
+    const foundProvider = await provider.findOne({ email }).exec();
+    let foundUser = foundPatient;
+    let role = 0;
 
-    if (!foundUser) { 
-        console.log("User not found")
+    if (!foundUser && !foundProvider) { 
+        console.log("Patient/Provider not found.")
         return res.status(401).json({ message: 'Invalid email or password' });
+    } else if (foundProvider) {
+        console.log("Provider account found")
+        role = 1;
+        foundUser = foundProvider;
+    } else {
+        console.log("Patient found.")
+        role = 2;
     }
 
     const match = password == foundUser.password ? true : false;
@@ -28,11 +38,12 @@ exports.login = async(req, res) => {
         return res.status(401).json({ message: 'Invalid email or password' });
     }
 
+    // role 1: provider, role 2: patient
     const accessToken = jwt.sign(
         {
             "UserInfo": {
                 "email": foundUser.email,
-                "role": 1
+                "role": role
             }
         },
         process.env.ACCESS_TOKEN_SECRET,

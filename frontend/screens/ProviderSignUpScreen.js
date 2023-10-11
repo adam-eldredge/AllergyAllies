@@ -30,20 +30,30 @@ export default function ProviderSignUpScreen() {
             nameOfPractice
           }
 
-        // Used to check if provider has a valid NPI, WIP
-        //   const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
-        //   const NPIexists = await axios.get(NPIreigstryURI);
-        //   console.log(NPIexists.data);
+          // Used to check if provider has a valid NPI, WIP
+          //const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
+          const NPIreigstryURI = `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?terms=${NPI}`
+          const NPIexists = await axios.get(NPIreigstryURI);
+          //console.log(NPIexists.data);
 
+          const emailNPIExists = await axios.post('http://localhost:5000/api/getProvider', { email, NPI });
 
-          const emailExists = await axios.post('http://localhost:5000/api/getProvider', { email });
-
-          if (emailExists.status === 200) {
-            const response = await axios.post('http://localhost:5000/api/addProvider', data);
-            console.log(response);
+          if (emailNPIExists.status === 200) {
+            //console.log(response);
+            if(NPIexists.data[0] == 1){
+              const response = await axios.post('http://localhost:5000/api/addProvider', data);
+            }
+            else{
+              setDisplay('Invalid NPI')
+              success = false;
+            }
           }
-          else if (emailExists.status === 201) {
+          else if (emailNPIExists.status === 201) {
             setDisplay('This email is already associated with an account!');
+            success = false;
+          }
+          else if(emailNPIExists.status === 208){
+            setDisplay('This NPI cannot be used.');
             success = false;
           }
 

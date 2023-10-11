@@ -3,6 +3,8 @@ const patient = require('../Models/patient');
 
 // Post method
 exports.addPatient = async (req, res) => {
+    // implement duplicate check
+    // add password encryption
     try {
         const { firstName, lastName, email, password } = req.body;
         const data = new patient({
@@ -51,7 +53,7 @@ exports.deletePatient = async (req, res) => {
         const id = req.params.id;
         const patientToDelete = await patient.findById(id);
         if (!patientToDelete) {
-            res.status(404).json({ message: "Patient not found" });
+            return res.status(404).json({ message: "Patient not found" });
         }
         const firstname = patientToDelete.firstname;
 
