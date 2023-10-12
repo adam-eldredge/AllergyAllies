@@ -14,6 +14,7 @@ import ProviderSignUpScreen from './screens/ProviderSignUpScreen';
 import PatientHome from './screens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
 import UpcomingInfo from './screens/UpcomingInfo.js';
+import InitialScreen from './screens/InitialScreen.js';
 import AuthContext from './AuthContext';
 import { useMemo, useReducer, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -108,6 +109,15 @@ export default function App({navigation}) {
           ) : state.userToken == null ? (
             // No token found, user isn't signed in
             <>
+            <Stack.Screen
+              name="InitialScreen"
+              component={InitialScreen}
+              options={{
+                title: '',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
+              }}
+            />
             <Stack.Screen
               name="SignIn"
               component={SignInScreen}
