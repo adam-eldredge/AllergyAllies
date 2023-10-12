@@ -76,7 +76,7 @@ export default function ProviderSignUpScreen() {
       setDisplay('Account successfully created! Returning to sign in screen...');
       setTimeout(() => {
         navigation.navigate('SignIn');
-        }, 3000);
+        }, 1000);
     }
   }
 
