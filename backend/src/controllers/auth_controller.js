@@ -43,7 +43,9 @@ exports.login = async(req, res) => {
         {
             "UserInfo": {
                 "id": foundUser.id,
-                "role": role
+                "role": role,
+                "firstName": foundUser.firstName,
+                "lastName": foundUser.lastName
             }
         },
         process.env.ACCESS_TOKEN_SECRET,

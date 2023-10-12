@@ -6,7 +6,7 @@ import Portal from './screens/Portal.js';
 import Alerts from './screens/Alerts.js';
 import AllAlerts from './screens/AllAlerts.js';
 import Reports from './screens/Reports.js';
-import HomeScreen from './screens/HomeScreen.js';
+import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
 import PatientSignUpScreen from './screens/PatientSignUpScreen';
@@ -142,9 +142,8 @@ export default function App({navigation}) {
           ) : (
             // User is signed in
             <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="Portal" component={Portal} />
+            <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
             <Stack.Screen name="Reports" component={Reports} />
             <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Patient Home'}} />
@@ -152,6 +151,7 @@ export default function App({navigation}) {
             <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
             <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
             <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
+            <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
             </>
           )}
         </Stack.Navigator>

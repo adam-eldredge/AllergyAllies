@@ -6,13 +6,80 @@ import AuthContext from '../AuthContext';
 import jwt_decode from 'jwt-decode';
 
 export default function Portal({navigation}){
-   /*
+
+   const { signOut } = useContext(AuthContext);
    const authContext = useContext(AuthContext);
    const decodedToken = jwt_decode(authContext.userToken);
-   console.log(decodedToken.UserInfo.id);
-   console.log(decodedToken.UserInfo.role);
-   */
-   return (
+   const role = decodedToken.UserInfo.role;
+   const firstName = decodedToken.UserInfo.firstName;
+
+   return role == 2 ? (
+      // PATIENT PORTAL
+      <View style = {styles.container}>
+      <Text style={styles.header}>Welcome, {firstName}</Text>
+      <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 22}}>
+      <TouchableOpacity style={styles.menuItem}
+         onPress={() =>
+            navigation.navigate('PatientHome')
+         }>
+            <Text style={styles.menuItemText}>Appointments</Text>
+            <IconButton
+               icon="calendar-month"
+               iconColor="#1059d5"
+               size={30}
+               alignItems='center'
+            />
+         </TouchableOpacity> 
+         <TouchableOpacity style={styles.menuItem}
+         onPress={() =>
+            navigation.navigate('Alerts')
+         }>
+            <Text style={styles.menuItemText}>Alerts</Text>
+            <IconButton
+               icon="alert"
+               iconColor="#1059d5"
+               size={30}
+               alignItems='center'
+            />
+         </TouchableOpacity>
+         <TouchableOpacity style={styles.menuItem}>
+            <Text style={styles.menuItemText}>Report a Reaction</Text>
+            <IconButton
+               icon="exclamation-thick"
+               iconColor="#1059d5"
+               size={30}
+               alignItems='center'
+            />
+         </TouchableOpacity> 
+         <TouchableOpacity style={styles.menuItem}onPress={() =>
+            navigation.navigate('PracticeSurvey')
+         }>
+            <Text style={styles.menuItemText}>Edit Survey Responses</Text>
+            <IconButton
+               icon="pencil"
+               iconColor="#1059d5"
+               size={30}
+               alignItems='center'
+            />
+         </TouchableOpacity>
+         <TouchableOpacity style={styles.menuItem}
+         onPress={() =>
+            signOut()
+         }>
+            <Text style={styles.menuItemText}>Sign Out</Text>
+            <IconButton
+               icon="exit-to-app"
+               iconColor="#1059d5"
+               size={30}
+               alignItems='center'
+            />
+         </TouchableOpacity> 
+      </View>
+      </View>
+   ) : (
+      // PROVIDER PORTAL
+      <View style = {styles.container}>
+      <Text style={styles.header}>Welcome, {firstName}</Text>
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 22}}>
          <TouchableOpacity style={styles.menuItem}
          onPress={() =>
@@ -55,30 +122,32 @@ export default function Portal({navigation}){
                size={30}
                alignItems='center'
             />
-         </TouchableOpacity> 
-         <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>Other Feature</Text>
+         </TouchableOpacity>
+         <TouchableOpacity style={styles.menuItem}
+         onPress={() =>
+            signOut()
+         }>
+            <Text style={styles.menuItemText}>Sign Out</Text>
             <IconButton
-               icon="close"
-               iconColor="#1059d5"
-               size={30}
-               alignItems='center'
-            />
-         </TouchableOpacity> 
-         <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuItemText}>Other Feature</Text>
-            <IconButton
-               icon="close"
+               icon="exit-to-app"
                iconColor="#1059d5"
                size={30}
                alignItems='center'
             />
          </TouchableOpacity> 
       </View>
+      </View>
    )
 }
 
 const styles = StyleSheet.create({
+   header:{
+      color: '#606060',
+      marginLeft: 15,
+      fontSize: 25,
+      textAlign: 'center',
+      fontWeight: '600'
+   },
    container: {
       paddingTop: 23
    },
