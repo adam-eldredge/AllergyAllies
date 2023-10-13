@@ -15,6 +15,7 @@ import PatientHome from './screens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
 import UpcomingInfo from './screens/UpcomingInfo.js';
 import InitialScreen from './screens/InitialScreen.js';
+import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
 import { useMemo, useReducer, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -162,6 +163,7 @@ export default function App({navigation}) {
             <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
             <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
             <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
+            <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
             </>
           )}
         </Stack.Navigator>
