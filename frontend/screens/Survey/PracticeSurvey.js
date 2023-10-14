@@ -183,5 +183,13 @@ export default function PracticeSurvey() {
     const survey = new Model(surveyJson);
     survey.applyTheme(theme);
 
-    return (<Survey model={survey} />)
+    //return //(//<Survey model={survey} />)
+    const rend = Platform.select({
+        ios: <Text>Please continue on desktop</Text>,
+        android: <Text>Please continue on desktop</Text>,
+        default: <Survey model={survey}/>,
+    });
+
+    console.log(rend);
+    return rend;
 }
