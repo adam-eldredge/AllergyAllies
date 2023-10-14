@@ -79,7 +79,28 @@ export default function Portal({navigation}){
    ) : (
       // PROVIDER PORTAL
       <View style = {styles.container}>
-      <Text style={styles.header}>Welcome, {firstName}</Text>
+         <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end'}}>
+            <Text style={styles.header}>Welcome, {firstName}</Text>
+            <View style={styles.spacer}></View>
+            <TouchableOpacity
+            onPress={() =>
+               navigation.navigate('ProviderAccount')
+            }>
+               <IconButton
+                  icon="account-circle-outline"
+                  iconColor="#606060"
+                  size={30}
+               />
+            </TouchableOpacity> 
+         </View>
+         <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center',}}>
+            <View style={styles.providerDashboardItem}>
+            </View>
+            <View style={styles.providerDashboardItem}>
+            </View>
+            <View style={styles.providerDashboardItem}>
+            </View>
+         </View>
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', paddingTop: 22}}>
          <TouchableOpacity style={styles.menuItem}
          onPress={() =>
@@ -146,7 +167,8 @@ const styles = StyleSheet.create({
       marginLeft: 15,
       fontSize: 25,
       textAlign: 'center',
-      fontWeight: '600'
+      fontWeight: '600',
+      marginTop: 10,
    },
    container: {
       paddingTop: 23
@@ -169,4 +191,15 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontWeight: '600',
    },
+   providerDashboardItem:{
+      borderRadius: 6,
+      height: 150,
+      width: 300,
+      borderColor: '#1059d5',
+      borderWidth: 1,
+      marginLeft: 20,
+   },
+   spacer: {
+      width: 300
+   }
 })

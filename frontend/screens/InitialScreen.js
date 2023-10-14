@@ -1,21 +1,23 @@
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, Dimensions, Alert, ScrollView } from 'react-native'
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 
 export default function InitialScreen({navigation}){
       return (
          <View>
-            <View View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', paddingTop: 22}}>
-                <Text style = {styles.title}>AllergyAlly</Text>
-                <TouchableOpacity
+            <Text style = {styles.title}>AllergyAlly</Text>
+            <Text style = {styles.subtitle}>Manage your allergies from anywhere, at any time.</Text>
+            <TouchableOpacity
                 style = {styles.signUpButton}
                 onPress={() =>
                     navigation.navigate('SignIn') }>
                 <Text style = {styles.logInButtonText}>Sign In or Create an Account</Text>
-                </TouchableOpacity>
+            </TouchableOpacity>
+            <View style={styles.section}>
+                <Text>add info</Text>
+                <Image style={{ width: "50%", height: "100%", marginTop: "60"}} source={require('./initialbackground.jpg')} />
             </View>
-            <Text style = {styles.subtitle}>Manage your allergies from anywhere.</Text>
          </View>
       )
    }
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 8,
         marginTop: 2,
-        marginLeft: 640,
+        marginLeft: 30,
         borderWidth: 1,
         borderColor: '#1059d5',
     },
@@ -45,7 +47,17 @@ const styles = StyleSheet.create({
     },
     subtitle:{
         marginLeft: 30,
+        marginBottom: 30,
         color: '#1059d5',
         fontSize: 20,
     },
+    section: {
+        backgroundColor: '#c7dafa',
+        width: Dimensions.get('window').width,
+        marginTop: 30,
+        height: 300,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    }
 })
