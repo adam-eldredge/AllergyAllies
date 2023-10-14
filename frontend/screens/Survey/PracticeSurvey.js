@@ -181,9 +181,13 @@ const surveyJson = {
 export default function PracticeSurvey() {
     // ***** SURVEY OBJECT ***** //
     const survey = new Model(surveyJson);
+
+    // Apply theme to survey
     survey.applyTheme(theme);
 
-    //return //(//<Survey model={survey} />)
+    // Function to handle survey completion
+    
+
     const rend = Platform.select({
         ios: <Text>Please continue on desktop</Text>,
         android: <Text>Please continue on desktop</Text>,

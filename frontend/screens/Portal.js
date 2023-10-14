@@ -4,14 +4,14 @@ import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import AuthContext from '../AuthContext';
 import jwt_decode from 'jwt-decode';
+import User from '../User';
 
 export default function Portal({navigation}){
 
    const { signOut } = useContext(AuthContext);
-   const authContext = useContext(AuthContext);
-   const decodedToken = jwt_decode(authContext.userToken);
-   const role = decodedToken.UserInfo.role;
-   const firstName = decodedToken.UserInfo.firstName;
+   const userInfo = User();
+   const role = userInfo.role;
+   const firstName = userInfo.firstName;
 
    return role == 2 ? (
       // PATIENT PORTAL
