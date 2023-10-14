@@ -18,6 +18,7 @@ import InitialScreen from './screens/InitialScreen.js';
 import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
 import { useMemo, useReducer, useEffect } from 'react';
+//import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as SecureStore from 'expo-secure-store';
 import jwt_decode from 'jwt-decode';
