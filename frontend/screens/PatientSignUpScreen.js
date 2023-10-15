@@ -56,7 +56,7 @@ export default function PatientSignUpScreen() {
       setDisplay('Account successfully created! Returning to sign in screen...');
       setTimeout(() => {
         navigation.navigate('SignIn');
-        }, 3000);
+        }, 1000);
     }
   }
 

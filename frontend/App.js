@@ -6,7 +6,7 @@ import Portal from './screens/Portal.js';
 import Alerts from './screens/Alerts.js';
 import AllAlerts from './screens/AllAlerts.js';
 import Reports from './screens/Reports.js';
-import HomeScreen from './screens/HomeScreen.js';
+import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
 import PatientSignUpScreen from './screens/PatientSignUpScreen';
@@ -14,8 +14,11 @@ import ProviderSignUpScreen from './screens/ProviderSignUpScreen';
 import PatientHome from './screens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
 import UpcomingInfo from './screens/UpcomingInfo.js';
+import InitialScreen from './screens/InitialScreen.js';
+import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
 import { useMemo, useReducer, useEffect } from 'react';
+//import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as SecureStore from 'expo-secure-store';
 import jwt_decode from 'jwt-decode';
@@ -109,6 +112,15 @@ export default function App({navigation}) {
             // No token found, user isn't signed in
             <>
             <Stack.Screen
+              name="InitialScreen"
+              component={InitialScreen}
+              options={{
+                title: '',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
+              }}
+            />
+            <Stack.Screen
               name="SignIn"
               component={SignInScreen}
               options={{
@@ -142,9 +154,8 @@ export default function App({navigation}) {
           ) : (
             // User is signed in
             <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="Portal" component={Portal} />
+            <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
             <Stack.Screen name="Reports" component={Reports} />
             <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Patient Home'}} />
@@ -152,6 +163,8 @@ export default function App({navigation}) {
             <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
             <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
             <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
+            <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
+            <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
             </>
           )}
         </Stack.Navigator>
