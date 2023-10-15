@@ -80,6 +80,17 @@ export default function ProviderSignUpScreen() {
     }
   }
 
+  const [practices, setPractices] = useState([]);
+  console.log('here');
+    const response = axios.get('http://localhost:5000/api/getAllPractices');
+    // if (response.status === 200) {
+    //   setPractices(response);
+    //   console.log(response);
+    // }
+    // else {
+    //   // There were no practices found
+    // }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Allergy Ally</Text>
@@ -120,13 +131,21 @@ export default function ProviderSignUpScreen() {
 
     {/*TODO Will update to Drop Down option of all practices */}
 
-    <TextInput style={styles.input}
+    {/* <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Name of Practice"
         placeholderTextColor="#7a7a7a"
         value={nameOfPractice}
         autoCapitalize="none"
-        onChangeText={setNameOfPractice}/>
+        onChangeText={setNameOfPractice}/> */}
+
+      <div className='drop-down'>
+        <select>
+          practices.map((obj)  {
+
+          })
+        </select>
+      </div>
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"

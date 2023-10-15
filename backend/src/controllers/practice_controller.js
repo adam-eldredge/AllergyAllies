@@ -1,3 +1,4 @@
+const { resolveSoa } = require('dns');
 const practice = require('../Models/practice');
 const multer = require('multer');
 const path = require('path');
@@ -13,6 +14,17 @@ exports.addPractice = async (req, res) => {
         return res.status(200).json(dataToSave);
     } catch (error) {
         return res.status(400).json({ message: error.message });
+    }
+}
+
+exports.getAllPractices = async (req, res) => {
+    try {
+        console.log('here');
+        const practices = await practice.find();
+        return res.status(200).json(practices);
+    }
+    catch (e) {
+        return res.status(400).json({message: 'Error retrieving practices'});
     }
 }
 

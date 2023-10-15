@@ -9,6 +9,8 @@ router.post('/addPractice', practiceController.addPractice);
 
 router.get('/practice/:id', practiceController.getPractice);
 
+router.get('/getAllPractices', practiceController.getAllPractices );
+
 router.delete('/deletePractice/:id', practiceController.deletePractice);
 // get location given id
 router.get('/location/:id', practiceController.getLocation);
