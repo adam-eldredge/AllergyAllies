@@ -1,11 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { AuthContext, AuthProvider } from '../App.js'
+import { AuthContext, AuthProvider } from '../../App.js'
 import axios from 'axios';
 
-
-export default function ProviderSignUpScreen() {
+export default function PatientSignUpScreen() {
   var success = true;
   const [display, setDisplay] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -13,47 +12,28 @@ export default function ProviderSignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
-  const [NPI, setNPI] = useState('');
-  const [nameOfPractice, setNameOfPractice] = useState('');
 
   const handleSignUp = async () => {
+
     setDisplay('')
-    if (firstName && lastName && email && password && confirmPass && NPI && nameOfPractice) {
+    if (firstName && lastName && email && password && confirmPass) {
       if (password == confirmPass) {
         try {
           const data = {
             firstName,
             lastName,
             email,
-            password,
-            NPI,
-            nameOfPractice
+            password
           }
 
-          // Used to check if provider has a valid NPI, WIP
-          //const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
-          const NPIreigstryURI = `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?terms=${NPI}`
-          const NPIexists = await axios.get(NPIreigstryURI);
-          //console.log(NPIexists.data);
+          const emailExists = await axios.post('http://localhost:5000/api/checkEmail', { email });
 
-          const emailNPIExists = await axios.post('http://localhost:5000/api/getProviderEmail', { email, NPI });
-
-          if (emailNPIExists.status === 200) {
-            //console.log(response);
-            if(NPIexists.data[0] == 1){
-              const response = await axios.post('http://localhost:5000/api/addProvider', data);
-            }
-            else{
-              setDisplay('Invalid NPI')
-              success = false;
-            }
+          if (emailExists.status === 200) {
+            const response = await axios.post('http://localhost:5000/api/addPatient', data);
+            console.log(response);
           }
-          else if (emailNPIExists.status === 201) {
+          else if (emailExists.status === 201) {
             setDisplay('This email is already associated with an account!');
-            success = false;
-          }
-          else if(emailNPIExists.status === 208){
-            setDisplay('This NPI cannot be used.');
             success = false;
           }
 
@@ -69,7 +49,7 @@ export default function ProviderSignUpScreen() {
       }
     }
     else {
-      setDisplay('Please fill out all fields!')
+      setDisplay('Please fill out all fields!');
       success = false;
     }
     if (success) {
@@ -79,17 +59,6 @@ export default function ProviderSignUpScreen() {
         }, 1000);
     }
   }
-
-  const [practices, setPractices] = useState([]);
-  console.log('here');
-    const response = axios.get('http://localhost:5000/api/getAllPractices');
-    // if (response.status === 200) {
-    //   setPractices(response);
-    //   console.log(response);
-    // }
-    // else {
-    //   // There were no practices found
-    // }
 
   return (
     <View style={styles.container}>
@@ -120,32 +89,6 @@ export default function ProviderSignUpScreen() {
         value={email}
         autoCapitalize="none"
         onChangeText={setEmail} />
-
-    <TextInput style={styles.input}
-        underlineColorAndroid="transparent"
-        placeholder="National Provider Identifier"
-        placeholderTextColor="#7a7a7a"
-        value={NPI}
-        autoCapitalize="none"
-        onChangeText={setNPI}/>
-
-    {/*TODO Will update to Drop Down option of all practices */}
-
-    {/* <TextInput style={styles.input}
-        underlineColorAndroid="transparent"
-        placeholder="Name of Practice"
-        placeholderTextColor="#7a7a7a"
-        value={nameOfPractice}
-        autoCapitalize="none"
-        onChangeText={setNameOfPractice}/> */}
-
-      <div className='drop-down'>
-        <select>
-          practices.map((obj)  {
-
-          })
-        </select>
-      </div>
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
@@ -193,13 +136,13 @@ const styles = StyleSheet.create({
   message: {
     textAlign: 'center',
     fontSize: 12,
-    color: '#DC143C',
+    color: '#000000'
 },
   shortInput: {
     margin: 15,
-    width: height > width ? null : 136,
     flexGrow: 1,
     height: 40,
+    width: height > width ? null : 136,
     borderColor: '#1059d5',
     borderWidth: 1,
     padding: 10
@@ -214,6 +157,7 @@ const styles = StyleSheet.create({
   },
   logInButton: {
     backgroundColor: '#1059d5',
+    width: height > width ? null : 300,
     padding: 10,
     margin: 15,
     height: 40,
