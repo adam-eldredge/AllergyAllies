@@ -21,10 +21,10 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: Number
     },
-    nameOfPractice: {
+    practiceID: {
         required: true,
         type: String
-    },
+    }
 }, { collection: 'Providers' })
 
 module.exports = mongoose.model('provider', dataSchema)

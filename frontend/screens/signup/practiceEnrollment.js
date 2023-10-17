@@ -1,40 +1,44 @@
 import React, { useContext, useState } from 'react';
 import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { AuthContext, AuthProvider } from '../App.js'
+import { AuthContext, AuthProvider } from '../../App.js'
 import axios from 'axios';
 
 export default function PatientSignUpScreen() {
   var success = true;
   const [display, setDisplay] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [practiceName, setName] = useState('');
+  const [providerNames, setProviderNames] = useState([]);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPass, setConfirmPass] = useState('');
+  const [officeHours, setOfficeHours] = useState('');
+  const [allergyShotHours, setAllergyShotHours] = useState('');
 
-  const handleSignUp = async () => {
+  const handleEnrollment = async () => {
 
     setDisplay('')
-    if (firstName && lastName && email && password && confirmPass) {
-      if (password == confirmPass) {
+    if (practiceName && providerNames && phoneNumber && email && officeHours && allergyShotHours) {
         try {
           const data = {
-            firstName,
-            lastName,
+            practiceName,
+            providerNames,
+            phoneNumber,
             email,
-            password
+            officeHours,
+            allergyShotHours
           }
 
-          const emailExists = await axios.post('http://localhost:5000/api/checkEmail', { email });
+          const practiceExists = await axios.get(`http://localhost:5000/api/practiceByName/${practiceName}`);
+          console.log(practiceExists.status);
 
-          if (emailExists.status === 200) {
-            const response = await axios.post('http://localhost:5000/api/addPatient', data);
+          if (practiceExists.status === 201) {
+            const response = await axios.post('http://localhost:5000/api/addPractice', data);
             console.log(response);
           }
-          else if (emailExists.status === 201) {
-            setDisplay('This email is already associated with an account!');
+          else if (practiceExists.status === 200) {
+            setDisplay('This practice is already enrolled!');
             success = false;
+            console.log(response);
           }
 
         }
@@ -42,18 +46,13 @@ export default function PatientSignUpScreen() {
           success = false;
           console.log(error, " Error");
         }
-      }
-      else {
-        setDisplay('Passwords do not match!');
-        success = false;
-      }
     }
     else {
       setDisplay('Please fill out all fields!');
       success = false;
     }
     if (success) {
-      setDisplay('Account successfully created! Returning to sign in screen...');
+      setDisplay('Practice successfully enrolled!');
       setTimeout(() => {
         navigation.navigate('SignIn');
         }, 1000);
@@ -67,19 +66,20 @@ export default function PatientSignUpScreen() {
       <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
-          placeholder="First Name"
+          placeholder="Practice Name"
           placeholderTextColor="#7a7a7a"
-          value={firstName}
+          value={practiceName}
           autoCapitalize="none"
-          onChangeText={setFirstName} />
+          onChangeText={setName} />
 
+        {/* NEEDS TO BE UPDATED TO A MULTI INPUT*/}
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
-          placeholder="Last Name"
+          placeholder="Provider Name"
           placeholderTextColor="#7a7a7a"
-          value={lastName}
+          value={providerNames}
           autoCapitalize="none"
-          onChangeText={setLastName} />
+          onChangeText={setProviderNames} />
       </View>
 
       <TextInput style={styles.input}
@@ -92,28 +92,36 @@ export default function PatientSignUpScreen() {
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
-        placeholder="Password"
+        placeholder="Phone Number"
         placeholderTextColor="#7a7a7a"
-        value={password}
+        value={phoneNumber}
         autoCapitalize="none"
-        onChangeText={setPassword}
+        onChangeText={setPhoneNumber}
         secureTextEntry={true} />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
-        placeholder="Confirm Password"
+        placeholder="Office Hours"
         placeholderTextColor="#7a7a7a"
-        value={confirmPass}
+        value={officeHours}
         autoCapitalize="none"
-        onChangeText={setConfirmPass}
+        onChangeText={setOfficeHours}
         secureTextEntry={true} />
 
+      <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Allergy Shot Hours"
+        placeholderTextColor="#7a7a7a"
+        value={allergyShotHours}
+        autoCapitalize="none"
+        onChangeText={setAllergyShotHours}
+        secureTextEntry={true} />
 
       <Text style={styles.message}>{display}</Text>
       <TouchableOpacity
         style={styles.logInButton}
-        onPress={handleSignUp}>
-        <Text style={styles.logInButtonText}> Create Account </Text>
+        onPress={handleEnrollment}>
+        <Text style={styles.logInButtonText}> Enroll Practice </Text>
       </TouchableOpacity>
 
     </View>

@@ -5,22 +5,26 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
-    practiceAddress: {
+    providerNames: {
         required: true,
         type: String
     },
-    antigensTested: {
+    phoneNumber: {
         required: true,
         type: String
     },
-    logo: {
+    email: {
         required: false,
         type: String
     },
-    scrollingAds: {
+    officeHours: {
         required: false,
         type: String
     },
+    allergyShotHours: {
+        required: true,
+        type: Boolean
+    }
 }, { collection: 'Practices' })
 
 module.exports = mongoose.model('practice', dataSchema)

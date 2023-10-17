@@ -1,18 +1,31 @@
+const { resolveSoa } = require('dns');
 const practice = require('../Models/practice');
 const multer = require('multer');
 const path = require('path');
 
 exports.addPractice = async (req, res) => {
     try {
-        const { practiceName, practiceAddress, antigensTested, logo, scrollingAds } = req.body;
+        const { practiceName, providerNames, phoneNumber, email, officeHours, allergyShotHours } = req.body;
         const data = new practice({
-            practiceName, practiceAddress, antigensTested, logo, scrollingAds
+            practiceName, providerNames, phoneNumber, email, officeHours, allergyShotHours
         });
         // PREVENT DUPLICATES
+        console.log(req.body);
         const dataToSave = await data.save();
         return res.status(200).json(dataToSave);
     } catch (error) {
         return res.status(400).json({ message: error.message });
+    }
+}
+
+exports.getAllPractices = async (req, res) => {
+    try {
+        const practices = await practice.find();
+        res.json(practices);
+        console.log('200');
+    }
+    catch (e) {
+        return res.status(400).json({message: 'Error retrieving practices'});
     }
 }
 
@@ -23,6 +36,21 @@ exports.getPractice = async (req, res) => {
         const practiceAcc = await practice.findById(id);
         if (!practiceAcc) {
             return res.status(404).json({ message: "Practice not found" });
+        }
+
+        return res.status(200).json(practiceAcc);
+    } catch (err) {
+        return res.status(400).json({ message: "Error retrieving practice" });
+    }
+}
+
+exports.getPracticeByName = async (req, res) => {
+    // get all practice data from db
+    try {
+        const name = req.params.name;
+        const practiceAcc = await practice.findOne({practiceName: name});
+        if (!practiceAcc) {
+            return res.status(201).json({ message: "Practice not found" });
         }
 
         return res.status(200).json(practiceAcc);

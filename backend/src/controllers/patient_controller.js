@@ -30,7 +30,7 @@ exports.getAllPatients = async (req, res) => {
     }
 }
 
-// Get patient by email
+// Get patient by id
 exports.getPatient = async (req, res) => {
     try {
         const id = req.params.id;
