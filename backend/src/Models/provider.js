@@ -25,6 +25,10 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    practiceID: {
+        required: true,
+        type: Number
+    }
 }, { collection: 'Providers' })
 
 module.exports = mongoose.model('provider', dataSchema)

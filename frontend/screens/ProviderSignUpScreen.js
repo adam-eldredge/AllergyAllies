@@ -36,7 +36,7 @@ export default function ProviderSignUpScreen() {
           const NPIexists = await axios.get(NPIreigstryURI);
           //console.log(NPIexists.data);
 
-          const emailNPIExists = await axios.post('http://localhost:5000/api/getProvider', { email, NPI });
+          const emailNPIExists = await axios.post('http://localhost:5000/api/getProviderEmail', { email, NPI });
 
           if (emailNPIExists.status === 200) {
             //console.log(response);

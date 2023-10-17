@@ -28,7 +28,7 @@ exports.getAllProviders = async (req, res) => {
 }
 
 // Get provider by email
-exports.getProvider = async (req, res) => {
+exports.getProviderEmail = async (req, res) => {
     try {
         const email = req.body.email.toString();
         const NPI = req.body.NPI.toString();
@@ -66,6 +66,22 @@ exports.deleteProvider = async (req, res) => {
     }
     catch (error) {
         res.status(400).json({ message: error.message })
+    }
+}
+
+// Get provider by id
+exports.getProvider = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const foundProvider = await provider.findById(id);
+        if (foundProvider) {
+            return res.status(200).json(foundProvider);
+        } else {
+            return res.status(404).json({ message: `Provider not found: ${id}` });
+        }
+    }
+    catch (error) {
+        return res.status(400).json({ message: error.message });
     }
 }
 

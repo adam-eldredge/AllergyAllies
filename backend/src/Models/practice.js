@@ -21,6 +21,10 @@ const dataSchema = new mongoose.Schema({
         required: false,
         type: String
     },
+    completedSurvey: {
+        required: true,
+        type: Boolean
+    }
 }, { collection: 'Practices' })
 
 module.exports = mongoose.model('practice', dataSchema)

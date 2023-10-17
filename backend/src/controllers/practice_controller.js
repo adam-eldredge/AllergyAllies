@@ -21,7 +21,7 @@ exports.getAllPractices = async (req, res) => {
     try {
         console.log('here');
         const practices = await practice.find();
-        return res.status(200).json(practices);
+        res.status(200).json(practices);
     }
     catch (e) {
         return res.status(400).json({message: 'Error retrieving practices'});

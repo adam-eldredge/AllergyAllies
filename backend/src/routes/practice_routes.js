@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const practiceController = require('../controllers/practice_controller');
-const verifyJWT = require('../middleware/verify_JWT');
+// const verifyJWT = require('../middleware/verify_JWT');
 
-router.use(verifyJWT)
+// router.use(verifyJWT)
 
 router.post('/addPractice', practiceController.addPractice);
 

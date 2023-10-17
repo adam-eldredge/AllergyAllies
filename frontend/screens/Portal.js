@@ -135,7 +135,9 @@ export default function Portal({navigation}){
                alignItems='center'
             />
          </TouchableOpacity> 
-         <TouchableOpacity style={styles.menuItem}>
+         <TouchableOpacity style={styles.menuItem}onPress={() =>
+            navigation.navigate('PracticeSurvey')
+         }>
             <Text style={styles.menuItemText}>Edit Survey Responses</Text>
             <IconButton
                icon="pencil"
