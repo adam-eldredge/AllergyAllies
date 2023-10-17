@@ -1,7 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { AuthContext, AuthProvider } from '../../App.js'
+import DropDownPicker from 'react-native-dropdown-picker';
 import axios from 'axios';
 
 
@@ -14,11 +15,50 @@ export default function ProviderSignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [NPI, setNPI] = useState('');
-  const [nameOfPractice, setNameOfPractice] = useState('');
+  const [practiceID, setPracticeID] = useState('');
+
+  const [practiceList, setPracticeList] = useState([]);
+  const [queriedPractices, setQueriedPractices] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  // Get practices to populate dropdown menu
+  useEffect(() => {
+    
+    async function getPractices() {
+      const res = await axios.get('http://localhost:5000/api/getAllPractices');
+
+      if (res.status === 200) {
+        console.log(res.data);
+        handlePractices(res.data);
+        setQueriedPractices(true);
+      }
+      else {
+        console.log(res.status);
+        setPracticeList([{label: 'None', value: 'No practices available'}]);
+      }
+    }
+
+    if (queriedPractices == false) {
+      getPractices();
+    }
+
+  });
+
+  const handlePractices = async (items) => {
+    {items.map((item) => {
+      console.log(`Item being mapped. Id: ${item._id} , name: ${item.practiceName}`)
+      addToList({label: item.practiceName,
+                value: item._id});
+    })}
+  }
+
+  const addToList = async (item) => {
+    setPracticeList(practiceList.concat(item))
+  }
 
   const handleSignUp = async () => {
     setDisplay('')
-    if (firstName && lastName && email && password && confirmPass && NPI && nameOfPractice) {
+    if (firstName && lastName && email && password && confirmPass && NPI && practiceID) {
       if (password == confirmPass) {
         try {
           const data = {
@@ -27,7 +67,7 @@ export default function ProviderSignUpScreen() {
             email,
             password,
             NPI,
-            nameOfPractice
+            practiceID
           }
 
           // Used to check if provider has a valid NPI, WIP
@@ -40,10 +80,10 @@ export default function ProviderSignUpScreen() {
 
           if (emailNPIExists.status === 200) {
             //console.log(response);
-            if(NPIexists.data[0] == 1){
+            if (NPIexists.data[0] == 1) {
               const response = await axios.post('http://localhost:5000/api/addProvider', data);
             }
-            else{
+            else {
               setDisplay('Invalid NPI')
               success = false;
             }
@@ -52,7 +92,7 @@ export default function ProviderSignUpScreen() {
             setDisplay('This email is already associated with an account!');
             success = false;
           }
-          else if(emailNPIExists.status === 208){
+          else if (emailNPIExists.status === 208) {
             setDisplay('This NPI cannot be used.');
             success = false;
           }
@@ -76,26 +116,15 @@ export default function ProviderSignUpScreen() {
       setDisplay('Account successfully created! Returning to sign in screen...');
       setTimeout(() => {
         navigation.navigate('SignIn');
-        }, 1000);
+      }, 1000);
     }
   }
-
-  const [practices, setPractices] = useState([]);
-  console.log('here');
-    const response = axios.get('http://localhost:5000/api/getAllPractices');
-    // if (response.status === 200) {
-    //   setPractices(response);
-    //   console.log(response);
-    // }
-    // else {
-    //   // There were no practices found
-    // }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Allergy Ally</Text>
 
-      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
+      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
           placeholder="First Name"
@@ -121,17 +150,17 @@ export default function ProviderSignUpScreen() {
         autoCapitalize="none"
         onChangeText={setEmail} />
 
-    <TextInput style={styles.input}
+      <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="National Provider Identifier"
         placeholderTextColor="#7a7a7a"
         value={NPI}
         autoCapitalize="none"
-        onChangeText={setNPI}/>
+        onChangeText={setNPI} />
 
-    {/*TODO Will update to Drop Down option of all practices */}
+      {/*TODO Will update to Drop Down option of all practices */}
 
-    {/* <TextInput style={styles.input}
+      {/* <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Name of Practice"
         placeholderTextColor="#7a7a7a"
@@ -139,13 +168,14 @@ export default function ProviderSignUpScreen() {
         autoCapitalize="none"
         onChangeText={setNameOfPractice}/> */}
 
-      <div className='drop-down'>
-        <select>
-          practices.map((obj)  {
-
-          })
-        </select>
-      </div>
+      <DropDownPicker
+      open={open}
+      value={practiceID}
+      items={practiceList}
+      setOpen={setOpen}
+      setValue={setPracticeID}
+      setItems={setPracticeList}
+      />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
@@ -194,7 +224,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     color: '#DC143C',
-},
+  },
   shortInput: {
     margin: 15,
     width: height > width ? null : 136,

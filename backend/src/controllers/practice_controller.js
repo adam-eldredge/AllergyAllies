@@ -10,6 +10,7 @@ exports.addPractice = async (req, res) => {
             practiceName, providerNames, phoneNumber, email, officeHours, allergyShotHours
         });
         // PREVENT DUPLICATES
+        console.log(req.body);
         const dataToSave = await data.save();
         return res.status(200).json(dataToSave);
     } catch (error) {
@@ -19,9 +20,9 @@ exports.addPractice = async (req, res) => {
 
 exports.getAllPractices = async (req, res) => {
     try {
-        console.log('here');
         const practices = await practice.find();
-        res.status(200).json(practices);
+        res.json(practices);
+        console.log('200');
     }
     catch (e) {
         return res.status(400).json({message: 'Error retrieving practices'});

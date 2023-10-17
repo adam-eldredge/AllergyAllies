@@ -21,13 +21,9 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: Number
     },
-    nameOfPractice: {
-        required: true,
-        type: String
-    },
     practiceID: {
         required: true,
-        type: Number
+        type: String
     }
 }, { collection: 'Providers' })
 
