@@ -5,6 +5,7 @@ import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import PatientAppointments from './PatientAppointments.js';
 import Alerts from '../screens/Alerts.js';
+import PatientProfile from '../screens/PatientProfile.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator();
@@ -37,7 +38,7 @@ export default function PatientHome(){
         <Tab.Screen name="Appointments" component={PatientAppointments} />
         <Tab.Screen name="History" component={PatientAppointments} />
         <Tab.Screen name="Alerts" component={Alerts} />
-        <Tab.Screen name="Profile" component={PatientAppointments} />
+        <Tab.Screen name="Profile" component={PatientProfile} />
         </Tab.Navigator>
       )
    }
