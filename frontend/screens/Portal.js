@@ -79,20 +79,7 @@ export default function Portal({navigation}){
    ) : (
       // PROVIDER PORTAL
       <View style = {styles.container}>
-         <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'flex-end'}}>
-            <Text style={styles.header}>Welcome, {firstName}</Text>
-            <View style={styles.spacer}></View>
-            <TouchableOpacity
-            onPress={() =>
-               navigation.navigate('ProviderAccount')
-            }>
-               <IconButton
-                  icon="account-circle-outline"
-                  iconColor="#606060"
-                  size={30}
-               />
-            </TouchableOpacity> 
-         </View>
+         <Text style={styles.header}>Welcome, {firstName}</Text>
          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center',}}>
             <View style={styles.providerDashboardItem}>
             </View>
@@ -166,7 +153,7 @@ export default function Portal({navigation}){
 const styles = StyleSheet.create({
    header:{
       color: '#606060',
-      marginLeft: 15,
+      marginBottom: 15,
       fontSize: 25,
       textAlign: 'center',
       fontWeight: '600',

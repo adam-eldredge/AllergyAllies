@@ -119,6 +119,7 @@ export default function App({navigation}) {
                 title: '',
                 headerTitleAlign: 'center',
                 headerTitleStyle: {textAlign: 'center'},
+                headerShown: false
               }}
             />
             <Stack.Screen
