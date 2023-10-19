@@ -49,12 +49,15 @@ export default function PatientProfile(){
         <Text style={styles.textBoxSubContent}>10/17/23</Text> 
         <Text style={styles.textBoxContent}>Tracking Start Date:</Text> 
         <Text style={styles.textBoxSubContent}>10/17/23</Text>
-        <Text style={styles.textBoxContent}>Starting Bottle Number:</Text> 
-        <Text style={styles.textBoxSubContent}>1</Text>
-        <Text style={styles.textBoxContent}>Maintenance Bottle Number:</Text> 
-        <Text style={styles.textBoxSubContent}>3</Text>
-        <Text style={styles.textBoxContent}>Starting Injection Amount:</Text> 
-        <Text style={styles.textBoxSubContent}>2 mg</Text>
+        <Text style={styles.textBoxContent}>Vial 1 (Insects):</Text> 
+        <Text style={styles.textBoxSubContent}>Maintenance Bottle Number: 6</Text>
+        <Text style={styles.textBoxSubContent}>Maximum Injection Amount: .25 mg</Text>
+        <Text style={styles.textBoxContent}>Vial 2 (Pollen):</Text> 
+        <Text style={styles.textBoxSubContent}>Maintenance Bottle Number: 4</Text>
+        <Text style={styles.textBoxSubContent}>Maximum Injection Amount: .20 mg</Text>
+        <Text style={styles.textBoxContent}>Vial 3 (Molds):</Text> 
+        <Text style={styles.textBoxSubContent}>Maintenance Bottle Number: 4</Text>
+        <Text style={styles.textBoxSubContent}>Maximum Injection Amount: .25 mg</Text>
         <Text style={styles.textBoxContent}>Frequency of Injections:</Text> 
         <Text style={styles.textBoxSubContent}>2x a week</Text>
       </View>
@@ -95,7 +98,8 @@ export default function PatientProfile(){
         borderBottomColor: '#e3e3e3',
         paddingLeft: 15,
         paddingBottom: 6,
-        color: '#0d3375'
+        color: '#0d3375',
+        fontWeight: '600'
       },
       textBoxDivider: {
         borderBottomWidth: 1,
@@ -108,7 +112,8 @@ export default function PatientProfile(){
         alignSelf: 'flex-start',
         paddingLeft: 15,
         paddingBottom: 8,
-        color: '#5e5e5e'
+        color: '#5e5e5e',
+        fontWeight: '400'
       },
       textBoxSubContent: {
         fontSize: 16,
@@ -117,7 +122,8 @@ export default function PatientProfile(){
         alignSelf: 'flex-start',
         paddingLeft: 15,
         paddingBottom: 6,
-        color: '#828282'
+        color: '#878787',
+        fontWeight: '400'
       },
     profilePhotoContainer: {
         alignItems: 'center',
@@ -141,7 +147,8 @@ export default function PatientProfile(){
     },
     name: {
         fontSize: 20,
-        marginTop: 8
+        marginTop: 8,
+        fontWeight: '700'
     },
     grayText: {
         fontSize: 14,
