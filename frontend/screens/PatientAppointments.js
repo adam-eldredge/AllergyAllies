@@ -15,6 +15,7 @@ export default function PatientAppointments({navigation}){
 const userInfo = User();
 const firstName = userInfo.firstName;
 
+//will eventually come from backend: (num appointments attended late/num appointments attended on time * 100)
 var compliance = 90;
 var msg = "";
 if (compliance >= 80)
