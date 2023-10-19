@@ -23,7 +23,7 @@ const dataSchema = new mongoose.Schema({
     },
     allergyShotHours: {
         required: true,
-        type: Boolean
+        type: String
     }
 }, { collection: 'Practices' })
 
