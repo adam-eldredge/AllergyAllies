@@ -12,7 +12,15 @@ export default function InitialScreen({navigation}){
             style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#95C8FC', }}
             resizeMode= 'fit'>
                 <View>
-                    <Text style = {styles.title}>AllergyAlly</Text>
+                    <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap',}}>
+                        <Text style = {styles.title}>AllergyAlly</Text>
+                        <IconButton
+                        icon="flower-pollen"
+                        iconColor="#063b94"
+                        size={60}
+                        style={{marginTop: 60}}
+                        />
+                    </View>
                     <Text style = {styles.subtitle}>Manage your allergies from anywhere, at any time.</Text>
                     <Text style = {styles.description}>Keep track of appointments, calculate injection dosages, record data, and more with AllergyAlly.</Text>
                     <TouchableOpacity
