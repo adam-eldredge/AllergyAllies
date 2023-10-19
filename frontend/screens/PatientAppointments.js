@@ -6,69 +6,114 @@ import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Alerts from './Alerts.js';
+import User from '../User';
 
 const Tab = createBottomTabNavigator();
 
-export default function PatientHome({navigation}){
+export default function PatientAppointments({navigation}){
+
+const userInfo = User();
+const firstName = userInfo.firstName;
+
+var compliance = 90;
+var msg = "";
+if (compliance >= 80)
+  msg = "Great job!";
+else if (compliance >= 60)
+  msg = "Keep it up!";
+else
+  msg = "Talk to your doctor about ways you can improve.";
       return (
        
-<ScrollView>
-<Text style = {styles.title1}>Next Appointment Deadline:</Text>
-<Text style = {styles.subtitle}>Tap on the day for more info</Text>
-<TouchableOpacity style = {styles.appointment}
-onPress={() =>
-    navigation.navigate('Upcoming')
+<ScrollView style = {styles.container}>
+<Text style = {styles.welcome}>Welcome, {firstName}</Text>
+<TouchableOpacity style = {styles.card} onPress={() =>
+    navigation.navigate('Progress')
   }>
-    <Text style={styles.appointmentText}>Monday 10/9/2023</Text>
+<Text style = {styles.title1}>You have been</Text>
+<Text style = {styles.complianceNum}>{compliance}%</Text>
+
+<Text style = {styles.title1}>compliant with your treatment schedule.</Text>
+<Text style = {styles.message}>{msg}</Text>
+
+
 </TouchableOpacity>
 
-<Text style={styles.container}></Text>
-<Text style = {styles.title2}>Past Appointments Attended:</Text>
-<View style = {styles.pastAppointment}>
-    <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
-    <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
-    </View>
-</View>
-<View style = {styles.pastAppointment}>
-    <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-    <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#e66624', marginRight: 10}}> 12 Days Late - Dose Adjustment </Text>
-    </View>
-</View>
-<View style = {styles.pastAppointment}>
-    <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-    <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
-        <Text style={{color: 'white', backgroundColor:'#e55555', marginRight: 10}}> Adverse Reaction </Text>
-    </View>
-</View>
-<View style = {styles.pastAppointment}>
-    <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-    <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
-    </View>
-</View>
 </ScrollView>
       )
    }
 
 const styles = StyleSheet.create({
    container: {
-      paddingTop: 30
+    flex: 1,
+    padding: 16,
    },
-    title1 :{
-    paddingTop: 20,
-    marginBottom: 5,
-    textAlign: 'center',
-    fontSize: 22,
+   card: {
+    alignItems: 'center',
+    borderRadius: 8,
+    //shadowOpacity: 0.1,
+    //shadowOffset: {width: 2, height: 4},
+    //shadowColor: 'black',
+    //shadowOpacity: 0.05,
+    //shadowRadius: 8,
+    backgroundColor: 'white',
+    marginTop: 18,
+    marginBottom: 18,
+    padding: 12,
+
+
+   },
+   welcome :{
+    fontSize: 20,
     fontWeight: '600',
+    alignSelf: 'center',
+    color: '#0d3375'
     },
+    title1 :{
+    marginHorizontal: 8,
+    marginVertical: 5,
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '400',
+    fontStyle: 'italic',
+    color: '#3d3d3d'
+    },
+    message :{
+        marginHorizontal: 8,
+        marginVertical: 5,
+        textAlign: 'center',
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#539CF5'
+        },
     title2 :{
         marginBottom: 15,
         textAlign: 'center',
         fontSize: 22,
         fontWeight: '600',
+    },
+    compliance: {
+        paddingTop: 10,
+        marginBottom: -5,
+        margin: 20,
+        height: 120,
+        width: 120,
+        justifyContent: 'center',
+        textAlignVertical: 'center',
+        alignSelf: 'center',
+        borderWidth: 1,
+        borderColor: '#539CF5',
+        borderRadius: 60,
+        backgroundColor: '#539CF5'
+    },
+    complianceNum: {
+        //alignSelf: 'center',
+        textAlign: 'center',
+        fontSize: 32,
+        fontWeight: '600',
+        color: '#539CF5',
+        margin: 10
+
     },
     subtitle :{
         paddingBottom: 15,

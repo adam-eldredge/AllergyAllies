@@ -29,6 +29,9 @@ import jwt_decode from 'jwt-decode';
 const Stack = createNativeStackNavigator();
 
 
+//PatientHome: the bottom tab navigation bar
+//PatientAppointments: the patient home screen
+
 export default function App({navigation}) {
 
   const initialState = {
@@ -169,7 +172,7 @@ export default function App({navigation}) {
             <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
             <Stack.Screen name="Reports" component={Reports} />
-            <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Patient Home'}} />
+            <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Allergy Ally'}} />
             <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
             <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
             <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
@@ -195,6 +198,7 @@ const styles = StyleSheet.create({
   },
   headerTitleStyle: {
     fontWeight: 'bold',
+    fontSize: 20,
     textAlign: 'center',
     alignSelf: 'center',
     color: 'white',
