@@ -4,12 +4,17 @@ import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react
 import { useRoute } from '@react-navigation/native';
 import AuthContext from '../AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import User from '../User';
+   
 
 
 export default function PatientProfile(){
 
     const { signOut } = useContext(AuthContext);
+    const userInfo = User();
+    const firstName = userInfo.firstName;
+    const lastName = userInfo.lastName;
+    const email = userInfo.email;
 
       return (
       <ScrollView style={styles.container}>
@@ -18,8 +23,8 @@ export default function PatientProfile(){
           source={require('./profilepic.png')}
           style={styles.profilePhoto}
         />
-        <Text style={styles.name}>Jane Doe</Text>
-        <Text style={styles.grayText}> janedoe@gmail.com </Text>
+        <Text style={styles.name}>{firstName} {lastName}</Text>
+        <Text style={styles.grayText}> testemail@gmail.com </Text>
       </View>
       <View style={styles.textBoxContainer}>
         <View style={styles.textBoxDivider}> 
@@ -46,7 +51,7 @@ export default function PatientProfile(){
         <Text style={styles.textBoxSubContent}>10/17/23</Text>
         <Text style={styles.textBoxContent}>Starting Bottle Number:</Text> 
         <Text style={styles.textBoxSubContent}>1</Text>
-        <Text style={styles.textBoxContent}>Maintenace Bottle Number:</Text> 
+        <Text style={styles.textBoxContent}>Maintenance Bottle Number:</Text> 
         <Text style={styles.textBoxSubContent}>3</Text>
         <Text style={styles.textBoxContent}>Starting Injection Amount:</Text> 
         <Text style={styles.textBoxSubContent}>2 mg</Text>
