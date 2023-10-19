@@ -12,7 +12,14 @@ export default function InitialScreen({navigation}){
             style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#95C8FC', }}
             resizeMode= 'fit'>
                 <View>
-                    <Text style = {styles.title}>AllergyAlly</Text>
+                    <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap',}}>
+                        <Text style = {styles.title}>AllergyAlly</Text>
+                        <IconButton style = {{marginTop: 60}}
+                        icon="flower-pollen"
+                        iconColor="#063b94"
+                        size={65}
+                        />
+                    </View>
                     <Text style = {styles.subtitle}>Manage your allergies from anywhere, at any time.</Text>
                     <Text style = {styles.description}>Keep track of appointments, calculate injection dosages, record data, and more with AllergyAlly.</Text>
                     <TouchableOpacity
@@ -74,11 +81,11 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         marginLeft: 60,
         borderWidth: 1,
-        borderColor: 'green',
-        backgroundColor: '#d2e9ff'
+        borderColor: '#509045',
+        backgroundColor: '#cee1ff'
     },
     logInButtonText:{
-        color: 'green',
+        color: '#509045',
         textAlign: 'center',
         fontSize: 15,
         fontWeight: '600',
