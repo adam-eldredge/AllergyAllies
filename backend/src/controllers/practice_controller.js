@@ -59,6 +59,21 @@ exports.getPracticeByName = async (req, res) => {
     }
 }
 
+exports.getPracticeByCode = async (req, res) => {
+    // get all practice data from db
+    try {
+        const pC = req.params.code;
+        const practiceAcc = await practice.findOne({practiceCode: pC});
+        if (!practiceAcc) {
+            return res.status(201).json({ message: "Practice not found" });
+        }
+
+        return res.status(200).json(practiceAcc);
+    } catch (err) {
+        return res.status(400).json({ message: "Error retrieving practice" });
+    }
+}
+
 exports.deletePractice = async (req, res) => {
     try {
         const id = req.params.id;

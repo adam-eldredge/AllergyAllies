@@ -6,9 +6,9 @@ exports.addPatient = async (req, res) => {
     // implement duplicate check
     // add password encryption
     try {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, practiceID } = req.body;
         const data = new patient({
-            firstName, lastName, email, password
+            firstName, lastName, email, password, practiceID
         });
 
         const dataToSave = await data.save();

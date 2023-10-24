@@ -24,6 +24,10 @@ const dataSchema = new mongoose.Schema({
     allergyShotHours: {
         required: true,
         type: String
+    },
+    practiceCode: {
+        required: true,
+        type: String
     }
 }, { collection: 'Practices' })
 
