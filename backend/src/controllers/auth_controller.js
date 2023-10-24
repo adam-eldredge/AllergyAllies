@@ -95,7 +95,9 @@ exports.refresh = async(req, res) => {
                 {
                     "UserInfo": {
                         "id": foundUser.id,
-                        "roles": 1
+                        "role": role,
+                        "firstName": foundUser.firstName,
+                        "lastName": foundUser.lastName
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
