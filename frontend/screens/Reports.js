@@ -18,61 +18,151 @@ export default function Reports({navigation}) {
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Attrition_09_12_2023</DataTable.Cell>
             <DataTable.Cell>automated</DataTable.Cell>
             <DataTable.Cell>09/12/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
           <DataTable.Row style={styles.tableRow1}>
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Maintenance_09_1...</DataTable.Cell>
             <DataTable.Cell>manual</DataTable.Cell>
             <DataTable.Cell>09/12/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
           <DataTable.Row style={styles.tableRow2}>
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Refills_09_12_2023</DataTable.Cell>
             <DataTable.Cell>automated</DataTable.Cell>
             <DataTable.Cell>09/12/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
           <DataTable.Row style={styles.tableRow1}>
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>NeedsRetest_09_1...</DataTable.Cell>
             <DataTable.Cell>manual</DataTable.Cell>
             <DataTable.Cell>09/11/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
           <DataTable.Row style={styles.tableRow2}>
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Refills_09_06_2023</DataTable.Cell>
             <DataTable.Cell>automated</DataTable.Cell>
             <DataTable.Cell>09/06/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
           <DataTable.Row style={styles.tableRow1}>
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Attrition_09_05_2023</DataTable.Cell>
             <DataTable.Cell>automated</DataTable.Cell>
             <DataTable.Cell>09/05/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
           <DataTable.Row style={styles.tableRow2}>
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Maintenance_09_0...</DataTable.Cell>
             <DataTable.Cell>manual</DataTable.Cell>
             <DataTable.Cell>09/05/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
           <DataTable.Row style={styles.tableRow1}>
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>NeedsRetest_09_0...</DataTable.Cell>
             <DataTable.Cell>manual</DataTable.Cell>
             <DataTable.Cell>09/04/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
           <DataTable.Row style={{...styles.tableRow2, borderBottomEndRadius: 8, borderBottomStartRadius: 8}}>
             <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Maintenance_09_0...</DataTable.Cell>
             <DataTable.Cell>manual</DataTable.Cell>
             <DataTable.Cell>09/04/2023</DataTable.Cell>
-            <DataTable.Cell>additional info here</DataTable.Cell>
+            <DataTable.Cell>
+              additional info here
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+                <IconButton
+                  icon="trash-can-outline"
+                  iconColor="#1059d5"
+                  size={17}
+                  onPress={showAlert}
+                />
+              </TouchableOpacity>
+            </DataTable.Cell>
           </DataTable.Row>
         </DataTable>
         <View style={{height: 30}}></View>
         </ScrollView>
         <View style={{flex: 1}}>
-        <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 100}}
+        <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 50}}
                onPress={() =>
                   navigation.navigate('Reports')
                }>
@@ -96,16 +186,16 @@ export default function Reports({navigation}) {
                />
             </TouchableOpacity>
             <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#7fd0ae'}}
-            onPress={() =>
-               navigation.navigate('Reports')
-            }>
-               <Text style={styles.providerDashboardText}>Reports</Text>
-               <IconButton
-                  icon="file-chart"
-                  iconColor="white"
-                  size={37}
-               />
-            </TouchableOpacity>
+               onPress={() =>
+                  navigation.navigate('AllAlerts')
+               }>
+                  <Text style={styles.providerDashboardText}>Alerts</Text>
+                  <IconButton
+                     icon="bell-ring"
+                     iconColor="white"
+                     size={37}
+                  />
+               </TouchableOpacity>
             <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#d07f99'}}
                onPress={() =>
                   signOut()
@@ -129,9 +219,9 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   header:{
-    fontSize: 50,
+    fontSize: 40,
+    marginTop: 40,
     fontWeight: '600',
-    marginTop: 20,
     marginLeft: 100,
     color: '#1059d5',
     marginBottom: 20,
@@ -141,13 +231,13 @@ const styles = StyleSheet.create({
     width: 700,
   },
   tableHeader: {
-    backgroundColor: '#b3caf2',
+    backgroundColor: '#cbdeff',
     borderTopStartRadius: 8,
     borderTopEndRadius: 8,
     color: 'black',
   },
   tableRow2: {
-    backgroundColor: '#e7e7e7',
+    backgroundColor: '#ebebeb',
   },
   providerDashboardItem:{
     borderRadius: 50,
@@ -165,3 +255,27 @@ const styles = StyleSheet.create({
     marginBottom: -10,
  },
 })
+
+const showAlert = () =>
+  Alert.alert(
+    'Delete this alert?',
+    'This action cannot be undone!',
+    [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+        //onPress: () => Alert.alert('add in delete functionality'),
+      },
+      {
+         text: 'Yes',
+         style: 'cancel',
+       },
+    ],
+    {
+      cancelable: true,
+      onDismiss: () =>
+        Alert.alert(
+          'This alert was dismissed by tapping outside of the alert dialog.',
+        ),
+    },
+  );
