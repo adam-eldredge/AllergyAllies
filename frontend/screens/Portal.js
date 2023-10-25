@@ -104,7 +104,7 @@ export default function Portal({navigation}){
                <TouchableOpacity
                onPress={() =>
                   navigation.navigate('AllAlerts')}>
-                  <Text style = {{textDecorationLine: 'underline', color: '#1059d5', fontSize: 15, marginTop: 10,}}>View All Alerts</Text>
+                  <Text style = {{textDecorationLine: 'underline', color: '#1059d5', fontSize: 15, marginTop: 10, fontWeight: 'bold',}}>View All Alerts</Text>
                </TouchableOpacity>
             </View>
             <View style = {{marginRight: 40}}>
@@ -136,7 +136,7 @@ export default function Portal({navigation}){
                   onPress={() =>
                      navigation.navigate('PracticeSurvey')
                   }>
-                  <Text style={{...styles.providerDashboardText, fontSize: 16}}>View/Edit Practice Info</Text>
+                  <Text style={{...styles.providerDashboardText, fontSize: 16,}}>View/Edit Practice Info</Text>
                   <IconButton
                      icon="pencil"
                      iconColor="white"
