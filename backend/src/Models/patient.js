@@ -20,7 +20,12 @@ const dataSchema = new mongoose.Schema({
     DoB: {
         required: false,
         type: Date
-    }
+    },
+    treatments: {
+        required: false,
+        type: [mongoose.Schema.Types.ObjectId],
+    },
+    maintenanceBottleNumber: {pollenMaintenanceBottle: Number, insectsAndPetsMaintenanceBottle: Number, moldsMaintenanceBottle: Number},
 }, { collection: 'Patients' })
 
 module.exports = mongoose.model('Patient', dataSchema)

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const nextDoseAdjustments = new mongoose.Schema({
-    startingInjectionInterval: {
+    injectionIntervalnjectionInterval: {
         required: true,
         type: Number,
     },
@@ -20,20 +20,77 @@ const nextDoseAdjustments = new mongoose.Schema({
 })
 
 // may need multiple of these, for different missedDays values
-const missedDoseAdjustments = new mongoose.Schema ({
+const missedDoseAdjustments1 = new mongoose.Schema ({
     doseAdjustMissedDays: {
         required: true,
         type: Number,
     },
-    injectionVolumeDecrease: {
+    adjustInjectionVolume: {
         required: true,
         type: Number,
     },
-    decreaseVialConcentration: {
+    adjustVialConcentration: {
         required: true,
         type: Number,
     },
-    decreaseBottleNumber: {
+    adjustBottleNumber: {
+        required: true,
+        type: Number,
+    },
+})
+
+const missedDoseAdjustments2 = new mongoose.Schema ({
+    doseAdjustMissedDays: {
+        required: true,
+        type: Number,
+    },
+    adjustInjectionVolume: {
+        required: true,
+        type: Number,
+    },
+    adjustVialConcentration: {
+        required: true,
+        type: Number,
+    },
+    adjustBottleNumber: {
+        required: true,
+        type: Number,
+    },
+})
+
+const missedDoseAdjustments3 = new mongoose.Schema ({
+    doseAdjustMissedDays: {
+        required: true,
+        type: Number,
+    },
+    adjustInjectionVolume: {
+        required: true,
+        type: Number,
+    },
+    adjustVialConcentration: {
+        required: true,
+        type: Number,
+    },
+    adjustBottleNumber: {
+        required: true,
+        type: Number,
+    },
+})
+
+const missedDoseAdjustments4 = new mongoose.Schema ({
+    doseAdjustMissedDays: {
+        required: true,
+        type: Number,
+    },
+    adjustInjectionVolume: {
+        required: true,
+        type: Number,
+    },
+    adjustVialConcentration: {
+        required: true,
+        type: Number,
+    },
+    adjustBottleNumber: {
         required: true,
         type: Number,
     },
@@ -45,15 +102,15 @@ const largeReactionsDoseAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    decreaseInjectionVol: {
+    adjustInjectionVol: {
         required: true,
         type: Number,
     },
-    decreaseVialConcentration: {
+    adjustVialConcentration: {
         required: true,
         type: Number,
     },
-    decreaseBottleNumber: {
+    adjustBottleNumber: {
         required: true,
         type: Number,
     }
@@ -64,15 +121,11 @@ const vialTestReactionAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    whealLevelAdjustForVialTestReactions: {
+    adjustVialConcentration: {
         required: true,
         type: Number,
     },
-    decreaseVialConcentration: {
-        required: true,
-        type: Number,
-    },
-    decreaseBottleNumber: {
+    adjustBottleNumber: {
         required: true,
         type: Number,
     },
@@ -89,7 +142,10 @@ const dataSchema = new mongoose.Schema({
         type: String
     },
     nextDoseAdjustment: nextDoseAdjustments,
-    missedDoseAdjustment: missedDoseAdjustments,
+    missedDoseAdjustment1: missedDoseAdjustments1,
+    missedDoseAdjustment2: missedDoseAdjustments2,
+    missedDoseAdjustment3: missedDoseAdjustments3,
+    missedDoseAdjustment4: missedDoseAdjustments4,
     largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
     vialTestReactionAdjustment: vialTestReactionAdjustments,
     
