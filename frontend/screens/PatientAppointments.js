@@ -5,7 +5,6 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Di
 import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Alerts from './Alerts.js';
 
 const Tab = createBottomTabNavigator();
 
