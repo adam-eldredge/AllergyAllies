@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Di
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Portal from './screens/Portal.js';
-import Alerts from './screens/Alerts.js';
 import AllAlerts from './screens/AllAlerts.js';
 import Reports from './screens/Reports.js';
 import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
@@ -167,7 +166,6 @@ export default function App({navigation}) {
             // User is signed in
             <>
             <Stack.Screen name="Portal" component={Portal} />
-            <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
             <Stack.Screen name="Reports" component={Reports} />
             <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Patient Home'}} />
