@@ -105,7 +105,7 @@ export default function AllAlerts({navigation}){
          </Card>
          <View style={{height: 20, backgroundColor: '#fcfcfc'}}></View>
       </ScrollView>
-      <View style={{backgroundColor: '#fcfcfc', flex: 1, marginLeft: 280, marginTop: -40}}>
+      <View style={{backgroundColor: '#fcfcfc', flex: 1, marginLeft: 100, marginTop: -50}}>
             <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 100}}
                onPress={() =>
                   navigation.navigate('Reports')
