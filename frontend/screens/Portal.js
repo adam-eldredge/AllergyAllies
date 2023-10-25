@@ -203,22 +203,6 @@ const styles = StyleSheet.create({
       fontSize: 20,
       fontWeight: '600',
    },
-   providerMenuText:{
-      color: '#1059d5',
-      textAlign: 'center',
-      fontSize: 20,
-      fontWeight: '600',
-   },
-   providerMenuItem:{
-      borderRadius: 100,
-      height: 200,
-      width: 200,
-      borderColor: '#71a1f3',
-      borderWidth: 3,
-      marginLeft: 20,
-      marginRight: 20,
-      marginBottom: 20,
-   },
    providerDashboardItem:{
       borderRadius: 20,
       height: 150,
@@ -242,6 +226,7 @@ const styles = StyleSheet.create({
    },
    alertText: {
       fontSize: 15,
+      fontWeight: '600',
    },
    spacer: {
       width: 300
