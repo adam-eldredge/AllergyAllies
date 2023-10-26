@@ -30,6 +30,19 @@ exports.getAllPatients = async (req, res) => {
     }
 }
 
+// Get all patients from a practice
+exports.getPatientsByPractice = async (req, res) => {
+    try {
+        const pracID = req.params.practiceID;
+        console.log(pracID)
+        const data = await patient.find({practiceID: pracID});
+        return res.json(data);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 // Get patient by id
 exports.getPatient = async (req, res) => {
     try {
