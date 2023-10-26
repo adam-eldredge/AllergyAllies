@@ -5,7 +5,7 @@ import AuthContext from '../AuthContext';
 import User from '../User';
 import axios from 'axios';
 
-export default function viewPatients({ navigation }) {
+export default function ViewPatients({ navigation }) {
 
     const { signOut } = useContext(AuthContext);
     const userInfo = User();
