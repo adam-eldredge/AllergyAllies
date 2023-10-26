@@ -20,7 +20,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/12/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -36,7 +36,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/12/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -52,7 +52,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/12/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -68,7 +68,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/11/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -84,7 +84,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/06/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -100,7 +100,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/05/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -116,7 +116,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/05/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -132,7 +132,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/04/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -148,7 +148,7 @@ export default function Reports({navigation}) {
             <DataTable.Cell>09/04/2023</DataTable.Cell>
             <DataTable.Cell>
               additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
                 <IconButton
                   icon="trash-can-outline"
                   iconColor="#1059d5"
@@ -162,7 +162,18 @@ export default function Reports({navigation}) {
         <View style={{height: 30}}></View>
         </ScrollView>
         <View style={{flex: 1}}>
-        <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 50}}
+        <TouchableOpacity style={{marginTop: 50, marginBottom: 10, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
+               onPress={() =>
+                  signOut()
+               }>
+                <Text style={{color: 'white', size: 5, marginRight: -10, marginLeft: 12, fontWeight: 500}}>Sign out</Text>
+                  <IconButton
+                     icon="exit-to-app"
+                     iconColor="white"
+                     size={14}
+                  />
+        </TouchableOpacity>
+        <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 15}}
                onPress={() =>
                   navigation.navigate('Reports')
                }>
@@ -196,16 +207,16 @@ export default function Reports({navigation}) {
                      size={37}
                   />
                </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#d07f99'}}
-               onPress={() =>
-                  signOut()
-               }>
-                  <Text style={styles.providerDashboardText}>Sign out</Text>
-                  <IconButton
-                     icon="exit-to-app"
-                     iconColor="white"
-                     size={37}
-                  />
+            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
+            onPress={() =>
+              navigation.navigate('Injections')
+             }>
+               <Text style={styles.providerDashboardText}>Injections</Text>
+              <IconButton
+                icon="needle"
+                iconColor="white"
+                size={37}
+              />
             </TouchableOpacity>
         </View>
       </View>
@@ -224,11 +235,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginLeft: 100,
     color: '#1059d5',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   table: {
     marginLeft: 100,
-    width: 700,
+    width: 800,
   },
   tableHeader: {
     backgroundColor: '#cbdeff',
@@ -240,10 +251,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ebebeb',
   },
   providerDashboardItem:{
-    borderRadius: 50,
+    borderRadius: 8,
     height: 100,
     width: 100,
-    marginBottom: 20,
+    marginBottom: 10,
     alignItems: 'center',
  },
  providerDashboardText:{

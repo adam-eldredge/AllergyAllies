@@ -7,7 +7,7 @@ export default function AllAlerts({navigation}){
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#fcfcfc'}}>
       <ScrollView style={{ backgroundColor: '#fcfcfc'}}>
          <Text style={styles.title}>Your Alerts</Text>
-         <Card style = {{...styles.alert, marginTop: 20}}>
+         <Card style = {{...styles.alert, marginTop: 10}}>
             <Card.Title titleStyle={{ fontWeight:"600" }}
                title="Patient Bob is at risk for attrition."
                subtitle="9/17/2023"
@@ -105,8 +105,19 @@ export default function AllAlerts({navigation}){
          </Card>
          <View style={{height: 20, backgroundColor: '#fcfcfc'}}></View>
       </ScrollView>
-      <View style={{backgroundColor: '#fcfcfc', flex: 1, marginLeft: 100, marginTop: -50}}>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 100}}
+      <View style={{backgroundColor: '#fcfcfc', flex: 1,}}>
+      <TouchableOpacity style={{marginTop: 50, marginBottom: 10, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
+               onPress={() =>
+                  signOut()
+               }>
+                <Text style={{color: 'white', size: 5, marginRight: -10, marginLeft: 12, fontWeight: 500}}>Sign out</Text>
+                  <IconButton
+                     icon="exit-to-app"
+                     iconColor="white"
+                     size={14}
+                  />
+        </TouchableOpacity>
+        <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 15}}
                onPress={() =>
                   navigation.navigate('Reports')
                }>
@@ -130,26 +141,26 @@ export default function AllAlerts({navigation}){
                />
             </TouchableOpacity>
             <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#7fd0ae'}}
-            onPress={() =>
-               navigation.navigate('Reports')
-            }>
-               <Text style={styles.providerDashboardText}>Reports</Text>
-               <IconButton
-                  icon="file-chart"
-                  iconColor="white"
-                  size={37}
-               />
-            </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#d07f99'}}
                onPress={() =>
-                  signOut()
+                  navigation.navigate('Reports')
                }>
-                  <Text style={styles.providerDashboardText}>Sign out</Text>
+                  <Text style={styles.providerDashboardText}>Reports</Text>
                   <IconButton
-                     icon="exit-to-app"
+                     icon="file-chart"
                      iconColor="white"
                      size={37}
                   />
+               </TouchableOpacity>
+            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
+            onPress={() =>
+              navigation.navigate('Injections')
+             }>
+               <Text style={styles.providerDashboardText}>Injections</Text>
+              <IconButton
+                icon="needle"
+                iconColor="white"
+                size={37}
+              />
             </TouchableOpacity>
       </View>
       </View>
@@ -165,7 +176,7 @@ const styles = StyleSheet.create({
       color: '#1059d5',
    },
    alert: {
-      width: 600,
+      width: 800,
       height: 70,
       marginLeft: 100,
       marginTop: 5,
@@ -174,10 +185,10 @@ const styles = StyleSheet.create({
       marginBottom: 5,
    },
    providerDashboardItem:{
-      borderRadius: 50,
+      borderRadius: 8,
       height: 100,
       width: 100,
-      marginBottom: 20,
+      marginBottom: 10,
       alignItems: 'center',
    },
    providerDashboardText:{

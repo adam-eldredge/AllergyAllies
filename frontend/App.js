@@ -5,6 +5,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Portal from './screens/Portal.js';
 import AllAlerts from './screens/AllAlerts.js';
 import Reports from './screens/Reports.js';
+import Injections from './screens/Injections.js';
 import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
@@ -176,6 +177,7 @@ export default function App({navigation}) {
             <Stack.Screen name="PracticeEnrollmentScreen" component={practiceEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
             <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
             <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
+            <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
             </>
           )}
         </Stack.Navigator>
