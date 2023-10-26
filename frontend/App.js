@@ -17,6 +17,7 @@ import UpcomingInfo from './screens/UpcomingInfo.js';
 import InitialScreen from './screens/InitialScreen.js';
 import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
+import viewPatients from './screens/viewPatients.js';
 import { useMemo, useReducer, useEffect } from 'react';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -175,6 +176,7 @@ export default function App({navigation}) {
             <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
             <Stack.Screen name="PracticeEnrollmentScreen" component={practiceEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
             <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
+            <Stack.Screen name="ViewPatients" component={viewPatients} options={{ title: 'View Patients'}}/>
             <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
             </>
           )}

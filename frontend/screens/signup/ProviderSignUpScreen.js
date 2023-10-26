@@ -15,51 +15,21 @@ export default function ProviderSignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [NPI, setNPI] = useState('');
-  const [practiceID, setPracticeID] = useState('');
-
-  const [practiceList, setPracticeList] = useState([]);
-  const [queriedPractices, setQueriedPractices] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  // Get practices to populate dropdown menu
-  useEffect(() => {
-
-    async function getPractices() {
-      const res = await axios.get('http://localhost:5000/api/getAllPractices');
-
-      if (res.status === 200) {
-        console.log(res.data);
-        handlePractices(res.data);
-        setQueriedPractices(true);
-      }
-      else {
-        console.log(res.status);
-        setPracticeList([{ key: 0, value: 'No practices available' }]);
-      }
-    }
-
-    if (queriedPractices == false) {
-      getPractices();
-    }
-
-  });
-
-  const handlePractices = async (items) => {
-    {
-      let index = 0;
-      let newList = [];
-      items.forEach(element => {
-        let newItem = { key: element._id, value: element.practiceName };
-        newList[index] = newItem;
-        index = index + 1;
-      });
-      setPracticeList(newList);
-    }
-  }
+  const [practiceCode, setPracticeCode] = useState('');
 
   const handleSignUp = async () => {
     setDisplay('')
-    if (firstName && lastName && email && password && confirmPass && NPI && practiceID) {
+    if (firstName && lastName && email && password && confirmPass && NPI && practiceCode) { 
+      const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+
+      const practiceID = practice.data._id;
+      console.log(practiceID)
+      if (!practiceID) {
+        setDisplay('Invalid Practice ID');
+        success = false;
+        return;
+      }
+
       if (password == confirmPass) {
         try {
           const data = {
@@ -75,12 +45,11 @@ export default function ProviderSignUpScreen() {
           //const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
           const NPIreigstryURI = `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?terms=${NPI}`
           const NPIexists = await axios.get(NPIreigstryURI);
-          //console.log(NPIexists.data);
 
+          // Check if the email already has an associated account
           const emailNPIExists = await axios.post('http://localhost:5000/api/getProviderEmail', { email, NPI });
 
           if (emailNPIExists.status === 200) {
-            //console.log(response);
             if (NPIexists.data[0] == 1) {
               const response = await axios.post('http://localhost:5000/api/addProvider', data);
             }
@@ -159,32 +128,13 @@ export default function ProviderSignUpScreen() {
         autoCapitalize="none"
         onChangeText={setNPI} />
 
-      {/* <DropDownPicker style={styles.dropdown}
-        placeholder='Practice'
-        open={open}
-        value={practiceID}
-        items={practiceList}
-        setOpen={setOpen}
-        setValue={setPracticeID}
-        setItems={setPracticeList}
-        listMode="SCROLLVIEW"
-        placeholderStyle= {{
-          color: "#7a7a7a",
-        }}
-        dropDownContainerStyle={
-          styles.dropdownSelect
-        }
-      /> */}
-
-      <SelectList
-        placeholder='Practice'
-        searchPlaceholder='Enter practice name'
-        setSelected={(val) => setPracticeID(val)}
-        data={practiceList}
-        boxStyles={styles.dropdown}
-        inputStyles={{color:"#7a7a7a"}}
-        dropdownStyles={styles.dropdownSelect}
-      />
+      <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Practice Code"
+        placeholderTextColor="#7a7a7a"
+        value={practiceCode}
+        autoCapitalize="none"
+        onChangeText={setPracticeCode} />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
