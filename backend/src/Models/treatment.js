@@ -47,25 +47,23 @@ const dataSchema = new mongoose.Schema({
     LLR: { pollenLLR: Number, insectsAndPetsLLR: Number, moldsLLR: Number},
     lastVialTests: {
         type: Map,
-        of: new mongoose.Schema({
-            name: String,
+        of: {
             values: {
                 dilution: Number, 
                 bottleNumber: String, 
                 whealSize: Number
             }
-        })
+        }
     },
     nextVialTests:{
         type: Map,
-        of: new mongoose.Schema({
-            name: String,
+        of: {
             values: {
                 dilution: Number, 
                 bottleNumber: String, 
                 whealSize: Number
             }
-        })
+        }
     },
 
     date: {

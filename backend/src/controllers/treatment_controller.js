@@ -6,11 +6,13 @@ const protocol = require('../Models/protocols');
 exports.addTreatment = async (req, res) => {
     try {
         const { nameOfPractice, NPI, patientLastName, patientFirstName, patientID, 
-            medication, injVols, bottleNumbers, LLR, dilutions, dosage, date, attended 
+            injVols, bottleNumbers, LLR, dilutions, date, attended 
         } = req.body;
+
+        //TODO update to include lastVialTest
         const data = new treatment({
             nameOfPractice, NPI, patientLastName, patientFirstName, patientID, 
-            medication, injVols, bottleNumbers, LLR, dilutions, dosage, date, attended
+            injVols, bottleNumbers, LLR, dilutions, date, attended
         });
         //Should add patient treatment data to end of array
         patient.findByIdAndUpdate({_id: req.body.patientID},
@@ -127,7 +129,7 @@ exports.nextTreatment = async(req, res) => {
         const insectsAndPetsInj = lastTreatment.injVols.insectsAndPetsInj;
         const insectsAndPetsDil = lastTreatment.dilutions.insectsAndPetsDil;
         const insectsAndPetsMaintenanceBottle = patientToFind.maintenanceBottleNumber.insectsAndPetsMaintenanceBottle;
-        const insectsAndPetsKey = 'insectsAndPet';
+        const insectsAndPetsKey = 'insectsAndPets';
 
         //Mold variables
         const moldBottleNumber = lastTreatment.bottleNumbers.moldsBottleNumber;
@@ -154,37 +156,133 @@ exports.nextTreatment = async(req, res) => {
         let newMoldDilAdjustment = DilAdjustmentCalc(moldLLR, moldInj, moldDil, moldKey);
 
 
-        //New Bottle Numbers for next treatment if 999, then maintenance
+        //New Bottle Numbers for next treatment is 999, then maintenance
         let newPollenBottleNumber = BottleNumberCalc(pollenBottleNumber, pollenLLR, pollenInj, pollenDil, pollenMaintenanceBottle, pollenKey);
         let newInsectsAndPetsBottleNumber = BottleNumberCalc(insectsAndPetsBottleNumber, insectsAndPetsLLR, insectsAndPetsInj, insectsAndPetsDil, insectsAndPetsMaintenanceBottle, insectsAndPetsKey);
         let newMoldBottleNumber = BottleNumberCalc(moldBottleNumber, moldLLR, moldInj, moldDil, moldMaintenanceBottle, moldKey);
 
         const data = new treatment({
             nameOfPractice: lastTreatment.nameOfPractice, 
-            NPI: req.body.NPI, 
+            NPI: lastTreatment.NPI, 
             patientLastName: lastTreatment.patientLastName, 
             patientFirstName: lastTreatment.patientFirstName, 
             patientID: lastTreatment.patientID, 
             injVols: {pollenInj: newPollenInj, insectsAndPetsInj: newInsectsAndPetsInj, moldsInj: newMoldInj},
             dilutions: {pollenDil: newPollenDilAdjustment, insectsAndPetsDil: newInsectsAndPetsDilAdjustment, moldsDil: newMoldDilAdjustment},
             bottleNumbers: {pollenBottleNumber: newPollenBottleNumber.toString(), insectsAndPetsBottleNumber: newInsectsAndPetsBottleNumber.toString(), moldsBottleNumber: newMoldBottleNumber.toString()}, 
-            LLR: {pollenLLR: parseInt(pollenLLR), insectsAndPetsLLR: parseInt(insectsAndPetsLLR), moldsLLR: parseInt(moldLLR)},
-            //TODO
-            lastVialTests,
-            nextVialTests,  
+            LLR: {pollenLLR: pollenLLR, insectsAndPetsLLR: insectsAndPetsLLR, moldsLLR: moldLLR},
+            // lastVialTests,
+            // nextVialTests,  
             date: today, 
             attended: false
         });
 
-        //TODO
-        //new bottles are tested using a vial test
-        //check for maximum inj volume and tell practice to do vial test, sometimes they need max inj vol twice
-        //practice can override vial test??
-        //exception is being at maintenance, means no vial test
-        //3 separate injections each appointment
-        //allergy drops are added into 1 bottle
+        //Get last vial treatment values
+        const lastVialTestPollen = lastTreatment.lastVialTests.get('pollen').values;
+        const lastVialTestInsectsAndPets = lastTreatment.lastVialTests.get('insectsAndPets').values;
+        const lastVialTestMold = lastTreatment.lastVialTests.get('mold').values;
+
+        //Moving past vial test data to current treatment
+        data.lastVialTests.set(pollenKey,{values: lastVialTestPollen});
+        data.lastVialTests.set(insectsAndPetsKey,{values: lastVialTestInsectsAndPets});
+        data.lastVialTests.set(moldKey,{values: lastVialTestMold});
 
 
+
+        let newPollenValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
+        let newInsectsAndPetsValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
+        let newMoldValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
+
+        NextVialTestDilution(newPollenValues, pollenLLR, pollenInj, pollenDil);
+        NextVialTestDilution(newInsectsAndPetsValues, insectsAndPetsLLR, insectsAndPetsInj, insectsAndPetsDil);
+        NextVialTestDilution(newMoldValues, moldLLR, moldInj, moldDil);
+
+        NextVialTestBottleNumber(newPollenValues, pollenLLR, pollenInj, pollenDil, pollenBottleNumber, pollenMaintenanceBottle);
+        NextVialTestBottleNumber(newInsectsAndPetsValues, insectsAndPetsLLR, insectsAndPetsInj, insectsAndPetsDil, insectsAndPetsBottleNumber, insectsAndPetsMaintenanceBottle);
+        NextVialTestBottleNumber(newMoldValues, moldLLR, moldInj, moldDil, moldBottleNumber, moldMaintenanceBottle);
+
+        data.nextVialTests.set(pollenKey, newPollenValues);
+        data.nextVialTests.set(insectsAndPetsKey, newInsectsAndPetsValues);
+        data.nextVialTests.set(moldKey, newMoldValues);
+
+        const dataToSave = await data.save();
+        res.status(200).json(dataToSave);
+
+
+        /*
+            Calculation for next Vial Test dilution
+        */
+        function NextVialTestDilution(values, lastTreatmentLLR, lastTreatmentInj, lastTreatmentDil){
+
+            if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol){
+                if((lastTreatmentDil <= 0) && (lastTreatmentLLR < findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection)){
+                    values.dilution = 0;
+                    return;
+                }
+                else{
+                    if(lastTreatmentDil > 0){
+                        if((lastTreatmentDil - 1) <= 0){
+                            return;
+                        }
+                        else{
+                            values.dilution = (lastTreatmentDil - 1);
+                            return;
+                        }
+                    }
+                    else{
+                        if(lastTreatmentLLR >= findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection){
+                            values.dilution = (lastTreatmentDil + 1);
+                            return;
+                        }
+                        else{
+                            return;
+                        }
+                    }
+                }
+            }
+            else{
+                return;
+            }
+        }
+
+        /*
+            Calculation for next Vial Test Bottle Number
+        */
+        function NextVialTestBottleNumber(values, lastTreatmentLLR, lastTreatmentInj, lastTreatmentDil, lastTreatmentBN, ptMaintBottle){
+
+            if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol){
+                if(lastTreatmentLLR >= findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection){
+                    values.bottleNumber = lastTreatmentBN;
+                    return;
+                }
+                else{
+                    if(lastTreatmentBN == "M"){
+                        values.bottleNumber = "M";
+                        return;
+                    }
+                    else{
+                        if((parseInt(lastTreatmentBN) + 1) >= ptMaintBottle){
+                            values.bottleNumber = "M";
+                            return;
+                        }
+                        else{
+                            if(lastTreatmentDil > 0){
+                                values.bottleNumber = lastTreatmentBN;
+                                return;
+                            }
+                            else{
+                                values.bottleNumber = (parseInt(lastTreatmentBN) + 1).toString();
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            else{
+                values.bottleNumber = "0";
+                return;
+            }
+        }
 
 
         /*
@@ -201,11 +299,7 @@ exports.nextTreatment = async(req, res) => {
                 newTreatmentInjVol = findProtocol.nextDoseAdjustment.maxInjectionVol;
                 return newTreatmentInjVol;
             }
-            /*
-                Ask about this   //H16 does not refer to any value, need to ask him.
-
-            */
-            else if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol && $H16 < findProtocol.missedDoseAdjustment1.doseAdjustMissedDays
+            else if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol && dateDifference < findProtocol.missedDoseAdjustment1.doseAdjustMissedDays
                 && lastTreatmentLLR < findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment)
             {
                     newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
