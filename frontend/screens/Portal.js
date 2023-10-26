@@ -123,7 +123,7 @@ export default function Portal({navigation}){
             <View style = {{marginRight: 40}}>
                <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3'}}
                   onPress={() =>
-                     navigation.navigate('Reports')
+                     navigation.navigate('ViewPatients')
                   }>
                   <Text style={{...styles.providerDashboardText}}>My Patients</Text>
                   <IconButton

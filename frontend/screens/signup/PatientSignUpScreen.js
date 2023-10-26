@@ -12,18 +12,31 @@ export default function PatientSignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
+  const [practiceCode, setPracticeCode] = useState('');
 
   const handleSignUp = async () => {
 
     setDisplay('')
     if (firstName && lastName && email && password && confirmPass) {
+
+      const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+
+      const practiceID = practice.data._id;
+      console.log(practiceID)
+      if (!practiceID) {
+        setDisplay('Invalid Practice ID');
+        success = false;
+        return;
+      }
+
       if (password == confirmPass) {
         try {
           const data = {
             firstName,
             lastName,
             email,
-            password
+            password,
+            practiceID
           }
 
           const emailExists = await axios.post('http://localhost:5000/api/checkEmail', { email });
@@ -56,7 +69,7 @@ export default function PatientSignUpScreen() {
       setDisplay('Account successfully created! Returning to sign in screen...');
       setTimeout(() => {
         navigation.navigate('SignIn');
-        }, 1000);
+      }, 1000);
     }
   }
 
@@ -64,7 +77,7 @@ export default function PatientSignUpScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Allergy Ally</Text>
 
-      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
+      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
           placeholder="First Name"
@@ -89,6 +102,14 @@ export default function PatientSignUpScreen() {
         value={email}
         autoCapitalize="none"
         onChangeText={setEmail} />
+
+      <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Practice Code"
+        placeholderTextColor="#7a7a7a"
+        value={practiceCode}
+        autoCapitalize="none"
+        onChangeText={setPracticeCode} />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
@@ -136,8 +157,8 @@ const styles = StyleSheet.create({
   message: {
     textAlign: 'center',
     fontSize: 12,
-    color: '#000000'
-},
+    color: '#DC143C',
+  },
   shortInput: {
     margin: 15,
     flexGrow: 1,

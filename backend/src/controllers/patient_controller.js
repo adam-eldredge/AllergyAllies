@@ -6,9 +6,9 @@ exports.addPatient = async (req, res) => {
     // implement duplicate check
     // add password encryption
     try {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, email, password, practiceID } = req.body;
         const data = new patient({
-            firstName, lastName, email, password
+            firstName, lastName, email, password, practiceID
         });
 
         const dataToSave = await data.save();
@@ -23,6 +23,18 @@ exports.addPatient = async (req, res) => {
 exports.getAllPatients = async (req, res) => {
     try {
         const data = await patient.find();
+        return res.json(data);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
+// Get all patients from a practice
+exports.getPatientsByPractice = async (req, res) => {
+    try {
+        const pracID = req.params.practiceID;
+        const data = await patient.find({practiceID: pracID});
         return res.json(data);
     }
     catch (error) {
