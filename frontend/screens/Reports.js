@@ -1,8 +1,13 @@
-import React, { Component } from 'react'
+import React, { Component, useContext } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper';
+import AuthContext from '../AuthContext';
+
 
 export default function Reports({navigation}) {
+
+  const { signOut } = useContext(AuthContext);
+  
     return (
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: 'white'}}>
         <ScrollView style={{backgroundColor:'white'}}>
@@ -164,7 +169,7 @@ export default function Reports({navigation}) {
         <View style={{flex: 1}}>
         <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 50}}
                onPress={() =>
-                  navigation.navigate('Reports')
+                  navigation.navigate('ViewPatients')
                }>
                <Text style={{...styles.providerDashboardText, fontSize: 12, marginBottom: -15}}>My Patients</Text>
                <IconButton

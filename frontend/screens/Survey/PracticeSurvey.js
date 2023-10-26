@@ -58,24 +58,24 @@ const surveyJson = {
                     [
                         {
                             name: 'f',
-                            title: 'Starting frequency of injections',
+                            title: 'Starting frequency of injections (# weekly)',
                             type: 'radiogroup',
                             colCount: '3',
                             choices: ['1', '2', '3'],
                             seperateSpecialChoices: 'true',
                         }, {
                             name: 'g',
-                            title: 'Frequency of Clinical Follow-up Appointments',
+                            title: 'Frequency of Clinical Follow-up Appointments (# yearly)',
                             type: 'radiogroup',
                             colCount: '4',
-                            choices: ['Once yearly', 'Twice yearly', 'Thrice yearly', '4x yearly'],
+                            choices: ['1', '2', '3', '4'],
                             seperateSpecialChoices: 'true'
                         }, {
                             name: 'h',
-                            title: 'Frequency of Progress Self-Assessment',
+                            title: 'Frequency of Progress Self-Assessment (# yearly)',
                             type: 'radiogroup',
                             colCount: '4',
-                            choices: ['Once yearly', 'Twice yearly', 'Thrice yearly', '4x yearly'],
+                            choices: ['1', '2', '3', '4'],
                             seperateSpecialChoices: 'true'
                         }
                     ]
@@ -94,30 +94,20 @@ const surveyJson = {
                             confirmDelete: 'true',
                             templateElements: [{
                                 name: 'i1',
-                                title: 'Antigen',
+                                title: 'Antigen Name',
                                 type: 'text',
-                            }, {
-                                name: 'i2',
-                                title: '#',
-                                type: 'text',
-                                inputType: 'number'
                             }]
                         }, {
                             name: 'j',
-                            title: 'Number of treatment vials and label/name for each vial',
+                            title: 'Treatment Vials',
                             type: 'paneldynamic',
                             panelCount: '1',
                             maxPanelCount: '10',
                             confirmDelete: 'true',
                             templateElements: [{
                                 name: 'j1',
-                                title: 'Name of treatment vial',
+                                title: 'Vial Name',
                                 type: 'text',
-                            }, {
-                                name: 'j2',
-                                title: '#',
-                                type: 'text',
-                                inputType: 'number'
                             }]
                         }
                     ]
@@ -149,12 +139,43 @@ const surveyJson = {
                                 max: '0.50',
                                 default: '0.05',
                                 visibleIf: "{k1} = 'Customize'"
+                            },
+                            {
+                                name: 'k3',
+                                title: 'Dose Adjustment Threshold (Days Missed)',
+                                type: 'text',
+                                inputType: 'numeric',
+                                placeholder: '10',
+                                min: '0',
+                                max: '30',
+                                default: '10',
+                                visibleIf: "{k1} = 'Customize'"
+                            },
+                            {
+                                name: 'k4',
+                                title: 'What events trigger a dose adjustment?',
+                                type: 'checkbox',
+                                visibleIf: "{k1} = 'Customize'",
+                                choices: [
+                                    {
+                                        text: "Vial Test Reaction",
+                                    },
+                                    {
+                                        text: "Immediate Injection Reaction",
+                                    },
+                                    {
+                                        text: "Delayed Injection Reaction",
+                                    },
+                                    {
+                                        text: "Missed Injection Adjustment"
+                                    }
+                                ]
                             }
                             ]
 
                         }, {
                             name: 'l',
-                            title: 'Dose Adjustments',
+                            title: 'General Rules for Dose Adjustments',
                             type: 'text',
 
                         }, {

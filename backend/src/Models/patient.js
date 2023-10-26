@@ -20,6 +20,10 @@ const dataSchema = new mongoose.Schema({
     DoB: {
         required: false,
         type: Date
+    },
+    practiceID: {
+        required: true,
+        type: String
     }
 }, { collection: 'Patients' })
 
