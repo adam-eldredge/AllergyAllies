@@ -108,7 +108,7 @@ export default function AllAlerts({navigation}){
       <View style={{backgroundColor: '#fcfcfc', flex: 1, marginLeft: 100, marginTop: -50}}>
             <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 100}}
                onPress={() =>
-                  navigation.navigate('Reports')
+                  navigation.navigate('ViewPatients')
                }>
                <Text style={{...styles.providerDashboardText, fontSize: 12, marginBottom: -15}}>My Patients</Text>
                <IconButton

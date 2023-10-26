@@ -12,6 +12,7 @@ export default function viewPatients({ navigation }) {
     const practiceID = userInfo.practiceID;
     const [patientsArray, setPatientsArray] = useState([]);
     const [queriedPatients, setQueriedPatients] = useState(false);
+    const stylesList = [styles.tableRow2, styles.tableRow1];
 
     useEffect(() => {
         const getPatients = async () => {
@@ -25,8 +26,8 @@ export default function viewPatients({ navigation }) {
     
     const PList = () => (
         <div>
-            {patientsArray.map(p => 
-            <DataTable.Row style={styles.tableRow2}>
+            {patientsArray.map((p, index) => 
+            <DataTable.Row style={stylesList[index % 2]}>
                 <DataTable.Cell>{p.firstName}</DataTable.Cell>
                 <DataTable.Cell>{p.lastName}</DataTable.Cell>
                 <DataTable.Cell>{p.email}</DataTable.Cell>

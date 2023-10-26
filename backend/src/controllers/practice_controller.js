@@ -126,6 +126,9 @@ exports.uploadLogo = async (req, res) => {
             filename: (req, file, cb) => {
                 cb(null, id + "_logo.png");
             },
+            limits: {
+                fileSize: 8000000 // Compliant: 8MB
+            }
         });
 
         // "image" name needs to match the key in postman when uploading:

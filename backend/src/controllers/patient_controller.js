@@ -34,7 +34,6 @@ exports.getAllPatients = async (req, res) => {
 exports.getPatientsByPractice = async (req, res) => {
     try {
         const pracID = req.params.practiceID;
-        console.log(pracID)
         const data = await patient.find({practiceID: pracID});
         return res.json(data);
     }
