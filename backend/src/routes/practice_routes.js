@@ -3,22 +3,30 @@ const router = express.Router();
 const practiceController = require('../controllers/practice_controller');
 const verifyJWT = require('../middleware/verify_JWT');
 
-router.use(verifyJWT)
+//router.use(verifyJWT)
 
+// POST localhost:5000/api/addPractice (body)
 router.post('/addPractice', practiceController.addPractice);
 
+// GET localhost:5000/api/addPractice (body)
 router.get('/practice/:id', practiceController.getPractice);
 
+// DEL localhost:5000/api/deletePractice
 router.delete('/deletePractice/:id', practiceController.deletePractice);
-// get location given id
+
+// GET localhost:5000/api/location/id
 router.get('/location/:id', practiceController.getLocation);
-// get logo given id
+
+// GET localhost:5000/api/logo/id
 router.get('/logo/:id', practiceController.getLogo);
-// get scrollingAds given id
+
+// GET localhost:5000/api/ads/id
 router.get('/ads/:id', practiceController.getScrollingAds);
-// get antigens tested given id
+
+// GET localhost:5000/api/antigens/id
 router.get('/antigens/:id', practiceController.getAntigensTested);
-// save uploaded images
+
+// POST localhost:5000/api/uploadLogo/id
 router.post('/uploadLogo/:id', practiceController.uploadLogo);
 
 module.exports = router;
