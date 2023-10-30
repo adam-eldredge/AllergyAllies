@@ -66,18 +66,35 @@ const getAllPatients = async (req, res) => {
 }
 
 // Get patient by id
-const getPatient = async (req, res) => {
+exports.getPatient = async (req, res) => {
     try {
         const id = req.params.id;
         const foundPatient = await patient.findById(id);
         if (foundPatient) {
             return res.status(200).json(foundPatient);
         } else {
-            return res.status(404).json({ message: `Patient not found: ${id}`});
+            return res.status(404).json({ message: `Patient not found: ${id}` });
         }
     }
     catch (error) {
-       return res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: error.message });
+    }
+}
+
+// Get patient by email
+exports.checkEmail = async (req, res) => {
+    try {
+        const email = req.body.email.toString();
+        const data = await patient.findOne({ email: email })
+        if (data === null) {
+            res.sendStatus(200);
+        }
+        else {
+            res.sendStatus(201);
+        }
+    }
+    catch (error) {
+        return res.status(400).json({ message: error.message });
     }
 }
 

@@ -3,19 +3,24 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Di
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Portal from './screens/Portal.js';
-import Alerts from './screens/Alerts.js';
 import AllAlerts from './screens/AllAlerts.js';
 import Reports from './screens/Reports.js';
-import HomeScreen from './screens/HomeScreen.js';
+import Injections from './screens/Injections.js';
+import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
-import PatientSignUpScreen from './screens/PatientSignUpScreen';
-import ProviderSignUpScreen from './screens/ProviderSignUpScreen';
+import PatientSignUpScreen from './screens/signup/PatientSignUpScreen';
+import ProviderSignUpScreen from './screens/signup/ProviderSignUpScreen.js';
+import practiceEnrollment from './screens/signup/practiceEnrollment.js';
 import PatientHome from './screens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
 import UpcomingInfo from './screens/UpcomingInfo.js';
+import InitialScreen from './screens/InitialScreen.js';
+import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
+import ViewPatients from './screens/ViewPatients.js';
 import { useMemo, useReducer, useEffect } from 'react';
+//import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as SecureStore from 'expo-secure-store';
 import jwt_decode from 'jwt-decode';
@@ -109,23 +114,59 @@ export default function App({navigation}) {
             // No token found, user isn't signed in
             <>
             <Stack.Screen
+              name="InitialScreen"
+              component={InitialScreen}
+              options={{
+                title: '',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
+                headerShown: false
+              }}
+            />
+            <Stack.Screen
               name="SignIn"
               component={SignInScreen}
               options={{
-                title: 'Sign in',
+                title: 'Sign In',
                 headerTitleAlign: 'center',
                 headerTitleStyle: {textAlign: 'center'},
                 animationTypeForReplace: state.isSignout ? 'pop' : 'push',
               }}
             />
-            <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} />
-            <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} />
+            <Stack.Screen
+              name="PatientSignUpScreen"
+              component={PatientSignUpScreen}
+              options={{
+                title: 'Patient Sign Up',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
+                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+              }}
+            />
+            <Stack.Screen
+              name="ProviderSignUpScreen"
+              component={ProviderSignUpScreen}
+              options={{
+                title: 'Provider Sign Up',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
+                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+              }}
+            />
+            <Stack.Screen
+              name="PracticeEnrollment"
+              component={practiceEnrollment}
+              options={{
+                title: 'Practice Enrollment',
+                headerTitleAlign: 'center',
+                headerTitleStyle: {textAlign: 'center'},
+                animationTypeForReplace: state.isSignout ? 'pop' : 'push',
+              }}
+            />
             </>
           ) : (
             // User is signed in
             <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="Portal" component={Portal} />
             <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
             <Stack.Screen name="Reports" component={Reports} />
@@ -134,6 +175,11 @@ export default function App({navigation}) {
             <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
             <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
             <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
+            <Stack.Screen name="PracticeEnrollmentScreen" component={practiceEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
+            <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
+            <Stack.Screen name="ViewPatients" component={ViewPatients} options={{ title: 'View Patients'}}/>
+            <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
+            <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
             </>
           )}
         </Stack.Navigator>

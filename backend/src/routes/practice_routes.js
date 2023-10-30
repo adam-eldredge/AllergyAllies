@@ -1,32 +1,40 @@
 const express = require('express');
 const router = express.Router();
 const practiceController = require('../controllers/practice_controller');
-const verifyJWT = require('../middleware/verify_JWT');
 
 //router.use(verifyJWT)
 
-// POST localhost:5000/api/addPractice (body)
+// Add a practice
 router.post('/addPractice', practiceController.addPractice);
 
-// GET localhost:5000/api/addPractice (body)
+// Get a practice by ID
 router.get('/practice/:id', practiceController.getPractice);
 
-// DEL localhost:5000/api/deletePractice
+// Get a practice by code
+router.get('/practiceByCode/:code', practiceController.getPracticeByCode);
+
+// Get a practice by name
+router.get('/practiceByName/:name', practiceController.getPracticeByName);
+
+// Get a list of all practice
+router.get('/getAllPractices', practiceController.getAllPractices );
+
+// Delete a practice by ID
 router.delete('/deletePractice/:id', practiceController.deletePractice);
 
-// GET localhost:5000/api/location/id
+// get location given id
 router.get('/location/:id', practiceController.getLocation);
 
-// GET localhost:5000/api/logo/id
+// get logo given id
 router.get('/logo/:id', practiceController.getLogo);
 
-// GET localhost:5000/api/ads/id
+// get scrollingAds given id
 router.get('/ads/:id', practiceController.getScrollingAds);
 
-// GET localhost:5000/api/antigens/id
+// get antigens tested given id
 router.get('/antigens/:id', practiceController.getAntigensTested);
 
-// POST localhost:5000/api/uploadLogo/id
+// save uploaded images
 router.post('/uploadLogo/:id', practiceController.uploadLogo);
 
 module.exports = router;

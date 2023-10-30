@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "dependencies": {
+    "@react-navigation/bottom-tabs": "^6.5.9",
+    "survey-core": "^1.9.112",
+    "survey-react-ui": "^1.9.112"
+  }
+}

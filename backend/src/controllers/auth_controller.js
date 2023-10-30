@@ -43,7 +43,10 @@ exports.login = async(req, res) => {
         {
             "UserInfo": {
                 "id": foundUser.id,
-                "role": role
+                "role": role,
+                "firstName": foundUser.firstName,
+                "lastName": foundUser.lastName,
+                "practiceID": foundUser.practiceID
             }
         },
         process.env.ACCESS_TOKEN_SECRET,
@@ -93,13 +96,17 @@ exports.refresh = async(req, res) => {
                 {
                     "UserInfo": {
                         "id": foundUser.id,
-                        "roles": 1
+                        "role": role,
+                        "firstName": foundUser.firstName,
+                        "lastName": foundUser.lastName,
+                        "practiceID": foundUser.practiceID
                     }
                 },
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '5m' }
             )
 
+            console.log(foundUser.practiceID)
             res.json({ accessToken })
         }
     )

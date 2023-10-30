@@ -1,12 +1,13 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { AuthContext, AuthProvider } from '../App.js'
+import { AuthContext, AuthProvider } from '../../App.js'
+import { SelectList } from 'react-native-dropdown-select-list'
 import axios from 'axios';
 
 
 export default function ProviderSignUpScreen() {
-
+  var success = true;
   const [display, setDisplay] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -14,11 +15,21 @@ export default function ProviderSignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [NPI, setNPI] = useState('');
-  const [nameOfPractice, setNameOfPractice] = useState('');
+  const [practiceCode, setPracticeCode] = useState('');
 
   const handleSignUp = async () => {
     setDisplay('')
-    if (firstName && lastName && email && password && confirmPass && NPI && nameOfPractice) {
+    if (firstName && lastName && email && password && confirmPass && NPI && practiceCode) { 
+      const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+
+      const practiceID = practice.data._id;
+      console.log(practiceID)
+      if (!practiceID) {
+        setDisplay('Invalid Practice ID');
+        success = false;
+        return;
+      }
+
       if (password == confirmPass) {
         try {
           const data = {
@@ -27,36 +38,55 @@ export default function ProviderSignUpScreen() {
             email,
             password,
             NPI,
-            nameOfPractice
+            practiceID
           }
 
-        // Used to check if provider has a valid NPI, WIP
-        //   const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
-        //   const NPIexists = await axios.get(NPIreigstryURI);
-        //   console.log(NPIexists.data);
+          // Used to check if provider has a valid NPI, WIP
+          //const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
+          const NPIreigstryURI = `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?terms=${NPI}`
+          const NPIexists = await axios.get(NPIreigstryURI);
 
+          // Check if the email already has an associated account
+          const emailNPIExists = await axios.post('http://localhost:5000/api/getProviderEmail', { email, NPI });
 
-          const emailExists = await axios.post('http://localhost:5000/api/getProvider', { email });
-
-          if (emailExists.status === 200) {
-            const response = await axios.post('http://localhost:5000/api/addProvider', data);
-            console.log(response);
+          if (emailNPIExists.status === 200) {
+            if (NPIexists.data[0] == 1) {
+              const response = await axios.post('http://localhost:5000/api/addProvider', data);
+            }
+            else {
+              setDisplay('Invalid NPI')
+              success = false;
+            }
           }
-          else if (emailExists.status === 201) {
+          else if (emailNPIExists.status === 201) {
             setDisplay('This email is already associated with an account!');
+            success = false;
+          }
+          else if (emailNPIExists.status === 208) {
+            setDisplay('This NPI cannot be used.');
+            success = false;
           }
 
         }
         catch (error) {
+          success = false;
           console.log(error, " Error");
         }
       }
       else {
         setDisplay('Passwords do not match!');
+        success = false;
       }
     }
     else {
       setDisplay('Please fill out all fields!')
+      success = false;
+    }
+    if (success) {
+      setDisplay('Account successfully created! Returning to sign in screen...');
+      setTimeout(() => {
+        navigation.navigate('SignIn');
+      }, 1000);
     }
   }
 
@@ -64,10 +94,11 @@ export default function ProviderSignUpScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Allergy Ally</Text>
 
-      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
+      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
           placeholder="First Name"
+          placeholderTextColor="#7a7a7a"
           value={firstName}
           autoCapitalize="none"
           onChangeText={setFirstName} />
@@ -75,6 +106,7 @@ export default function ProviderSignUpScreen() {
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
           placeholder="Last Name"
+          placeholderTextColor="#7a7a7a"
           value={lastName}
           autoCapitalize="none"
           onChangeText={setLastName} />
@@ -83,29 +115,31 @@ export default function ProviderSignUpScreen() {
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Email"
+        placeholderTextColor="#7a7a7a"
         value={email}
         autoCapitalize="none"
         onChangeText={setEmail} />
 
-    <TextInput style={styles.input}
+      <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="National Provider Identifier"
+        placeholderTextColor="#7a7a7a"
         value={NPI}
         autoCapitalize="none"
-        onChangeText={setNPI}/>
+        onChangeText={setNPI} />
 
-    {/*TODO Will update to Drop Down option of all practices */}
-
-    <TextInput style={styles.input}
+      <TextInput style={styles.input}
         underlineColorAndroid="transparent"
-        placeholder="Name of Practice"
-        value={nameOfPractice}
+        placeholder="Practice Code"
+        placeholderTextColor="#7a7a7a"
+        value={practiceCode}
         autoCapitalize="none"
-        onChangeText={setNameOfPractice}/>
+        onChangeText={setPracticeCode} />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Password"
+        placeholderTextColor="#7a7a7a"
         value={password}
         autoCapitalize="none"
         onChangeText={setPassword}
@@ -114,6 +148,7 @@ export default function ProviderSignUpScreen() {
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
         placeholder="Confirm Password"
+        placeholderTextColor="#7a7a7a"
         value={confirmPass}
         autoCapitalize="none"
         onChangeText={setConfirmPass}
@@ -131,9 +166,12 @@ export default function ProviderSignUpScreen() {
   );
 }
 
+const { width, height } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 23
+    paddingTop: 23,
+    alignItems: height > width ? null : 'center'
   },
   title: {
     textAlign: 'center',
@@ -145,9 +183,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     color: '#DC143C',
-},
+  },
   shortInput: {
     margin: 15,
+    width: height > width ? null : 136,
     flexGrow: 1,
     height: 40,
     borderColor: '#1059d5',
@@ -157,6 +196,25 @@ const styles = StyleSheet.create({
   input: {
     margin: 15,
     height: 40,
+    width: height > width ? null : 300,
+    borderColor: '#1059d5',
+    borderRadius: 0,
+    borderWidth: 1,
+    padding: 10
+  },
+  dropdown: {
+    margin: 15,
+    height: 40,
+    width: height > width ? null : 300,
+    borderColor: '#1059d5',
+    borderWidth: 1,
+    borderRadius: 0,
+    padding: 10
+  },
+  dropdownSelect: {
+    borderRadius: 0,
+    margin: 15,
+    width: height > width ? null : 300,
     borderColor: '#1059d5',
     borderWidth: 1,
     padding: 10
