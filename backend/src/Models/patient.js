@@ -25,6 +25,13 @@ const dataSchema = new mongoose.Schema({
         required: false,
         type: Date
     },
+
+    treatments: {
+        required: false,
+        type: [mongoose.Schema.Types.ObjectId],
+    },
+    maintenanceBottleNumber: {pollenMaintenanceBottle: Number, insectsAndPetsMaintenanceBottle: Number, moldsMaintenanceBottle: Number},
+
     NPI: {
         require: false,
         type: Number,
@@ -42,6 +49,7 @@ const dataSchema = new mongoose.Schema({
         type: Number,
         default: 0
     }
+
 }, { collection: 'Patients' })
 
 module.exports = mongoose.model('Patient', dataSchema)
