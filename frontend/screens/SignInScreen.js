@@ -81,7 +81,7 @@ export default function SignInScreen({navigation}) {
                style = {styles.signUpButton}
                   onPress={() =>
                   navigation.navigate('ProviderSignUpScreen') }>
-               <Text style = {styles.logInButtonText}>I am a practice</Text>
+               <Text style = {styles.logInButtonText}>I am a provider</Text>
             </TouchableOpacity>
             </View>
     </View>

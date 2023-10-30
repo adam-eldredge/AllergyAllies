@@ -1,10 +1,12 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRoute } from '@react-navigation/native';
-import { AuthContext, AuthProvider } from '../App.js'
+import { AuthContext, AuthProvider } from '../../App.js'
+import { SelectList } from 'react-native-dropdown-select-list'
 import axios from 'axios';
 
-export default function PatientSignUpScreen() {
+
+export default function ProviderSignUpScreen() {
   var success = true;
   const [display, setDisplay] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -12,28 +14,56 @@ export default function PatientSignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
+  const [NPI, setNPI] = useState('');
+  const [practiceCode, setPracticeCode] = useState('');
 
   const handleSignUp = async () => {
-
     setDisplay('')
-    if (firstName && lastName && email && password && confirmPass) {
+    if (firstName && lastName && email && password && confirmPass && NPI && practiceCode) { 
+      const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
+
+      const practiceID = practice.data._id;
+      console.log(practiceID)
+      if (!practiceID) {
+        setDisplay('Invalid Practice ID');
+        success = false;
+        return;
+      }
+
       if (password == confirmPass) {
         try {
           const data = {
             firstName,
             lastName,
             email,
-            password
+            password,
+            NPI,
+            practiceID
           }
 
-          const emailExists = await axios.post('http://localhost:5000/api/checkEmail', { email });
+          // Used to check if provider has a valid NPI, WIP
+          //const NPIreigstryURI = `https://npiregistry.cms.hhs.gov/api/?number=${NPI}&pretty=&version=2.1`
+          const NPIreigstryURI = `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?terms=${NPI}`
+          const NPIexists = await axios.get(NPIreigstryURI);
 
-          if (emailExists.status === 200) {
-            const response = await axios.post('http://localhost:5000/api/addPatient', data);
-            console.log(response);
+          // Check if the email already has an associated account
+          const emailNPIExists = await axios.post('http://localhost:5000/api/getProviderEmail', { email, NPI });
+
+          if (emailNPIExists.status === 200) {
+            if (NPIexists.data[0] == 1) {
+              const response = await axios.post('http://localhost:5000/api/addProvider', data);
+            }
+            else {
+              setDisplay('Invalid NPI')
+              success = false;
+            }
           }
-          else if (emailExists.status === 201) {
+          else if (emailNPIExists.status === 201) {
             setDisplay('This email is already associated with an account!');
+            success = false;
+          }
+          else if (emailNPIExists.status === 208) {
+            setDisplay('This NPI cannot be used.');
             success = false;
           }
 
@@ -49,14 +79,14 @@ export default function PatientSignUpScreen() {
       }
     }
     else {
-      setDisplay('Please fill out all fields!');
+      setDisplay('Please fill out all fields!')
       success = false;
     }
     if (success) {
       setDisplay('Account successfully created! Returning to sign in screen...');
       setTimeout(() => {
         navigation.navigate('SignIn');
-        }, 1000);
+      }, 1000);
     }
   }
 
@@ -64,7 +94,7 @@ export default function PatientSignUpScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Allergy Ally</Text>
 
-      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
+      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         <TextInput style={styles.shortInput}
           underlineColorAndroid="transparent"
           placeholder="First Name"
@@ -89,6 +119,22 @@ export default function PatientSignUpScreen() {
         value={email}
         autoCapitalize="none"
         onChangeText={setEmail} />
+
+      <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="National Provider Identifier"
+        placeholderTextColor="#7a7a7a"
+        value={NPI}
+        autoCapitalize="none"
+        onChangeText={setNPI} />
+
+      <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Practice Code"
+        placeholderTextColor="#7a7a7a"
+        value={practiceCode}
+        autoCapitalize="none"
+        onChangeText={setPracticeCode} />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
@@ -125,7 +171,7 @@ const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     paddingTop: 23,
-    alignItems: height > width ? null : 'center',
+    alignItems: height > width ? null : 'center'
   },
   title: {
     textAlign: 'center',
@@ -136,13 +182,13 @@ const styles = StyleSheet.create({
   message: {
     textAlign: 'center',
     fontSize: 12,
-    color: '#000000'
-},
+    color: '#DC143C',
+  },
   shortInput: {
     margin: 15,
+    width: height > width ? null : 136,
     flexGrow: 1,
     height: 40,
-    width: height > width ? null : 136,
     borderColor: '#1059d5',
     borderWidth: 1,
     padding: 10
@@ -152,12 +198,29 @@ const styles = StyleSheet.create({
     height: 40,
     width: height > width ? null : 300,
     borderColor: '#1059d5',
+    borderRadius: 0,
+    borderWidth: 1,
+    padding: 10
+  },
+  dropdown: {
+    margin: 15,
+    height: 40,
+    width: height > width ? null : 300,
+    borderColor: '#1059d5',
+    borderWidth: 1,
+    borderRadius: 0,
+    padding: 10
+  },
+  dropdownSelect: {
+    borderRadius: 0,
+    margin: 15,
+    width: height > width ? null : 300,
+    borderColor: '#1059d5',
     borderWidth: 1,
     padding: 10
   },
   logInButton: {
     backgroundColor: '#1059d5',
-    width: height > width ? null : 300,
     padding: 10,
     margin: 15,
     height: 40,

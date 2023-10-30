@@ -1,15 +1,25 @@
-const express = require('express')
-const router = express.Router()
-const routeController = require('../controllers/route_controller')
-const verifyJWT = require('../middleware/verify_JWT');
+const express = require('express');
+const router = express.Router();
+const reportController = require('../controllers/report_controller');
+//const verifyJWT = require('../middleware/verify_JWT');
 
-router.use(verifyJWT)
-/* Route Definitions */
+//router.use(verifyJWT)
+router.get('/getAllReportNames', reportController.getAllReportNames);
+// :id -> report id
+router.get('/getReportData/:id', reportController.getReportData);
 
-// GET localhost:5000/api/example 
-router.get('/example', routeController.exampleFunc);
+router.get('/approachingMaintenanceReport/:NPI', reportController.generateApproachingMaintenanceReport);
 
-// GET localhost:5000/api/example/another 
-router.get('/another', routeController.anotherExampleFunc);
+router.get('/attritionReport/:NPI', reportController.generateAttritionReport);
+
+router.get('/generalRefillsReport/:NPI', reportController.generateGeneralRefillsReport);
+
+router.get('/allergyDropsRefillsReport/:NPI', reportController.generateAllergyDropsRefillsReport);
+
+router.get('/allergyShotsRefillsReport/:NPI', reportController.generateAllergyShotsRefillsReport);
+
+router.get('/epipenRefillsReport/:NPI', reportController.generateEpipenRefillsReport);
+
+router.get('/needsRetestReport/:NPI', reportController.generateNeedsRetestReport);
 
 module.exports = router;
