@@ -35,7 +35,7 @@ const addPatientToProvider = async (req, res) => {
             return res.status(404).json({ message: 'Patient not found' });
         }
 
-        foundPatient.providerID = foundProvider._id;
+        foundPatient.NPI = foundProvider.NPI;
 
         const updatedPatient = await foundPatient.save();
 
