@@ -15,7 +15,7 @@ exports.addTreatment = async (req, res) => {
             injVols, bottleNumbers, LLR, dilutions, date, attended
         });
         //Should add patient treatment data to end of array
-        patient.findByIdAndUpdate({_id: req.body.patientID},
+        const patientToFind = await patient.findByIdAndUpdate({_id: req.body.patientID},
             { $push: {treatments: data}},
             function(error){
                 if(error){
@@ -24,7 +24,15 @@ exports.addTreatment = async (req, res) => {
                 else{
                     console.log(`Treatment added to ${patientLastName}, ${patientFirstName} for ${nameOfPractice}.`)
                 }
-            });
+        });
+
+        const treatmentLength = patientToFind.treatments.length();
+        const patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
+        const lastTreatment = await treatment.findById(patientLastTreatmentID);
+
+        //Move the lastTreatments vial Test to new one
+        data.lastVialTests = lastTreatment.nextVialTests;
+
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
     }
@@ -183,11 +191,12 @@ exports.nextTreatment = async(req, res) => {
         const lastVialTestMold = lastTreatment.lastVialTests.get('mold').values;
 
         //Moving past vial test data to current treatment
-        data.lastVialTests.set(pollenKey,{values: lastVialTestPollen});
-        data.lastVialTests.set(insectsAndPetsKey,{values: lastVialTestInsectsAndPets});
-        data.lastVialTests.set(moldKey,{values: lastVialTestMold});
-
-
+        if(data.lastVialTests.size == 0){
+            data.lastVialTests.set(pollenKey,{values: lastVialTestPollen});
+            data.lastVialTests.set(insectsAndPetsKey,{values: lastVialTestInsectsAndPets});
+            data.lastVialTests.set(moldKey,{values: lastVialTestMold});
+        }
+        
 
         let newPollenValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
         let newInsectsAndPetsValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
