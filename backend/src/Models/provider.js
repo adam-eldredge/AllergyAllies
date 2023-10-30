@@ -22,7 +22,11 @@ const dataSchema = new mongoose.Schema({
         type: Number
     },
     practiceID: {
-        required: true,
+        required: false,
+        type: String
+    },
+    providerCode: {
+        required: false,
         type: String
     }
 }, { collection: 'Providers' })

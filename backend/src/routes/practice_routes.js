@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const practiceController = require('../controllers/practice_controller');
 
+//router.use(verifyJWT)
 
 // Add a practice
 router.post('/addPractice', practiceController.addPractice);

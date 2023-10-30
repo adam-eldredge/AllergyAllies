@@ -13,6 +13,10 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    phone: {
+        required: true,
+        type: String
+    },
     password: {
         required: true,
         type: String
@@ -21,9 +25,22 @@ const dataSchema = new mongoose.Schema({
         required: false,
         type: Date
     },
-    practiceID: {
-        required: true,
-        type: String
+    NPI: {
+        require: false,
+        type: Number,
+    },
+    // DEFAULT, INACTIVE, MAINTENANCE, ATTRITION
+    status: {
+        require: true,
+        type: String,
+    },
+    statusTime: {
+        require: true,
+        type: Date
+    },
+    tokens: {
+        type: Number,
+        default: 0
     }
 }, { collection: 'Patients' })
 
