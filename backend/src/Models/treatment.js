@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+// can put injVol sum each time new report is made to help
+// calculate when refill needed
 
 const dataSchema = new mongoose.Schema({
     nameOfPractice: {
@@ -47,23 +49,25 @@ const dataSchema = new mongoose.Schema({
     LLR: { pollenLLR: Number, insectsAndPetsLLR: Number, moldsLLR: Number},
     lastVialTests: {
         type: Map,
-        of: {
+        of: new mongoose.Schema({
+            name: String,
             values: {
                 dilution: Number, 
                 bottleNumber: String, 
                 whealSize: Number
             }
-        }
+        })
     },
     nextVialTests:{
         type: Map,
-        of: {
+        of: new mongoose.Schema({
+            name: String,
             values: {
                 dilution: Number, 
                 bottleNumber: String, 
                 whealSize: Number
             }
-        }
+        })
     },
 
     date: {

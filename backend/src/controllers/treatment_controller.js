@@ -6,13 +6,11 @@ const protocol = require('../Models/protocols');
 exports.addTreatment = async (req, res) => {
     try {
         const { nameOfPractice, NPI, patientLastName, patientFirstName, patientID, 
-            injVols, bottleNumbers, LLR, dilutions, date, attended 
+            medication, injVols, bottleNumbers, LLR, dilutions, dosage, date, attended 
         } = req.body;
-
-        //TODO update to include lastVialTest
         const data = new treatment({
             nameOfPractice, NPI, patientLastName, patientFirstName, patientID, 
-            injVols, bottleNumbers, LLR, dilutions, date, attended
+            medication, injVols, bottleNumbers, LLR, dilutions, dosage, date, attended
         });
         //Should add patient treatment data to end of array
         patient.findByIdAndUpdate({_id: req.body.patientID},
@@ -32,6 +30,7 @@ exports.addTreatment = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 }
+
 
 // Get all method
 exports.getAllTreatments = async (req, res) => {
