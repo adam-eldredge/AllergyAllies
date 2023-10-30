@@ -65,8 +65,20 @@ const getAllPatients = async (req, res) => {
     }
 }
 
+// Get all patients from a practice
+const getPatientsByPractice = async (req, res) => {
+    try {
+        const pracID = req.params.practiceID;
+        const data = await patient.find({practiceID: pracID});
+        return res.json(data);
+    }
+    catch (error) {
+        return res.status(500).json({ message: error.message });
+    }
+}
+
 // Get patient by id
-exports.getPatient = async (req, res) => {
+const getPatient = async (req, res) => {
     try {
         const id = req.params.id;
         const foundPatient = await patient.findById(id);
@@ -82,7 +94,7 @@ exports.getPatient = async (req, res) => {
 }
 
 // Get patient by email
-exports.checkEmail = async (req, res) => {
+const checkEmail = async (req, res) => {
     try {
         const email = req.body.email.toString();
         const data = await patient.findOne({ email: email })
@@ -181,7 +193,9 @@ module.exports = {
     addPatientToProvider,
     getAllPatientsHelper,
     getAllPatients,
+    getPatientsByPractice,
     getPatient,
+    checkEmail,
     addTokens,
     resetTokens,
     deletePatient,
