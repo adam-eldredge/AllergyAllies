@@ -1,5 +1,5 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { Platform } from 'react-native';
+import { View, Platform, TouchableOpacity, StyleSheet, IconButton } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 
@@ -81,6 +81,26 @@ const surveyJson = {
                     ]
             },
             {
+                name: 'Treatment',
+                title: 'Treatment',
+                elements:
+                    [
+                        {
+                            name: 'j',
+                            title: 'Treatment Vials',
+                            type: 'paneldynamic',
+                            panelCount: '0',
+                            maxPanelCount: '100',
+                            confirmDelete: 'true',
+                            templateElements: [{
+                                name: 'j1',
+                                title: 'Vial Name',
+                                type: 'text',
+                            }]
+                        }
+                    ]
+            },
+            {
                 name: 'Antigens',
                 title: 'Antigens',
                 elements:
@@ -89,26 +109,15 @@ const surveyJson = {
                             name: 'i',
                             title: 'Antigens Tested',
                             type: 'paneldynamic',
-                            panelCount: '1',
-                            maxPanelCount: '10',
+                            panelCount: '0',
+                            maxPanelCount: '100',
                             confirmDelete: 'true',
                             templateElements: [{
                                 name: 'i1',
                                 title: 'Antigen Name',
                                 type: 'text',
-                            }]
-                        }, {
-                            name: 'j',
-                            title: 'Treatment Vials',
-                            type: 'paneldynamic',
-                            panelCount: '1',
-                            maxPanelCount: '10',
-                            confirmDelete: 'true',
-                            templateElements: [{
-                                name: 'j1',
-                                title: 'Vial Name',
-                                type: 'text',
-                            }]
+                            }
+                            ]
                         }
                     ]
             },
@@ -220,14 +229,14 @@ export default function PracticeSurvey() {
     const rend = Platform.select({
         ios: <Text>Please continue on desktop</Text>,
         android: <Text>Please continue on desktop</Text>,
-        default: <Survey model={survey}/>,
+        default: <Survey model={survey} />
     });
 
     console.log(rend);
     return rend;
 }
 
-const sendSurvey = async(user, json) => {
+const sendSurvey = async (user, json) => {
     // First, check if this user is a practice
     if (user.role == 2) {
         console.log('patient');
@@ -246,11 +255,11 @@ const sendSurvey = async(user, json) => {
             console.log(`practiceID: ${pID}`);
             console.log(`JSON: ${json}`);
             const surveyData = JSON.stringify(createSurveyObj(json));
-            const data = {pID, surveyData};
-            const posted = axios.post('http://localhost:5000/api/addSurvey', data );
+            const data = { pID, surveyData };
+            const posted = axios.post('http://localhost:5000/api/addSurvey', data);
         }
     }
-    
+
 }
 
 const createSurveyObj = (json) => {
@@ -286,7 +295,51 @@ const createSurveyObj = (json) => {
             adjustmentRules: json.m,
             adjustmentDefaults: json.n
         }
-        
+
     };
     return survey;
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingTop: 23,
+        paddingLeft: 10,
+        paddingRight: 10,
+    },
+    header: {
+        fontSize: 40,
+        marginTop: 40,
+        fontWeight: '600',
+        marginLeft: 100,
+        color: '#1059d5',
+        marginBottom: 10,
+    },
+    table: {
+        marginLeft: 100,
+        width: 800,
+    },
+    tableHeader: {
+        backgroundColor: '#cbdeff',
+        borderTopStartRadius: 8,
+        borderTopEndRadius: 8,
+        color: 'black',
+    },
+    tableRow2: {
+        backgroundColor: '#ebebeb',
+    },
+    providerDashboardItem: {
+        borderRadius: 8,
+        height: 100,
+        width: 100,
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+    providerDashboardText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 15,
+        fontWeight: '600',
+        marginTop: 20,
+        marginBottom: -10,
+    },
+})

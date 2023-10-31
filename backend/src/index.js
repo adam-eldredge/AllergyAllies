@@ -23,7 +23,8 @@ const patient_routes = require('./routes/patient_routes');
 const survey_routes = require('./routes/survey_routes');
 const provider_routes = require('./routes/provider_routes');
 const report_routes = require('./routes/report_routes');
-const practice_routes = require('./routes/practice_routes')
+const export_routes = require('./routes/export_routes');
+const practice_routes = require('./routes/practice_routes');
 const auth_routes = require('./routes/auth_routes');
 
 // Use statements
@@ -32,6 +33,8 @@ app.use('/api', provider_routes);
 app.use('/api', practice_routes);
 app.use('/api', survey_routes);
 app.use('/api', report_routes);
+app.use('/api', export_routes);
+
 app.use('/auth', auth_routes);
 
 

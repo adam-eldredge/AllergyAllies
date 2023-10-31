@@ -79,7 +79,20 @@ export default function Portal({navigation}){
    ) : (
       // PROVIDER PORTAL
       <View style = {styles.container2}>
-         <Text style={styles.header2}>Welcome, {firstName}!</Text>
+         <View style={{flexDirection: 'row'}}>
+            <Text style={styles.header2}>Welcome, {firstName}!</Text>
+            <TouchableOpacity style={{marginTop: 40, marginLeft: 540, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
+               onPress={() =>
+               signOut()
+            }>
+               <Text style={{color: 'white', size: 5, marginRight: -10, marginLeft: 12, fontWeight: 500}}>Sign out</Text>
+                  <IconButton
+                     icon="exit-to-app"
+                     iconColor="white"
+                     size={14}
+                  />
+            </TouchableOpacity>
+         </View>
          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap',}}>
             <View style={{marginLeft: 100, marginRight: 170}}>
                <Text style={{fontSize: 18, marginBottom: 10, fontWeight: '500'}}>Your Alerts:</Text>
@@ -143,16 +156,16 @@ export default function Portal({navigation}){
                      size={60}
                   />
                </TouchableOpacity>
-               <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#d07f99'}}
+               <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
                onPress={() =>
-                  signOut()
+               navigation.navigate('Injections')
                }>
-                  <Text style={styles.providerDashboardText}>Sign out</Text>
-                  <IconButton
-                     icon="exit-to-app"
-                     iconColor="white"
-                     size={60}
-                  />
+                  <Text style={styles.providerDashboardText}>Injections</Text>
+               <IconButton
+                  icon="needle"
+                  iconColor="white"
+                  size={60}
+               />
                </TouchableOpacity>
             </View>
          </View>
