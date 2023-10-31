@@ -27,10 +27,10 @@ export default function HomeScreen({navigation}){
         }
       />
       <Button
-        title="PatientHome"
+        title="PatientNavBar"
         color="#1059d5"
         onPress={() =>
-          navigation.navigate('PatientHome')
+          navigation.navigate('PatientNavBar')
         }
       />
       <Button

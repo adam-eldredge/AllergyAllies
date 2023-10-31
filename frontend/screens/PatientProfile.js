@@ -5,6 +5,7 @@ import { useRoute } from '@react-navigation/native';
 import AuthContext from '../AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import User from '../User';
+import { DataTable } from 'react-native-paper'; 
    
 
 
@@ -49,17 +50,30 @@ export default function PatientProfile(){
         <Text style={styles.textBoxSubContent}>10/17/23</Text> 
         <Text style={styles.textBoxContent}>Tracking Start Date:</Text> 
         <Text style={styles.textBoxSubContent}>10/17/23</Text>
-        <Text style={styles.textBoxContent}>Vial 1 (Insects):</Text> 
-        <Text style={styles.textBoxSubContent}>Maintenance Bottle Number: 6</Text>
-        <Text style={styles.textBoxSubContent}>Maximum Injection Amount: .25 mg</Text>
-        <Text style={styles.textBoxContent}>Vial 2 (Pollen):</Text> 
-        <Text style={styles.textBoxSubContent}>Maintenance Bottle Number: 4</Text>
-        <Text style={styles.textBoxSubContent}>Maximum Injection Amount: .20 mg</Text>
-        <Text style={styles.textBoxContent}>Vial 3 (Molds):</Text> 
-        <Text style={styles.textBoxSubContent}>Maintenance Bottle Number: 4</Text>
-        <Text style={styles.textBoxSubContent}>Maximum Injection Amount: .25 mg</Text>
+            
         <Text style={styles.textBoxContent}>Frequency of Injections:</Text> 
         <Text style={styles.textBoxSubContent}>2x a week</Text>
+
+{/* 
+        <DataTable style={styles.container}> 
+      <DataTable.Header style={styles.tableHeader}> 
+        <DataTable.Title fontSize = {20}>Vial</DataTable.Title> 
+        <DataTable.Title>Maintenance Bottle #</DataTable.Title> 
+      </DataTable.Header> 
+      <DataTable.Row> 
+        <DataTable.Cell>Vial 1 (Insects)</DataTable.Cell> 
+        <DataTable.Cell>6</DataTable.Cell> 
+      </DataTable.Row> 
+  
+      <DataTable.Row> 
+        <DataTable.Cell>Vial 2 (Molds)</DataTable.Cell> 
+        <DataTable.Cell>6</DataTable.Cell> 
+      </DataTable.Row> 
+      <DataTable.Row> 
+        <DataTable.Cell>Vial 3 (Pollen)</DataTable.Cell> 
+        <DataTable.Cell>4</DataTable.Cell> 
+      </DataTable.Row> 
+    </DataTable>   */}
       </View>
 
       <TouchableOpacity
@@ -172,4 +186,7 @@ export default function PatientProfile(){
         textAlign: 'center',
         fontSize: 15,
      },
+     tableHeader: { 
+      backgroundColor: '#DCDCDC', 
+    }
   });

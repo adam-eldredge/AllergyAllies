@@ -1,7 +1,7 @@
 
 
 import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, Image, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
 import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -15,8 +15,8 @@ export default function PatientAppointments({navigation}){
 const userInfo = User();
 const firstName = userInfo.firstName;
 
-//will eventually come from backend: (num appointments attended late/num appointments attended on time * 100)
-var compliance = 90;
+//get from backend: (num appointments attended late/num appointments attended on time * 100)
+var compliance = 40;
 var msg = "";
 if (compliance >= 80)
   msg = "Great job!";
@@ -39,6 +39,15 @@ else
 
 
 </TouchableOpacity>
+<Text style = {styles.welcome}>Next appointment deadline:</Text>
+<TouchableOpacity style = {styles.appointment}
+onPress={() =>
+    navigation.navigate('Upcoming')
+  }>
+    <Text style={styles.appointmentText}>Monday 10/9/2023</Text>
+</TouchableOpacity>
+
+<Image style={{ width: "150%", height: "20%", marginTop: 150, marginLeft: -85}} source={require('./AdPlaceholder.png')} />
 
 </ScrollView>
       )
@@ -59,7 +68,7 @@ const styles = StyleSheet.create({
     //shadowRadius: 8,
     backgroundColor: 'white',
     marginTop: 18,
-    marginBottom: 18,
+    marginBottom: 30,
     padding: 12,
 
 
@@ -90,7 +99,7 @@ const styles = StyleSheet.create({
     title2 :{
         marginBottom: 15,
         textAlign: 'center',
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: '600',
     },
     compliance: {
@@ -125,8 +134,8 @@ const styles = StyleSheet.create({
     },
     appointment: {
         width: Dimensions.get('window').width - 30,
-        marginLeft: 15,
-        marginBottom: 8,
+        //marginLeft: 15,
+        marginVertical: 8,
         height: 60,
         borderRadius: 8,
         backgroundColor: '#84aef8',
@@ -135,7 +144,7 @@ const styles = StyleSheet.create({
         textstyle:{fontsize: 60}
     },
     appointmentText: {
-        fontSize: 18,
+        fontSize: 24,
         marginVertical: 4,
         fontWeight: '500',
         color: 'white',
