@@ -39,8 +39,9 @@ exports.login = async(req, res) => {
     }
 
     // role 1: provider, role 2: patient
+    let accessToken = null
     if (role == 1) {
-        const accessToken = jwt.sign(
+        accessToken = jwt.sign(
             {
                 "UserInfo": {
                     "id": foundUser.id,
@@ -55,7 +56,7 @@ exports.login = async(req, res) => {
         )
     }
     else {
-        const accessToken = jwt.sign(
+        accessToken = jwt.sign(
             {
                 "UserInfo": {
                     "id": foundUser.id,
@@ -111,8 +112,9 @@ exports.refresh = async(req, res) => {
                 }
             }
 
+            let accessToken = null
             if (role == 1) {
-                const accessToken = jwt.sign(
+                accessToken = jwt.sign(
                     {
                         "UserInfo": {
                             "id": foundUser.id,
@@ -127,7 +129,7 @@ exports.refresh = async(req, res) => {
                 )
             }
             else {
-                const accessToken = jwt.sign(
+                accessToken = jwt.sign(
                     {
                         "UserInfo": {
                             "id": foundUser.id,
@@ -144,7 +146,7 @@ exports.refresh = async(req, res) => {
             }
 
             console.log(foundUser.practiceID)
-            res.json({ accessToken })
+            res.json({ accessToken })            
         }
     )
 }
