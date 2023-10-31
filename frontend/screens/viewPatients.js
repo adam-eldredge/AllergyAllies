@@ -51,7 +51,6 @@ export default function ViewPatients({ navigation }) {
     function updateRenderData() {
         let newList = []
 
-        console.log('here')
         patientsArray.map((element) => {
             let lastName = element.lastName.toLowerCase()
             if (patientName && filter == 'All') {
@@ -78,10 +77,19 @@ export default function ViewPatients({ navigation }) {
     }
 
     return (
-        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white' }}>
-            <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'center' }}>
-                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+            <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={styles.header}>Patients</Text>
+                    <TextInput style={styles.input}
+                        underlineColorAndroid="transparent"
+                        placeholder="Last Name"
+                        placeholderTextColor="#7a7a7a"
+                        value={patientName}
+                        autoCapitalize="none"
+                        onChangeText={(name) => {
+                            setPatientName(name)
+                        }} />
                     <SelectList
                         placeholder='Filter'
                         search={false}
@@ -93,15 +101,6 @@ export default function ViewPatients({ navigation }) {
                         inputStyles={{ color: "#7a7a7a" }}
                         dropdownStyles={styles.dropdownSelect}
                     />
-                    <TextInput style={styles.input}
-                        underlineColorAndroid="transparent"
-                        placeholder="Last Name"
-                        placeholderTextColor="#7a7a7a"
-                        value={patientName}
-                        autoCapitalize="none"
-                        onChangeText={(name) => {
-                            setPatientName(name)
-                        }} />
                 </View>
                 <DataTable style={styles.table}>
                     <DataTable.Header style={styles.tableHeader}>
@@ -181,6 +180,7 @@ const styles = StyleSheet.create({
         width: height > width ? null : 300,
         borderColor: '#1059d5',
         borderWidth: 1,
+        borderRadius: 8,
         padding: 10
     },
     header: {
@@ -228,11 +228,9 @@ const styles = StyleSheet.create({
         padding: 10
     },
     dropdownSelect: {
-        borderRadius: 0,
-        margin: 15,
+        borderRadius: 8,
         borderWidth: 1,
         borderColor: '#1059d5',
-        borderWidth: 8,
         padding: 10
     }
 })
