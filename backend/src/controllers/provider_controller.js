@@ -1,11 +1,19 @@
 const provider = require('../Models/provider');
+const crypto = require('crypto');
 
-// Post method
+// Function to generate a random code
+function generateRandomCode() {
+    const length = 6;
+    return crypto.randomBytes(Math.ceil(length / 2)).toString('hex').slice(0, length);
+}
+
+// Post method - TEST CRYPTO, TEST USAGE OF PRACTICE ID, GENERATE PRACTICE ID
 exports.addProvider = async (req, res) => {
     try {
-        const { firstName, lastName, email, password, NPI, practiceID } = req.body;
+        const { firstName, lastName, email, password, NPI, practiceID} = req.body;
+        const providerCode = generateRandomCode();
         const data = new provider({
-            firstName, lastName, email, password, NPI, practiceID
+            firstName, lastName, email, password, NPI, practiceID, providerCode
         });
 
         const dataToSave = await data.save();

@@ -4,7 +4,6 @@ import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import PatientAppointments from './PatientAppointments.js';
-import Alerts from '../screens/Alerts.js';
 import PatientProfile from '../screens/PatientProfile.js';
 import PatientProgress from '../screens/PatientProgress.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';

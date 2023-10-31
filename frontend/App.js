@@ -3,9 +3,9 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Di
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Portal from './screens/Portal.js';
-import Alerts from './screens/Alerts.js';
 import AllAlerts from './screens/AllAlerts.js';
 import Reports from './screens/Reports.js';
+import Injections from './screens/Injections.js';
 import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
@@ -18,6 +18,7 @@ import UpcomingInfo from './screens/UpcomingInfo.js';
 import InitialScreen from './screens/InitialScreen.js';
 import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
+import ViewPatients from './screens/ViewPatients.js';
 import { useMemo, useReducer, useEffect } from 'react';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -122,6 +123,7 @@ export default function App({navigation}) {
                 title: '',
                 headerTitleAlign: 'center',
                 headerTitleStyle: {textAlign: 'center'},
+                headerShown: false
               }}
             />
             <Stack.Screen
@@ -169,7 +171,6 @@ export default function App({navigation}) {
             // User is signed in
             <>
             <Stack.Screen name="Portal" component={Portal} />
-            <Stack.Screen name="Alerts" component={Alerts} />
             <Stack.Screen name="AllAlerts" component={AllAlerts} options={{title: 'All Alerts'}}/>
             <Stack.Screen name="Reports" component={Reports} />
             <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Allergy Ally'}} />
@@ -179,7 +180,9 @@ export default function App({navigation}) {
             <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
             <Stack.Screen name="PracticeEnrollmentScreen" component={practiceEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
             <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
+            <Stack.Screen name="ViewPatients" component={ViewPatients} options={{ title: 'View Patients'}}/>
             <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
+            <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
             </>
           )}
         </Stack.Navigator>

@@ -8,6 +8,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Alerts from './Alerts.js';
 import User from '../User';
 
+
 const Tab = createBottomTabNavigator();
 
 export default function PatientAppointments({navigation}){

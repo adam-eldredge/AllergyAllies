@@ -2,11 +2,11 @@ const protocol = require('../Models/protocol');
 
 exports.addProtocol = async (req, res) => {
     try {
-        const { NPI, startingInjectionFrequency, appointmentSchedule, automaticDoseAdvancements,
-        doseAdjustments, generalAdjustments, doseAdjustmentDefaults } = req.body;
+        // see protocol.js for bottles/vialtest format
+        const { NPI, bottles, vialTestReactionAdjustment, appointmentSchedule } = req.body;
+
         const data = new protocol({
-            NPI, startingInjectionFrequency, appointmentSchedule, automaticDoseAdvancements,
-            doseAdjustments, generalAdjustments, doseAdjustmentDefaults
+            NPI, bottles, vialTestReactionAdjustment, appointmentSchedule
         });
 
         const dataToSave = await data.save();
