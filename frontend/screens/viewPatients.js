@@ -77,7 +77,7 @@ export default function ViewPatients({ navigation }) {
     }
 
     return (
-        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
             <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
                     <Text style={styles.header}>Patients</Text>
@@ -114,55 +114,64 @@ export default function ViewPatients({ navigation }) {
                 </DataTable>
                 <View style={{ height: 30 }}></View>
             </View>
-
-
-            <View style={{ flex: 1 }}>
-                <TouchableOpacity style={{ ...styles.providerDashboardItem, backgroundColor: '#71a1f3' }}
-                    onPress={() =>
-                        navigation.navigate('Reports')
-                    }>
-                    <Text style={styles.providerDashboardText}>Reports</Text>
-                    <IconButton
-                        icon="file-chart"
-                        iconColor="white"
-                        size={37}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ ...styles.providerDashboardItem, backgroundColor: '#937fd0' }}
-                    onPress={() =>
-                        navigation.navigate('PracticeSurvey')
-                    }>
-                    <Text style={{ ...styles.providerDashboardText, fontSize: 12 }}>View/Edit</Text>
-                    <Text style={{ ...styles.providerDashboardText, fontSize: 12, marginTop: 10, marginBottom: -15 }}>Practice Info</Text>
-                    <IconButton
-                        icon="pencil"
-                        iconColor="white"
-                        size={37}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ ...styles.providerDashboardItem, backgroundColor: '#7fd0ae' }}
-                    onPress={() =>
-                        navigation.navigate('AllAlerts')
-                    }>
-                    <Text style={styles.providerDashboardText}>Alerts</Text>
-                    <IconButton
-                        icon="bell-ring"
-                        iconColor="white"
-                        size={37}
-                    />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ ...styles.providerDashboardItem, backgroundColor: '#d07f99' }}
-                    onPress={() =>
-                        signOut()
-                    }>
-                    <Text style={styles.providerDashboardText}>Sign out</Text>
+            <View style={{flex: 1, marginLeft: 900}}>
+            <TouchableOpacity style={{marginTop: 50, marginBottom: 10, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
+                onPress={() =>
+                    signOut()
+                }>
+                    <Text style={{color: 'white', size: 5, marginRight: -10, marginLeft: 12, fontWeight: 500}}>Sign out</Text>
                     <IconButton
                         icon="exit-to-app"
                         iconColor="white"
-                        size={37}
+                        size={14}
                     />
-                </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
+            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 15}}
+                onPress={() =>
+                    navigation.navigate('Reports')
+                }>
+                <Text style={{...styles.providerDashboardText, fontSize: 12, marginBottom: -15}}>Reports</Text>
+                <IconButton
+                    icon="file-chart"
+                    iconColor="white"
+                    size={37}
+                />
+            </TouchableOpacity>
+            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#937fd0'}}
+               onPress={() =>
+                  navigation.navigate('PracticeSurvey')
+               }>
+               <Text style={{...styles.providerDashboardText, fontSize: 12}}>View/Edit</Text>
+               <Text style={{...styles.providerDashboardText, fontSize: 12, marginTop: 10, marginBottom: -15}}>Practice Info</Text>
+               <IconButton
+                  icon="pencil"
+                  iconColor="white"
+                  size={37}
+               />
+            </TouchableOpacity>
+            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#7fd0ae'}}
+               onPress={() =>
+                  navigation.navigate('AllAlerts')
+               }>
+                  <Text style={styles.providerDashboardText}>Alerts</Text>
+                  <IconButton
+                     icon="bell-ring"
+                     iconColor="white"
+                     size={37}
+                  />
+               </TouchableOpacity>
+            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
+            onPress={() =>
+              navigation.navigate('Injections')
+             }>
+               <Text style={styles.providerDashboardText}>Injections</Text>
+              <IconButton
+                icon="needle"
+                iconColor="white"
+                size={37}
+              />
+            </TouchableOpacity>
+        </View>
         </View>
     );
 }
@@ -204,21 +213,21 @@ const styles = StyleSheet.create({
     tableRow2: {
         backgroundColor: '#ebebeb',
     },
-    providerDashboardItem: {
-        borderRadius: 50,
+    providerDashboardItem:{
+        borderRadius: 8,
         height: 100,
         width: 100,
-        marginBottom: 20,
+        marginBottom: 10,
         alignItems: 'center',
-    },
-    providerDashboardText: {
+     },
+     providerDashboardText:{
         color: 'white',
         textAlign: 'center',
         fontSize: 15,
         fontWeight: '600',
         marginTop: 20,
         marginBottom: -10,
-    },
+     },
     dropdown: {
         margin: 15,
         height: 40,
