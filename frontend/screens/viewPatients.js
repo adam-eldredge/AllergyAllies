@@ -15,8 +15,9 @@ export default function ViewPatients({ navigation }) {
     const [renderData, setRenderData] = useState([]);
     const [queriedPatients, setQueriedPatients] = useState(false);
     const stylesList = [styles.tableRow2, styles.tableRow1];
-    const [filter, setFilter] = useState('');
-    const filterList = ['All', 'Attrition', 'Inactive', 'Active', 'Maintenance']
+    const [filter, setFilter] = useState('All');
+    const filterList = ['All', 'attrition', 'inactive', 'active', 'maintenance']
+    const [patientName, setPatientName] = useState('');
 
     useEffect(() => {
         const getPatients = async () => {
@@ -30,6 +31,8 @@ export default function ViewPatients({ navigation }) {
 
         if (!queriedPatients) { getPatients() }
     })
+
+    useEffect(() => updateRenderData(), [patientName])
 
     const PList = () => (
         <div>
@@ -46,46 +49,32 @@ export default function ViewPatients({ navigation }) {
     );
 
     function updateRenderData() {
-        if (filter == 'All') {
-            let newList = []
-            patientsArray.map((element) => {
+        let newList = []
+
+        console.log('here')
+        patientsArray.map((element) => {
+            let lastName = element.lastName.toLowerCase()
+            if (patientName && filter == 'All') {
+                let match = patientName.toLowerCase()
+                if (lastName.includes(match)) {
+                    newList.push(element);
+                }
+            }
+            else if (filter == 'All'){
                 newList.push(element);
-            })
+            }
+            else if (patientName && element.status == filter) {
+                let match = patientName.toLowerCase()
+                if (lastName.includes(match)) {
+                    newList.push(element);
+                }
+            }
+            else if (element.status == filter){
+                newList.push(element);
+            }
+        })
 
-            setRenderData(newList);
-        }
-        else if (filter == 'Attrition') {
-            let newList = []
-            patientsArray.map((element) => {
-                if (element.status == 'attrition') { newList.push(element); }
-            })
-
-            setRenderData(newList);
-        }
-        else if (filter == 'Inactive') {
-            let newList = []
-            patientsArray.map((element) => {
-                if (element.status == 'inactive') { newList.push(element); }
-            })
-
-            setRenderData(newList);
-        }
-        else if (filter == 'Active') {
-            let newList = []
-            patientsArray.map((element) => {
-                if (element.status == 'active') { newList.push(element); }
-            })
-
-            setRenderData(newList);
-        }
-        else if (filter == 'Maintenance') {
-            let newList = []
-            patientsArray.map((element) => {
-                if (element.status == 'maintenance') { newList.push(element); }
-            })
-
-            setRenderData(newList);
-        }
+        setRenderData(newList);
     }
 
     return (
@@ -104,6 +93,15 @@ export default function ViewPatients({ navigation }) {
                         inputStyles={{ color: "#7a7a7a" }}
                         dropdownStyles={styles.dropdownSelect}
                     />
+                    <TextInput style={styles.input}
+                        underlineColorAndroid="transparent"
+                        placeholder="Last Name"
+                        placeholderTextColor="#7a7a7a"
+                        value={patientName}
+                        autoCapitalize="none"
+                        onChangeText={(name) => {
+                            setPatientName(name)
+                        }} />
                 </View>
                 <DataTable style={styles.table}>
                     <DataTable.Header style={styles.tableHeader}>
@@ -111,7 +109,7 @@ export default function ViewPatients({ navigation }) {
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Last Name</DataTable.Title>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Email</DataTable.Title>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Status</DataTable.Title>
-                        <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>View patient account</DataTable.Title>
+                        <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Profile</DataTable.Title>
                     </DataTable.Header>
                     <PList />
                 </DataTable>
@@ -177,6 +175,14 @@ const styles = StyleSheet.create({
         paddingLeft: 10,
         paddingRight: 10,
     },
+    input: {
+        margin: 15,
+        height: 40,
+        width: height > width ? null : 300,
+        borderColor: '#1059d5',
+        borderWidth: 1,
+        padding: 10
+    },
     header: {
         fontSize: 40,
         marginTop: 40,
@@ -224,6 +230,7 @@ const styles = StyleSheet.create({
     dropdownSelect: {
         borderRadius: 0,
         margin: 15,
+        borderWidth: 1,
         borderColor: '#1059d5',
         borderWidth: 8,
         padding: 10
