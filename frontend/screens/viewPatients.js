@@ -79,7 +79,7 @@ export default function ViewPatients({ navigation }) {
     return (
         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
             <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 30 }}>
                     <Text style={styles.header}>Patients</Text>
                     <TextInput style={styles.input}
                         underlineColorAndroid="transparent"
@@ -194,9 +194,10 @@ const styles = StyleSheet.create({
     },
     header: {
         fontSize: 40,
-        marginTop: 40,
         fontWeight: '600',
+        marginTop: 10,
         marginLeft: 100,
+        marginRight: 20,
         color: '#1059d5',
         marginBottom: 20,
     },
