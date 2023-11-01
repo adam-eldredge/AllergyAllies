@@ -6,15 +6,26 @@ const protocol = require('../Models/protocols');
 exports.addTreatment = async (req, res) => {
     try {
         const { nameOfPractice, NPI, patientLastName, patientFirstName, patientID, 
-            medication, injVols, bottleNumbers, LLR, dilutions, dosage, date, attended 
+            date, attended 
         } = req.body;
+
+        const findProtocol = await protocol.findOne({ NPI: NPI });
+        if (!findProtocol) {
+            res.status(404).json({ message: "Protocol not found" });
+        }
+
         const data = new treatment({
-            nameOfPractice, NPI, patientLastName, patientFirstName, patientID, 
-            medication, injVols, bottleNumbers, LLR, dilutions, dosage, date, attended
+            nameOfPractice, NPI, patientLastName, patientFirstName, patientID,
+            date, attended
         });
+
+        for(let i = 0; i < findProtocol.bottles.length(); i++){
+            data.bottles[i].nameOfBottle = findProtocol.bottles[i].bottleName;
+        }
+
         //Should add patient treatment data to end of array
-        const patientToFind = await patient.findByIdAndUpdate({_id: req.body.patientID},
-            { $push: {treatments: data}},
+        const patientToFind = await patient.findById({_id: req.body.patientID},
+            { $push: {treatments: data.id}},
             function(error){
                 if(error){
                     console.log(error);
@@ -24,12 +35,14 @@ exports.addTreatment = async (req, res) => {
                 }
         });
 
+        //Need to add bottles of protocol if patient has no treatments
+
         const treatmentLength = patientToFind.treatments.length();
         const patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
         const lastTreatment = await treatment.findById(patientLastTreatmentID);
 
         //Move the lastTreatments vial Test to new one
-        data.lastVialTests = lastTreatment.nextVialTests;
+        data.lastVialTests = lastTreatment.lastVialTests;
 
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
@@ -121,97 +134,52 @@ exports.nextTreatment = async(req, res) => {
         const lastTreatmentDate = new Date(lastTreatment.date);
         const dateDifference = (today.getTime() - lastTreatmentDate.getTime()) / (1000 * 3600 * 24);
 
-        
-        //Pollen variables
-        const pollenBottleNumber = lastTreatment.bottleNumbers.pollenBottleNumber;
-        const pollenLLR = lastTreatment.LLR.pollenLLR;
-        const pollenInj = lastTreatment.injVols.pollenInj;
-        const pollenDil = lastTreatment.dilutions.pollenDil;
-        const pollenMaintenanceBottle = patientToFind.maintenanceBottleNumber.pollenMaintenanceBottle;
-        const pollenKey = 'pollen';
-
-        //Insect and Pets variables
-        const insectsAndPetsBottleNumber = lastTreatment.bottleNumbers.insectsAndPetsBottleNumber;
-        const insectsAndPetsLLR = lastTreatment.LLR.insectsAndPetsLLR;
-        const insectsAndPetsInj = lastTreatment.injVols.insectsAndPetsInj;
-        const insectsAndPetsDil = lastTreatment.dilutions.insectsAndPetsDil;
-        const insectsAndPetsMaintenanceBottle = patientToFind.maintenanceBottleNumber.insectsAndPetsMaintenanceBottle;
-        const insectsAndPetsKey = 'insectsAndPets';
-
-        //Mold variables
-        const moldBottleNumber = lastTreatment.bottleNumbers.moldsBottleNumber;
-        const moldLLR = lastTreatment.LLR.moldsLLR;
-        const moldInj = lastTreatment.injVols.moldsInj;
-        const moldDil = lastTreatment.dilutions.moldsDil;
-        const moldMaintenanceBottle = patientToFind.maintenanceBottleNumber.moldsMaintenanceBottle;
-        const moldKey = 'mold';
-
-
-        // function InjVolumeCalc(lastTreatmentBN, lastTreatmentLLR, lastTreatmentInj, lastTreatmentDil, ptMaintBottle)
-        // function DilAdjustmentCalc(lastTreatmentLLR, lastTreatmentInj, lastTreatmentDil, vialTestKey)
-        // function BottleNumberCalc(lastTreatmentBN, lastTreatmentLLR, lastTreatmentInj, lastTreatmentDil, ptMaintBottle, vialTestKey)
-
-        //New Injection values for next treatment
-        let newPollenInj = InjVolumeCalc(pollenBottleNumber, pollenLLR, pollenInj, pollenDil, pollenMaintenanceBottle);
-        let newInsectsAndPetsInj = InjVolumeCalc(insectsAndPetsBottleNumber, insectsAndPetsLLR, insectsAndPetsInj, insectsAndPetsDil, insectsAndPetsMaintenanceBottle);
-        let newMoldInj = InjVolumeCalc(moldBottleNumber, moldLLR, moldInj, moldDil, moldMaintenanceBottle);
-
-
-        //New Dilutions values for next treatment
-        let newPollenDilAdjustment = DilAdjustmentCalc(pollenLLR, pollenInj, pollenDil, pollenKey);
-        let newInsectsAndPetsDilAdjustment = DilAdjustmentCalc(insectsAndPetsLLR, insectsAndPetsInj, insectsAndPetsDil, insectsAndPetsKey);
-        let newMoldDilAdjustment = DilAdjustmentCalc(moldLLR, moldInj, moldDil, moldKey);
-
-
-        //New Bottle Numbers for next treatment is 999, then maintenance
-        let newPollenBottleNumber = BottleNumberCalc(pollenBottleNumber, pollenLLR, pollenInj, pollenDil, pollenMaintenanceBottle, pollenKey);
-        let newInsectsAndPetsBottleNumber = BottleNumberCalc(insectsAndPetsBottleNumber, insectsAndPetsLLR, insectsAndPetsInj, insectsAndPetsDil, insectsAndPetsMaintenanceBottle, insectsAndPetsKey);
-        let newMoldBottleNumber = BottleNumberCalc(moldBottleNumber, moldLLR, moldInj, moldDil, moldMaintenanceBottle, moldKey);
-
         const data = new treatment({
             nameOfPractice: lastTreatment.nameOfPractice, 
             NPI: lastTreatment.NPI, 
             patientLastName: lastTreatment.patientLastName, 
             patientFirstName: lastTreatment.patientFirstName, 
             patientID: lastTreatment.patientID, 
-            injVols: {pollenInj: newPollenInj, insectsAndPetsInj: newInsectsAndPetsInj, moldsInj: newMoldInj},
-            dilutions: {pollenDil: newPollenDilAdjustment, insectsAndPetsDil: newInsectsAndPetsDilAdjustment, moldsDil: newMoldDilAdjustment},
-            bottleNumbers: {pollenBottleNumber: newPollenBottleNumber.toString(), insectsAndPetsBottleNumber: newInsectsAndPetsBottleNumber.toString(), moldsBottleNumber: newMoldBottleNumber.toString()}, 
-            LLR: {pollenLLR: pollenLLR, insectsAndPetsLLR: insectsAndPetsLLR, moldsLLR: moldLLR},
-            // lastVialTests,
-            // nextVialTests,  
             date: today, 
             attended: false
         });
 
-        //Get last vial treatment values
-        const lastVialTestPollen = lastTreatment.lastVialTests.get('pollen').values;
-        const lastVialTestInsectsAndPets = lastTreatment.lastVialTests.get('insectsAndPets').values;
-        const lastVialTestMold = lastTreatment.lastVialTests.get('mold').values;
+        //Determine how many antigens they are using
+        const patientBottleCount = lastTreatment.bottles.length();
 
-        //Moving past vial test data to current treatment
-        if(data.lastVialTests.size == 0){
-            data.lastVialTests.set(pollenKey,{values: lastVialTestPollen});
-            data.lastVialTests.set(insectsAndPetsKey,{values: lastVialTestInsectsAndPets});
-            data.lastVialTests.set(moldKey,{values: lastVialTestMold});
+        for(let i = 0; i < patientBottleCount; i++){
+            let antigenName = lastTreatment.bottles[i].nameOfBottle;
+            let antigenInjVol = lastTreatment.bottles[i].injVol;
+            let antigenDil = lastTreatment.bottles[i].injDilution;
+            let antigenLLR = lastTreatment.bottles[i].injLLR;
+            let antigenCurrBottleNumber = lastTreatment.bottles[i].currBottleNumber;
+            let antigenMaintenanceBN = patientToFind.maintenanceBottleNumber[i].maintenanceNumber;
+
+            let newInjVol = InjVolumeCalc(antigenCurrBottleNumber, antigenLLR, antigenInjVol, antigenDil, antigenMaintenanceBN);
+            let newDilAdjustment = DilAdjustmentCalc(antigenLLR, antigenInjVol, antigenDil, antigenName);
+
+            //New Bottle Numbers for next treatment is 999, then maintenance
+            let newBottleNumber = BottleNumberCalc(antigenCurrBottleNumber, antigenLLR, antigenInjVol, antigenDil, antigenMaintenanceBN, antigenName);
+
+            let lastVialTest = lastTreatment.lastVialTests.get(antigenName).values;
+
+            if(lastTreatment.lastVialTests.size < patientBottleCount){
+                data.lastVialTests.set(antigenName, {values: lastVialTest});
+            }
+
+            let newVialValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
+            NextVialTestDilution(newVialValues, antigenLLR, antigenInjVol, antigenDil);
+            NextVialTestBottleNumber(newVialValues, antigenLLR, antigenInjVol, antigenDil, antigenCurrBottleNumber, antigenMaintenanceBN);
+
+            data.bottles.push({
+                nameOfBottle: antigenName,
+                injVol: newInjVol,
+                injDilution: newDilAdjustment,
+                currBottleNumber: newBottleNumber,
+            });
+
+            data.nextVialTests.set(antigenName, newVialValues);
         }
-        
-
-        let newPollenValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
-        let newInsectsAndPetsValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
-        let newMoldValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
-
-        NextVialTestDilution(newPollenValues, pollenLLR, pollenInj, pollenDil);
-        NextVialTestDilution(newInsectsAndPetsValues, insectsAndPetsLLR, insectsAndPetsInj, insectsAndPetsDil);
-        NextVialTestDilution(newMoldValues, moldLLR, moldInj, moldDil);
-
-        NextVialTestBottleNumber(newPollenValues, pollenLLR, pollenInj, pollenDil, pollenBottleNumber, pollenMaintenanceBottle);
-        NextVialTestBottleNumber(newInsectsAndPetsValues, insectsAndPetsLLR, insectsAndPetsInj, insectsAndPetsDil, insectsAndPetsBottleNumber, insectsAndPetsMaintenanceBottle);
-        NextVialTestBottleNumber(newMoldValues, moldLLR, moldInj, moldDil, moldBottleNumber, moldMaintenanceBottle);
-
-        data.nextVialTests.set(pollenKey, newPollenValues);
-        data.nextVialTests.set(insectsAndPetsKey, newInsectsAndPetsValues);
-        data.nextVialTests.set(moldKey, newMoldValues);
 
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
