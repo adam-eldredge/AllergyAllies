@@ -6,7 +6,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Alerts from './Alerts.js';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-//import { Pagination } from 'react-native-snap-carousel/pagination';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
+import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
 
 const Tab = createBottomTabNavigator();
 
@@ -19,6 +21,8 @@ export default function PatientHome({navigation}){
         id: index + 1,
         title: `Vial ${index + 1}`,
         progress: Math.floor(Math.random() * 100), //random values, get from backend
+        lastInjDate: '10/9/23',
+        lastInjDosage: '.025 ml'
       }));
 
 
@@ -27,10 +31,17 @@ export default function PatientHome({navigation}){
     const renderItem = ({ item }) => (
         <View>
         <Text style={styles.title}>{item.title}</Text>  
-        <View style={styles.card}>
+        <View
+      style={[
+        styles.card,
+        {
+          // Try setting `flexDirection` to `"row"`.
+          flexDirection: 'row',
+        },
+      ]}>
         <AnimatedCircularProgress
-            size={250}
-            width={20}
+            size={150}
+            width={12}
             rotation={0}
             lineCap="round"
             fill={item.progress}
@@ -51,7 +62,42 @@ export default function PatientHome({navigation}){
                 )
             }
         </AnimatedCircularProgress>
+        <View>
+        <Text style={styles.lastInj}>Last injection:</Text>  
+
+
+
+
+
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={styles.icon}>
+      <FontAwesomeIcon icon={faCalendar} color={'#737373'} size={20}/>
+      </View>
+      <View>
+        <Text style={styles.cardSubData}>Date</Text>    
+        <Text style={styles.cardData}>{item.lastInjDate}</Text>    
+      </View> 
+    </View>
+
+
+    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+        <View style={styles.icon}>
+      <FontAwesomeIcon icon={faSyringe} color={'#737373'} size={20}/>
+      </View>
+      <View>
+        <Text style={styles.cardSubData}>Dosage</Text>    
+        <Text style={styles.cardData}>{item.lastInjDosage}</Text>    
+      </View> 
+    </View>
+
+
+
+        
+        
         </View>
+         
+        </View>
+
         </View>
       );
 
@@ -166,13 +212,13 @@ const styles = StyleSheet.create({
     },
     progressCircleText:{
         textAlign: 'center',
-        fontSize: 30,
+        fontSize: 24,
         fontWeight: '600',
         color: '#424242'
     },
     progressCircleSubText:{
         textAlign: 'center',
-        fontSize: 20,
+        fontSize: 12,
         fontWeight: '400',
         color: '#424242'
     },
@@ -216,6 +262,35 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3,
       },
+    cardData: {
+        alignSelf: 'left',
+        fontWeight: '500',
+        fontSize: 15,
+        marginBottom: 10,
+        marginLeft: 12,
+        color: "#2b2b2b"
+    }, 
+    cardSubData: {
+        alignSelf: 'left',
+        fontWeight: '400',
+        fontSize: 12,
+        color: '#878787',
+        marginLeft: 12,
+        marginTop: 8
+    }, 
+    lastInj: {
+        alignSelf: 'left',
+        fontWeight: '500',
+        fontSize: 15,
+        marginBottom: 2,
+        marginLeft: 20,
+        color: "#2b2b2b"
+    }, 
+    icon: {
+        marginLeft: 40,
+        alignSelf: 'center',
+        verticalAlign: 'center',
+    },
       title: {
         fontSize: 20,
         fontWeight: 'bold',
