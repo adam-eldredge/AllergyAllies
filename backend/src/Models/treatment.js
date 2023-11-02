@@ -8,6 +8,9 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    providerID: {
+        type: String
+    },
     NPI: {
         required: true,
         type: Number
@@ -25,28 +28,19 @@ const dataSchema = new mongoose.Schema({
         type: String
     },
 
-    //These may be redundant or can replace medication
-    // vialNames: {pollen: Boolean, insectsAndPets: Boolean, molds: Boolean},
-    // medication: {
-    //     required: true,
-    //     type: String
-    // },
+    bottles: {
+        required: false,
+        type: [{
+            nameOfBottle: String,
+            injVol: Number,
+            injDilution: Number,
+            injLLR: Number,
+            currBottleNumber: String,
+            date: Date,
+            needsRetest: Boolean
+        }],
+    },
 
-    //These may be redundant or can replace dosage
-    injVols: {pollenInj: Number, insectsAndPetsInj: Number, moldsInj: Number},
-    // dosage: {
-    //     required: true,
-    //     type: String
-    // },
-
-    dilutions: {pollenDil: Number, insectsAndPetsDil: Number, moldsDil: Number},
-
-    //Store as number or M for maintenance
-    bottleNumbers: {pollenBottleNumber: String, insectsAndPetsBottleNumber: String, moldsBottleNumber: String},
-
-
-    //These values needs to stay updated with each treatment TODO
-    LLR: { pollenLLR: Number, insectsAndPetsLLR: Number, moldsLLR: Number},
     lastVialTests: {
         type: Map,
         of: new mongoose.Schema({
