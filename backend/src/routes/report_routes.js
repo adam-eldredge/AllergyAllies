@@ -8,18 +8,20 @@ router.get('/getAllReportNames', reportController.getAllReportNames);
 // :id -> report id
 router.get('/getReportData/:id', reportController.getReportData);
 
-router.get('/approachingMaintenanceReport/:NPI', reportController.generateApproachingMaintenanceReport);
+router.get('/deleteReport/:id', reportController.deleteReport);
 
-router.get('/attritionReport/:NPI', reportController.generateAttritionReport);
+router.get('/approachingMaintenanceReport/:providerID', reportController.generateApproachingMaintenanceReport);
 
-router.get('/generalRefillsReport/:NPI', reportController.generateGeneralRefillsReport);
+router.get('/attritionReport/:providerID', reportController.generateAttritionReport);
 
-router.get('/allergyDropsRefillsReport/:NPI', reportController.generateAllergyDropsRefillsReport);
+router.get('/generalRefillsReport/:providerID', reportController.generateGeneralRefillsReport);
 
-router.get('/allergyShotsRefillsReport/:NPI', reportController.generateAllergyShotsRefillsReport);
+router.get('/allergyDropsRefillsReport/:providerID', reportController.generateAllergyDropsRefillsReport);
 
-router.get('/epipenRefillsReport/:NPI', reportController.generateEpipenRefillsReport);
+router.get('/allergyShotsRefillsReport/:providerID', reportController.generateAllergyShotsRefillsReport);
 
-router.get('/needsRetestReport/:NPI', reportController.generateNeedsRetestReport);
+router.get('/epipenRefillsReport/:providerID', reportController.generateEpipenRefillsReport);
+
+router.get('/needsRetestReport/:providerID', reportController.generateNeedsRetestReport);
 
 module.exports = router;
