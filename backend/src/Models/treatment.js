@@ -8,6 +8,9 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    providerID: {
+        type: String
+    },
     NPI: {
         required: true,
         type: Number
@@ -33,6 +36,8 @@ const dataSchema = new mongoose.Schema({
             injDilution: Number,
             injLLR: Number,
             currBottleNumber: String,
+            date: Date,
+            needsRetest: Boolean
         }],
     },
 

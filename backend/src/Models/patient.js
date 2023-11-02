@@ -38,24 +38,23 @@ const dataSchema = new mongoose.Schema({
         }],
     },
 
-    NPI: {
+    providerID: {
         require: false,
-        type: Number,
+        type: String,
     },
     // DEFAULT, INACTIVE, MAINTENANCE, ATTRITION
     status: {
         require: true,
         type: String,
     },
-    statusTime: {
+    statusDate: {
         require: true,
         type: Date
     },
     tokens: {
         type: Number,
         default: 0
-    }
-
+    },
 }, { collection: 'Patients' })
 
 module.exports = mongoose.model('Patient', dataSchema)

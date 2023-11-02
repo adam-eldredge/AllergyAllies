@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-/* Needs Rework - for multiple vial/shot types */
 const nextDoseAdjustments = new mongoose.Schema({
     // also known as injection frequency
     injectionInterval: {
@@ -22,64 +21,7 @@ const nextDoseAdjustments = new mongoose.Schema({
 })
 
 // may need multiple of these, for different missedDays values
-const missedDoseAdjustments1 = new mongoose.Schema ({
-    doseAdjustMissedDays: {
-        required: true,
-        type: Number,
-    },
-    adjustInjectionVolume: {
-        required: true,
-        type: Number,
-    },
-    adjustVialConcentration: {
-        required: true,
-        type: Number,
-    },
-    adjustBottleNumber: {
-        required: true,
-        type: Number,
-    },
-})
-
-const missedDoseAdjustments2 = new mongoose.Schema ({
-    doseAdjustMissedDays: {
-        required: true,
-        type: Number,
-    },
-    adjustInjectionVolume: {
-        required: true,
-        type: Number,
-    },
-    adjustVialConcentration: {
-        required: true,
-        type: Number,
-    },
-    adjustBottleNumber: {
-        required: true,
-        type: Number,
-    },
-})
-
-const missedDoseAdjustments3 = new mongoose.Schema ({
-    doseAdjustMissedDays: {
-        required: true,
-        type: Number,
-    },
-    adjustInjectionVolume: {
-        required: true,
-        type: Number,
-    },
-    adjustVialConcentration: {
-        required: true,
-        type: Number,
-    },
-    adjustBottleNumber: {
-        required: true,
-        type: Number,
-    },
-})
-
-const missedDoseAdjustments4 = new mongoose.Schema ({
+const missedDoseAdjustments = new mongoose.Schema ({
     doseAdjustMissedDays: {
         required: true,
         type: Number,
@@ -146,13 +88,13 @@ const bottleSchema = new mongoose.Schema({
         require: true,
         type: Number
     },
-    missedDoseAdjustment: missedDoseAdjustments,
+    //missedDoseAdjustment: missedDoseAdjustments,
     largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
 })
 
 // we need default values 
 const dataSchema = new mongoose.Schema({
-    NPI: {
+    providerID: {
         required: true,
         type: String
     },
@@ -160,12 +102,11 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
-
     nextDoseAdjustment: nextDoseAdjustments,
-    missedDoseAdjustment1: missedDoseAdjustments1,
-    missedDoseAdjustment2: missedDoseAdjustments2,
-    missedDoseAdjustment3: missedDoseAdjustments3,
-    missedDoseAdjustment4: missedDoseAdjustments4,
+    missedDoseAdjustment1: missedDoseAdjustments,
+    missedDoseAdjustment2: missedDoseAdjustments,
+    missedDoseAdjustment3: missedDoseAdjustments,
+    missedDoseAdjustment4: missedDoseAdjustments,
     largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
     bottles: [bottleSchema],
     vialTestReactionAdjustment: vialTestReactionAdjustments,  
