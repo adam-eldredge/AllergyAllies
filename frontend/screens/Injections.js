@@ -5,7 +5,7 @@ import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } fro
 export default function AllAlerts({navigation}){
    return (
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#fcfcfc'}}>
-      <View style={{backgroundColor: '#fcfcfc', flex: 1,}}>
+      <View style={{backgroundColor: '#fcfcfc', flex: 1}}>
       <TouchableOpacity style={{marginTop: 50, marginBottom: 10, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
                onPress={() =>
                   signOut()

@@ -30,7 +30,13 @@ const dataSchema = new mongoose.Schema({
         required: false,
         type: [mongoose.Schema.Types.ObjectId],
     },
-    maintenanceBottleNumber: {pollenMaintenanceBottle: Number, insectsAndPetsMaintenanceBottle: Number, moldsMaintenanceBottle: Number},
+    maintenanceBottleNumber: {
+        required: false,
+        type: [{
+            nameOfBottle: String,
+            maintenanceNumber: Number,
+        }],
+    },
 
     providerID: {
         require: false,
