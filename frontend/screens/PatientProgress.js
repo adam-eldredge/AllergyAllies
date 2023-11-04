@@ -9,6 +9,7 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
 import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
+import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
 
 const Tab = createBottomTabNavigator();
 
@@ -17,12 +18,30 @@ export default function PatientHome({navigation}){
     //get from backend: from practice survey
     const numVials = 3;
 
+    //create arrays for progress percentage, last injection dosage, and last injection date for each vial
+    const progress = Array(numVials).fill(null);
+    const dosages = Array(numVials).fill(null);
+    const dates = Array(numVials).fill(null);
+    const bottleNums = Array(numVials).fill(null);
+    const maintenanceNums = Array(numVials).fill(null);
+
+    //dummy values right now, get from backend
+    for (let i = 0; i <= numVials; i++) {
+        dosages[i] = (i+1)*.25;
+        dates[i] = ('10/9/23')
+        progress[i] = (i+1)*10;
+        maintenanceNums[i] = i+4;
+        bottleNums[i] = i+2;
+      }
+
     const data = Array.from({ length: numVials }, (_, index) => ({
         id: index + 1,
         title: `Vial ${index + 1}`,
-        progress: Math.floor(Math.random() * 100), //random values, get from backend
-        lastInjDate: '10/9/23',
-        lastInjDosage: '.025 ml'
+        progress: progress[index], //random values, get from backend
+        lastInjDate: dates[index],
+        maintenanceNum: maintenanceNums[index],
+        bottleNum: bottleNums[index],
+        lastInjDosage: dosages[index]
       }));
 
 
@@ -31,14 +50,8 @@ export default function PatientHome({navigation}){
     const renderItem = ({ item }) => (
         <View>
         <Text style={styles.title}>{item.title}</Text>  
-        <View
-      style={[
-        styles.card,
-        {
-          // Try setting `flexDirection` to `"row"`.
-          flexDirection: 'row',
-        },
-      ]}>
+        <View style={styles.card}>
+        <View style={{flexDirection: 'row', }}>
         <AnimatedCircularProgress
             size={150}
             width={12}
@@ -86,19 +99,53 @@ export default function PatientHome({navigation}){
       </View>
       <View>
         <Text style={styles.cardSubData}>Dosage</Text>    
-        <Text style={styles.cardData}>{item.lastInjDosage}</Text>    
+        <Text style={styles.cardData}>{item.lastInjDosage} ml</Text>    
+      </View> 
+    </View>
+
+    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+        <View style={styles.icon}>
+      <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/>
+      </View>
+      <View>
+        <Text style={styles.cardSubData}>Bottle #</Text>    
+        <Text style={styles.cardData}>{item.bottleNum}</Text>    
       </View> 
     </View>
 
 
 
         
-        
-        </View>
-         
-        </View>
 
         </View>
+
+
+
+
+
+
+
+        
+
+        </View>
+
+{/* 
+        <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+        <View style={styles.icon}>
+      <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/>
+      </View>
+      <View>
+        <Text style={styles.maintenanceSub}>Maintenance Bottle #</Text>    
+        <Text style={styles.maintenanceNum}>{item.maintenanceNum}</Text>    
+      </View> 
+        </View> */}
+
+
+    
+        </View>
+       
+
+    </View>
       );
 
  return (
@@ -237,6 +284,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#d1ddf2',
         paddingLeft: 20,
         textstyle:{fontsize: 60}
+    },
+    maintenanceNum: {
+        fontWeight: '500',
+        fontSize: 15,
+        marginBottom: 10,
+        marginLeft: 12,
+        color: "#2b2b2b"
+    },
+    maintenanceSub: {
+        fontWeight: '400',
+        fontSize: 12,
+        marginTop: 30,
+        color: '#878787',
     },
     flags: {
         flex: 1,
