@@ -98,6 +98,10 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    practiceID: {
+        required: true,
+        type: String
+    },
     appointmentSchedule: {
         required: true,
         type: String
