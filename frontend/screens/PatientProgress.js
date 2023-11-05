@@ -45,6 +45,21 @@ export default function PatientHome({navigation}){
       }));
 
 
+      const renderDot = (index) => (
+        <View
+          key={index}
+          style={[
+            styles.dot,
+            { opacity: index === activeSlide ? 0.6 : 0.2 }, // Adjust the opacity based on activeIndex
+          ]}
+        />
+      );
+
+      const onIndexChanged = (index) => {
+        setActiveSlide(index);
+      };
+
+
     const [activeSlide, setActiveSlide] = useState(0);
 
     const renderItem = ({ item }) => (
@@ -154,11 +169,17 @@ export default function PatientHome({navigation}){
 <View style = {styles.progressCircle}>
      <Carousel
         data={data}
+        loop={false}
+        onIndexChanged={onIndexChanged}
         renderItem={renderItem}
         width={350}
         height = {300}
         onSnapToItem={(index) => setActiveSlide(index)}
       />
+
+<View style={styles.dotsContainer}>
+        {data.map((_, index) => renderDot(index))}
+      </View>
 {/*<Pagination
         dotsLength={data.length}
         activeDotIndex={activeSlide}
@@ -346,6 +367,19 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         color: "#2b2b2b"
     }, 
+    dotsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: -12
+      },
+      dot: {
+        width: 8,
+        height: 8,
+        borderRadius: 5,
+        backgroundColor: 'black',
+        marginHorizontal: 5,
+      },
     icon: {
         marginLeft: 40,
         alignSelf: 'center',
