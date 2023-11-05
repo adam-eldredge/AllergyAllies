@@ -39,18 +39,39 @@ exports.login = async(req, res) => {
     }
 
     // role 1: provider, role 2: patient
-    const accessToken = jwt.sign(
-        {
-            "UserInfo": {
-                "id": foundUser.id,
-                "role": role,
-                "firstName": foundUser.firstName,
-                "lastName": foundUser.lastName
-            }
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: '5m'}
-    )
+    let accessToken = null
+    if (role == 1) {
+        accessToken = jwt.sign(
+            {
+                "UserInfo": {
+                    "id": foundUser.id,
+                    "role": role,
+                    "firstName": foundUser.firstName,
+                    "lastName": foundUser.lastName,
+                    "practiceID": foundUser.practiceID
+                }
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '5m'}
+        )
+    }
+    else {
+        accessToken = jwt.sign(
+            {
+                "UserInfo": {
+                    "id": foundUser.id,
+                    "role": role,
+                    "firstName": foundUser.firstName,
+                    "lastName": foundUser.lastName,
+                    "practiceID": foundUser.practiceID,
+                    "status": foundUser.status
+                }
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '5m'}
+        )
+    }
+    
 
     const refreshToken = jwt.sign(
         { "id": foundUser.id },
@@ -91,18 +112,41 @@ exports.refresh = async(req, res) => {
                 }
             }
 
-            const accessToken = jwt.sign(
-                {
-                    "UserInfo": {
-                        "id": foundUser.id,
-                        "roles": 1
-                    }
-                },
-                process.env.ACCESS_TOKEN_SECRET,
-                { expiresIn: '5m' }
-            )
+            let accessToken = null
+            if (role == 1) {
+                accessToken = jwt.sign(
+                    {
+                        "UserInfo": {
+                            "id": foundUser.id,
+                            "role": role,
+                            "firstName": foundUser.firstName,
+                            "lastName": foundUser.lastName,
+                            "practiceID": foundUser.practiceID
+                        }
+                    },
+                    process.env.ACCESS_TOKEN_SECRET,
+                    { expiresIn: '5m'}
+                )
+            }
+            else {
+                accessToken = jwt.sign(
+                    {
+                        "UserInfo": {
+                            "id": foundUser.id,
+                            "role": role,
+                            "firstName": foundUser.firstName,
+                            "lastName": foundUser.lastName,
+                            "practiceID": foundUser.practiceID,
+                            "status": foundUser.status
+                        }
+                    },
+                    process.env.ACCESS_TOKEN_SECRET,
+                    { expiresIn: '5m'}
+                )
+            }
 
-            res.json({ accessToken })
+            console.log(foundUser.practiceID)
+            res.json({ accessToken })            
         }
     )
 }

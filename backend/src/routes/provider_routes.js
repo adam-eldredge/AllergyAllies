@@ -17,4 +17,6 @@ router.get('/getProvider/:id', providerController.getProvider);
 // DELETE localhost:5000/api/addProvider
 router.delete('/deleteProvider/:id', providerController.deleteProvider);
 
+router.delete('/deleteAlert/:id');
+
 module.exports = router;

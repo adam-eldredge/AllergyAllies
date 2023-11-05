@@ -1,10 +1,17 @@
 import React, { useCallback, useContext, useState } from 'react';
-import { Platform } from 'react-native';
+import { View, Platform, TouchableOpacity, StyleSheet, IconButton } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
+<<<<<<< HEAD
 //import 'survey-core/defaultV2.min.css';
 //import { Model } from 'survey-core';
 //import { Survey } from 'survey-react-ui';
+=======
+
+import 'survey-core/defaultV2.min.css';
+import { Model } from 'survey-core';
+import { Survey } from 'survey-react-ui';
+>>>>>>> 4e82c169d9e075a8582a4bd3a08d30751e9d03ec
 import theme from './theme.js';
 import User from '../../User.js';
 
@@ -57,25 +64,45 @@ const surveyJson = {
                     [
                         {
                             name: 'f',
-                            title: 'Starting frequency of injections',
+                            title: 'Starting frequency of injections (# weekly)',
                             type: 'radiogroup',
                             colCount: '3',
                             choices: ['1', '2', '3'],
                             seperateSpecialChoices: 'true',
                         }, {
                             name: 'g',
-                            title: 'Frequency of Clinical Follow-up Appointments',
+                            title: 'Frequency of Clinical Follow-up Appointments (# yearly)',
                             type: 'radiogroup',
                             colCount: '4',
-                            choices: ['Once yearly', 'Twice yearly', 'Thrice yearly', '4x yearly'],
+                            choices: ['1', '2', '3', '4'],
                             seperateSpecialChoices: 'true'
                         }, {
                             name: 'h',
-                            title: 'Frequency of Progress Self-Assessment',
+                            title: 'Frequency of Progress Self-Assessment (# yearly)',
                             type: 'radiogroup',
                             colCount: '4',
-                            choices: ['Once yearly', 'Twice yearly', 'Thrice yearly', '4x yearly'],
+                            choices: ['1', '2', '3', '4'],
                             seperateSpecialChoices: 'true'
+                        }
+                    ]
+            },
+            {
+                name: 'Treatment',
+                title: 'Treatment',
+                elements:
+                    [
+                        {
+                            name: 'j',
+                            title: 'Treatment Vials',
+                            type: 'paneldynamic',
+                            panelCount: '0',
+                            maxPanelCount: '100',
+                            confirmDelete: 'true',
+                            templateElements: [{
+                                name: 'j1',
+                                title: 'Vial Name',
+                                type: 'text',
+                            }]
                         }
                     ]
             },
@@ -88,36 +115,15 @@ const surveyJson = {
                             name: 'i',
                             title: 'Antigens Tested',
                             type: 'paneldynamic',
-                            panelCount: '1',
-                            maxPanelCount: '10',
+                            panelCount: '0',
+                            maxPanelCount: '100',
                             confirmDelete: 'true',
                             templateElements: [{
                                 name: 'i1',
-                                title: 'Antigen',
+                                title: 'Antigen Name',
                                 type: 'text',
-                            }, {
-                                name: 'i2',
-                                title: '#',
-                                type: 'text',
-                                inputType: 'number'
-                            }]
-                        }, {
-                            name: 'j',
-                            title: 'Number of treatment vials and label/name for each vial',
-                            type: 'paneldynamic',
-                            panelCount: '1',
-                            maxPanelCount: '10',
-                            confirmDelete: 'true',
-                            templateElements: [{
-                                name: 'j1',
-                                title: 'Name of treatment vial',
-                                type: 'text',
-                            }, {
-                                name: 'j2',
-                                title: '#',
-                                type: 'text',
-                                inputType: 'number'
-                            }]
+                            }
+                            ]
                         }
                     ]
             },
@@ -148,12 +154,43 @@ const surveyJson = {
                                 max: '0.50',
                                 default: '0.05',
                                 visibleIf: "{k1} = 'Customize'"
+                            },
+                            {
+                                name: 'k3',
+                                title: 'Dose Adjustment Threshold (Days Missed)',
+                                type: 'text',
+                                inputType: 'numeric',
+                                placeholder: '10',
+                                min: '0',
+                                max: '30',
+                                default: '10',
+                                visibleIf: "{k1} = 'Customize'"
+                            },
+                            {
+                                name: 'k4',
+                                title: 'What events trigger a dose adjustment?',
+                                type: 'checkbox',
+                                visibleIf: "{k1} = 'Customize'",
+                                choices: [
+                                    {
+                                        text: "Vial Test Reaction",
+                                    },
+                                    {
+                                        text: "Immediate Injection Reaction",
+                                    },
+                                    {
+                                        text: "Delayed Injection Reaction",
+                                    },
+                                    {
+                                        text: "Missed Injection Adjustment"
+                                    }
+                                ]
                             }
                             ]
 
                         }, {
                             name: 'l',
-                            title: 'Dose Adjustments',
+                            title: 'General Rules for Dose Adjustments',
                             type: 'text',
 
                         }, {
@@ -198,14 +235,14 @@ export default function PracticeSurvey() {
     const rend = Platform.select({
         ios: <Text>Please continue on desktop</Text>,
         android: <Text>Please continue on desktop</Text>,
-        default: <Survey model={survey}/>,
+        default: <Survey model={survey} />
     });
 
     console.log(rend);
     return rend;
 }
 
-const sendSurvey = async(user, json) => {
+const sendSurvey = async (user, json) => {
     // First, check if this user is a practice
     if (user.role == 2) {
         console.log('patient');
@@ -224,11 +261,11 @@ const sendSurvey = async(user, json) => {
             console.log(`practiceID: ${pID}`);
             console.log(`JSON: ${json}`);
             const surveyData = JSON.stringify(createSurveyObj(json));
-            const data = {pID, surveyData};
-            const posted = axios.post('http://localhost:5000/api/addSurvey', data );
+            const data = { pID, surveyData };
+            const posted = axios.post('http://localhost:5000/api/addSurvey', data);
         }
     }
-    
+
 }
 
 const createSurveyObj = (json) => {
@@ -264,7 +301,51 @@ const createSurveyObj = (json) => {
             adjustmentRules: json.m,
             adjustmentDefaults: json.n
         }
-        
+
     };
     return survey;
 }
+
+const styles = StyleSheet.create({
+    container: {
+        paddingTop: 23,
+        paddingLeft: 10,
+        paddingRight: 10,
+    },
+    header: {
+        fontSize: 40,
+        marginTop: 40,
+        fontWeight: '600',
+        marginLeft: 100,
+        color: '#1059d5',
+        marginBottom: 10,
+    },
+    table: {
+        marginLeft: 100,
+        width: 800,
+    },
+    tableHeader: {
+        backgroundColor: '#cbdeff',
+        borderTopStartRadius: 8,
+        borderTopEndRadius: 8,
+        color: 'black',
+    },
+    tableRow2: {
+        backgroundColor: '#ebebeb',
+    },
+    providerDashboardItem: {
+        borderRadius: 8,
+        height: 100,
+        width: 100,
+        marginBottom: 10,
+        alignItems: 'center',
+    },
+    providerDashboardText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 15,
+        fontWeight: '600',
+        marginTop: 20,
+        marginBottom: -10,
+    },
+})

@@ -63,8 +63,7 @@ export default function PatientSignUpScreen() {
     <View style={styles.container}>
       <Text style={styles.title}>Allergy Ally</Text>
 
-      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center'}}>
-        <TextInput style={styles.shortInput}
+        <TextInput style={styles.input}
           underlineColorAndroid="transparent"
           placeholder="Practice Name"
           placeholderTextColor="#7a7a7a"
@@ -73,14 +72,13 @@ export default function PatientSignUpScreen() {
           onChangeText={setName} />
 
         {/* NEEDS TO BE UPDATED TO A MULTI INPUT*/}
-        <TextInput style={styles.shortInput}
+        <TextInput style={styles.input}
           underlineColorAndroid="transparent"
           placeholder="Provider Name"
           placeholderTextColor="#7a7a7a"
           value={providerNames}
           autoCapitalize="none"
           onChangeText={setProviderNames} />
-      </View>
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
@@ -96,8 +94,7 @@ export default function PatientSignUpScreen() {
         placeholderTextColor="#7a7a7a"
         value={phoneNumber}
         autoCapitalize="none"
-        onChangeText={setPhoneNumber}
-        secureTextEntry={true} />
+        onChangeText={setPhoneNumber}/>
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
@@ -105,8 +102,7 @@ export default function PatientSignUpScreen() {
         placeholderTextColor="#7a7a7a"
         value={officeHours}
         autoCapitalize="none"
-        onChangeText={setOfficeHours}
-        secureTextEntry={true} />
+        onChangeText={setOfficeHours} />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
@@ -114,8 +110,7 @@ export default function PatientSignUpScreen() {
         placeholderTextColor="#7a7a7a"
         value={allergyShotHours}
         autoCapitalize="none"
-        onChangeText={setAllergyShotHours}
-        secureTextEntry={true} />
+        onChangeText={setAllergyShotHours} />
 
       <Text style={styles.message}>{display}</Text>
       <TouchableOpacity

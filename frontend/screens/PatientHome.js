@@ -4,7 +4,6 @@ import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import PatientAppointments from './PatientAppointments.js';
-import Alerts from '../screens/Alerts.js';
 import PatientProfile from '../screens/PatientProfile.js';
 import PatientProgress from '../screens/PatientProgress.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -37,9 +36,14 @@ export default function PatientHome(){
             headerShown: false
           })}
         >
+<<<<<<< HEAD
         <Tab.Screen name="Home" component={PatientAppointments} />
         <Tab.Screen name="Progress" component={PatientProgress} />
         <Tab.Screen name="Alerts" component={Alerts} />
+=======
+        <Tab.Screen name="Appointments" component={PatientAppointments} />
+        <Tab.Screen name="History" component={PatientAppointments} />
+>>>>>>> 4e82c169d9e075a8582a4bd3a08d30751e9d03ec
         <Tab.Screen name="Profile" component={PatientProfile} />
         </Tab.Navigator>
       )

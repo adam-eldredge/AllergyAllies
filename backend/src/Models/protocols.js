@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const nextDoseAdjustments = new mongoose.Schema({
-    startingInjectionInterval: {
+    // also known as injection frequency
+    injectionInterval: {
         required: true,
         type: Number,
     },
@@ -25,15 +26,15 @@ const missedDoseAdjustments = new mongoose.Schema ({
         required: true,
         type: Number,
     },
-    injectionVolumeDecrease: {
+    adjustInjectionVolume: {
         required: true,
         type: Number,
     },
-    decreaseVialConcentration: {
+    adjustVialConcentration: {
         required: true,
         type: Number,
     },
-    decreaseBottleNumber: {
+    adjustBottleNumber: {
         required: true,
         type: Number,
     },
@@ -45,15 +46,15 @@ const largeReactionsDoseAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    decreaseInjectionVol: {
+    adjustInjectionVol: {
         required: true,
         type: Number,
     },
-    decreaseVialConcentration: {
+    adjustVialConcentration: {
         required: true,
         type: Number,
     },
-    decreaseBottleNumber: {
+    adjustBottleNumber: {
         required: true,
         type: Number,
     }
@@ -64,23 +65,36 @@ const vialTestReactionAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    whealLevelAdjustForVialTestReactions: {
+    adjustVialConcentration: {
         required: true,
         type: Number,
     },
-    decreaseVialConcentration: {
-        required: true,
-        type: Number,
-    },
-    decreaseBottleNumber: {
+    adjustBottleNumber: {
         required: true,
         type: Number,
     },
 })
 
+const bottleSchema = new mongoose.Schema({
+    bottleName: {
+        require: true,
+        type: String,
+    },
+    bottleSize: {
+        require: true,
+        type: Number
+    },
+    numbBottles: {
+        require: true,
+        type: Number
+    },
+    //missedDoseAdjustment: missedDoseAdjustments,
+    largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
+})
+
 // we need default values 
 const dataSchema = new mongoose.Schema({
-    NPI: {
+    providerID: {
         required: true,
         type: String
     },
@@ -89,10 +103,14 @@ const dataSchema = new mongoose.Schema({
         type: String
     },
     nextDoseAdjustment: nextDoseAdjustments,
-    missedDoseAdjustment: missedDoseAdjustments,
+    missedDoseAdjustment1: missedDoseAdjustments,
+    missedDoseAdjustment2: missedDoseAdjustments,
+    missedDoseAdjustment3: missedDoseAdjustments,
+    missedDoseAdjustment4: missedDoseAdjustments,
     largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
-    vialTestReactionAdjustment: vialTestReactionAdjustments,
-    
+    bottles: [bottleSchema],
+    vialTestReactionAdjustment: vialTestReactionAdjustments,  
+
 }, { collection: 'Protocols' })
 
 module.exports = mongoose.model('protocol', dataSchema)

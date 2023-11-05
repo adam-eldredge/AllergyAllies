@@ -13,6 +13,10 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    phone: {
+        required: true,
+        type: String
+    },
     password: {
         required: true,
         type: String
@@ -20,7 +24,37 @@ const dataSchema = new mongoose.Schema({
     DoB: {
         required: false,
         type: Date
-    }
+    },
+
+    treatments: {
+        required: false,
+        type: [mongoose.Schema.Types.ObjectId],
+    },
+    maintenanceBottleNumber: {
+        required: false,
+        type: [{
+            nameOfBottle: String,
+            maintenanceNumber: Number,
+        }],
+    },
+
+    providerID: {
+        require: false,
+        type: String,
+    },
+    // DEFAULT, INACTIVE, MAINTENANCE, ATTRITION
+    status: {
+        require: true,
+        type: String,
+    },
+    statusDate: {
+        require: true,
+        type: Date
+    },
+    tokens: {
+        type: Number,
+        default: 0
+    },
 }, { collection: 'Patients' })
 
 module.exports = mongoose.model('Patient', dataSchema)
