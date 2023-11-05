@@ -4,12 +4,12 @@ import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Alerts from './Alerts.js';
-//import { AnimatedCircularProgress } from 'react-native-circular-progress';
-//import Carousel, { Pagination } from 'react-native-snap-carousel';
-//import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-//import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
-//import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
-//import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import Carousel from 'react-native-reanimated-carousel';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
+import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
+import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
 
 const Tab = createBottomTabNavigator();
 
@@ -45,6 +45,21 @@ export default function PatientHome({navigation}){
       }));
 
 
+      const renderDot = (index) => (
+        <View
+          key={index}
+          style={[
+            styles.dot,
+            { opacity: index === activeSlide ? 0.6 : 0.2 }, // Adjust the opacity based on activeIndex
+          ]}
+        />
+      );
+
+      const onIndexChanged = (index) => {
+        setActiveSlide(index);
+      };
+
+
     const [activeSlide, setActiveSlide] = useState(0);
 
     const renderItem = ({ item }) => (
@@ -52,7 +67,7 @@ export default function PatientHome({navigation}){
         <Text style={styles.title}>{item.title}</Text>  
         <View style={styles.card}>
         <View style={{flexDirection: 'row', }}>
-        {/* <AnimatedCircularProgress
+        <AnimatedCircularProgress
             size={150}
             width={12}
             rotation={0}
@@ -74,7 +89,7 @@ export default function PatientHome({navigation}){
       
                 )
             }
-        </AnimatedCircularProgress> */}
+        </AnimatedCircularProgress>
         <View>
         <Text style={styles.lastInj}>Last injection:</Text>  
 
@@ -84,7 +99,7 @@ export default function PatientHome({navigation}){
 
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <View style={styles.icon}>
-      {/* <FontAwesomeIcon icon={faCalendar} color={'#737373'} size={20}/>  */}
+      <FontAwesomeIcon icon={faCalendar} color={'#737373'} size={20}/> 
       </View>
       <View>
         <Text style={styles.cardSubData}>Date</Text>    
@@ -95,7 +110,7 @@ export default function PatientHome({navigation}){
 
     <View style={{ flexDirection: 'row', alignContent: 'center' }}>
         <View style={styles.icon}>
-         {/* <FontAwesomeIcon icon={faSyringe} color={'#737373'} size={20}/> */}
+         <FontAwesomeIcon icon={faSyringe} color={'#737373'} size={20}/>
       </View>
       <View>
         <Text style={styles.cardSubData}>Dosage</Text>    
@@ -105,7 +120,7 @@ export default function PatientHome({navigation}){
 
     <View style={{ flexDirection: 'row', alignContent: 'center' }}>
         <View style={styles.icon}>
-         {/* <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/> */}
+        <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/> 
       </View>
       <View>
         <Text style={styles.cardSubData}>Bottle #</Text>    
@@ -129,9 +144,9 @@ export default function PatientHome({navigation}){
 
         </View>
 
-{/* 
-        <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
+ 
+       {/* <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+        <View style={styles.iconMaintenance}>
       <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/>
       </View>
       <View>
@@ -152,19 +167,19 @@ export default function PatientHome({navigation}){
        
 <ScrollView>
 <View style = {styles.progressCircle}>
-   {/*  <Carousel
+     <Carousel
         data={data}
+        loop={false}
+        onIndexChanged={onIndexChanged}
         renderItem={renderItem}
-        sliderWidth={350}
-        itemWidth={350}
+        width={350}
+        height = {300}
         onSnapToItem={(index) => setActiveSlide(index)}
       />
-<Pagination
-        dotsLength={data.length}
-        activeDotIndex={activeSlide}
-        inactiveDotOpacity={0.3}
-        inactiveDotScale={.8}
- /> */}
+
+<View style={styles.dotsContainer}>
+        {data.map((_, index) => renderDot(index))}
+      </View>
 </View>
 
 
@@ -295,7 +310,7 @@ const styles = StyleSheet.create({
     maintenanceSub: {
         fontWeight: '400',
         fontSize: 12,
-        marginTop: 30,
+        marginLeft: 12,
         color: '#878787',
     },
     flags: {
@@ -346,10 +361,28 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         color: "#2b2b2b"
     }, 
+    dotsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: -14
+      },
+      dot: {
+        width: 8,
+        height: 8,
+        borderRadius: 5,
+        backgroundColor: 'black',
+        marginHorizontal: 5,
+      },
     icon: {
         marginLeft: 40,
         alignSelf: 'center',
         verticalAlign: 'center',
+    },
+    iconMaintenance: {
+        alignSelf: 'center',
+        verticalAlign: 'center',
+        marginLeft: -130
     },
       title: {
         fontSize: 20,
