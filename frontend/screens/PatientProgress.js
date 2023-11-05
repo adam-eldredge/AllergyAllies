@@ -6,10 +6,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Alerts from './Alerts.js';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Carousel from 'react-native-reanimated-carousel';
-//import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-//import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
-//import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
-//import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
+import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
+import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
 
 const Tab = createBottomTabNavigator();
 
@@ -99,7 +99,7 @@ export default function PatientHome({navigation}){
 
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <View style={styles.icon}>
-      {/* <FontAwesomeIcon icon={faCalendar} color={'#737373'} size={20}/>  */}
+      <FontAwesomeIcon icon={faCalendar} color={'#737373'} size={20}/> 
       </View>
       <View>
         <Text style={styles.cardSubData}>Date</Text>    
@@ -110,7 +110,7 @@ export default function PatientHome({navigation}){
 
     <View style={{ flexDirection: 'row', alignContent: 'center' }}>
         <View style={styles.icon}>
-         {/* <FontAwesomeIcon icon={faSyringe} color={'#737373'} size={20}/> */}
+         <FontAwesomeIcon icon={faSyringe} color={'#737373'} size={20}/>
       </View>
       <View>
         <Text style={styles.cardSubData}>Dosage</Text>    
@@ -120,7 +120,7 @@ export default function PatientHome({navigation}){
 
     <View style={{ flexDirection: 'row', alignContent: 'center' }}>
         <View style={styles.icon}>
-         {/* <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/> */}
+        <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/> 
       </View>
       <View>
         <Text style={styles.cardSubData}>Bottle #</Text>    
@@ -144,9 +144,9 @@ export default function PatientHome({navigation}){
 
         </View>
 
-{/* 
-        <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
+ 
+       {/* <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+        <View style={styles.iconMaintenance}>
       <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/>
       </View>
       <View>
@@ -180,12 +180,6 @@ export default function PatientHome({navigation}){
 <View style={styles.dotsContainer}>
         {data.map((_, index) => renderDot(index))}
       </View>
-{/*<Pagination
-        dotsLength={data.length}
-        activeDotIndex={activeSlide}
-        inactiveDotOpacity={0.3}
-        inactiveDotScale={.8}
- /> */}
 </View>
 
 
@@ -316,7 +310,7 @@ const styles = StyleSheet.create({
     maintenanceSub: {
         fontWeight: '400',
         fontSize: 12,
-        marginTop: 30,
+        marginLeft: 12,
         color: '#878787',
     },
     flags: {
@@ -371,7 +365,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: -12
+        marginTop: -14
       },
       dot: {
         width: 8,
@@ -384,6 +378,11 @@ const styles = StyleSheet.create({
         marginLeft: 40,
         alignSelf: 'center',
         verticalAlign: 'center',
+    },
+    iconMaintenance: {
+        alignSelf: 'center',
+        verticalAlign: 'center',
+        marginLeft: -130
     },
       title: {
         fontSize: 20,
