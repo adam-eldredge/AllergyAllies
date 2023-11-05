@@ -4,8 +4,8 @@ import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Alerts from './Alerts.js';
-//import { AnimatedCircularProgress } from 'react-native-circular-progress';
-//import Carousel, { Pagination } from 'react-native-snap-carousel';
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import Carousel from 'react-native-reanimated-carousel';
 //import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 //import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
 //import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
@@ -52,7 +52,7 @@ export default function PatientHome({navigation}){
         <Text style={styles.title}>{item.title}</Text>  
         <View style={styles.card}>
         <View style={{flexDirection: 'row', }}>
-        {/* <AnimatedCircularProgress
+        <AnimatedCircularProgress
             size={150}
             width={12}
             rotation={0}
@@ -74,7 +74,7 @@ export default function PatientHome({navigation}){
       
                 )
             }
-        </AnimatedCircularProgress> */}
+        </AnimatedCircularProgress>
         <View>
         <Text style={styles.lastInj}>Last injection:</Text>  
 
@@ -152,14 +152,14 @@ export default function PatientHome({navigation}){
        
 <ScrollView>
 <View style = {styles.progressCircle}>
-   {/*  <Carousel
+     <Carousel
         data={data}
         renderItem={renderItem}
-        sliderWidth={350}
-        itemWidth={350}
+        width={350}
+        height = {300}
         onSnapToItem={(index) => setActiveSlide(index)}
       />
-<Pagination
+{/*<Pagination
         dotsLength={data.length}
         activeDotIndex={activeSlide}
         inactiveDotOpacity={0.3}
