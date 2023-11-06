@@ -37,7 +37,8 @@ export default function PatientHome({navigation}){
     const data = Array.from({ length: numVials }, (_, index) => ({
         id: index + 1,
         title: `Vial ${index + 1}`,
-        progress: progress[index], //random values, get from backend
+        //get from backend
+        progress: progress[index], 
         lastInjDate: dates[index],
         maintenanceNum: maintenanceNums[index],
         bottleNum: bottleNums[index],
@@ -90,12 +91,10 @@ export default function PatientHome({navigation}){
                 )
             }
         </AnimatedCircularProgress>
+
+
         <View>
         <Text style={styles.lastInj}>Last injection:</Text>  
-
-
-
-
 
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <View style={styles.icon}>
@@ -128,21 +127,9 @@ export default function PatientHome({navigation}){
       </View> 
     </View>
 
+</View>
 
-
-        
-
-        </View>
-
-
-
-
-
-
-
-        
-
-        </View>
+ </View>
 
  
        {/* <View style={{ flexDirection: 'row', alignContent: 'center' }}>
@@ -157,10 +144,9 @@ export default function PatientHome({navigation}){
 
 
     
-        </View>
+</View>
        
-
-    </View>
+</View>
       );
 
  return (
@@ -188,28 +174,45 @@ export default function PatientHome({navigation}){
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
     <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
+        <View style={styles.onTime}>
+        <Text style={{color: 'white'}}> Attended on Time </Text>
+        </View>
     </View>
 </View>
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#e66624', marginRight: 10}}> 12 Days Late - Dose Adjustment </Text>
+    <View style={styles.attendedLate}>
+        <Text style={{color: 'white'}}> 12 Days Late - Dose Adjustment </Text>
+    </View>
     </View>
 </View>
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
-        <Text style={{color: 'white', backgroundColor:'#e55555', marginRight: 10}}> Adverse Reaction </Text>
+        <View style={styles.onTime}>
+        <Text style={{color: 'white'}}> Attended on Time </Text>
+        </View>
+        <View style={styles.adverseReaction}>
+        <Text style={{color: 'white'}}> Adverse Reaction </Text>
+        </View>
     </View>
 </View>
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
+    <View style={styles.flags}>
+        <View style={styles.onTime}>
+        <Text style={{color: 'white'}}> Attended on Time </Text>
+        </View>
+    </View>
     </View>
 </View>
+<TouchableOpacity
+               onPress={() =>
+               navigation.navigate('Alerts') }>
+               <Text style = {styles.viewAllAppointments}>View All</Text>
+            </TouchableOpacity>
 </ScrollView>
       )
    }
@@ -226,10 +229,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     },
     title2 :{
-        marginBottom: 15,
-        textAlign: 'center',
-        fontSize: 22,
-        fontWeight: '600',
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#424242',
+        marginLeft: 25,
+        marginBottom: 4
     },
     compliance: {
         paddingTop: 10,
@@ -240,8 +244,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'purple',
         borderRadius: 60,
-
-
     },
     subtitle :{
         paddingBottom: 15,
@@ -286,19 +288,23 @@ const styles = StyleSheet.create({
     },
     pastAppointmentText: {
         fontSize: 17,
-        marginBottom: 10,
+        marginBottom: 4,
         fontWeight: '500',
         marginTop: 12,
     },
     pastAppointment: {
-        width: Dimensions.get('window').width - 30,
-        marginLeft: 15,
+        margin: 10,
+        marginHorizontal: 15,
         marginBottom: 10,
-        height: 70,
-        borderRadius: 8,
+        borderRadius: 12,
         backgroundColor: '#d1ddf2',
         paddingLeft: 20,
-        textstyle:{fontsize: 60}
+        paddingBottom: 8,
+        textstyle:{fontsize: 60},
+        shadowColor: 'black',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
     },
     maintenanceNum: {
         fontWeight: '500',
@@ -318,13 +324,44 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'center',
-        //marginTop: 10,
+        borderRadius: 20,
+    },
+    onTime: {
+        borderRadius: 8, 
+        backgroundColor: '#5ba863',
+        padding: 2,
+        paddingHorizontal: 4,
+        marginRight: 6,
+        marginBottom: 6
+    },
+    adverseReaction: {
+        borderRadius: 8, 
+        backgroundColor: '#e55555',
+        padding: 2,
+        paddingHorizontal: 4,
+        marginRight: 6,
+        marginBottom: 6
+    },
+    attendedLate: {
+        borderRadius: 8, 
+        backgroundColor: '#ff955c',
+        padding: 2,
+        paddingHorizontal: 4,
+        marginRight: 6,
+        marginBottom: 6
     },
     flagText: {
         backgroundColor: 'red',
         color: 'white',
     },
-
+    viewAllAppointments: {
+      margin: 18,
+      color: '#1059d5',
+      alignSelf: 'center',
+      fontSize: 17,
+      fontWeight: '500',
+      textDecorationLine: 'underline',
+    },
     card: {
         backgroundColor: 'white',
         borderRadius: 20,
