@@ -15,6 +15,6 @@ router.post('/getTreatment', treatmentController.getTreatment);
 router.delete('/deleteTreatment/:id', treatmentController.deleteTreatment);
 
 // POST to add next treatment
-router.post('/nextTreatment', treatmentController.nextTreatment);
+router.post('/nextTreatment/:id', treatmentController.nextTreatment);
 
 module.exports = router;

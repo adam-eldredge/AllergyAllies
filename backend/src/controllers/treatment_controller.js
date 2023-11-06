@@ -5,8 +5,9 @@ const protocol = require('../Models/protocols');
 // Post method
 exports.addTreatment = async (req, res) => {
     try {
+        //This stuff will be manually input by the practice when a first treatment is entered
         const { nameOfPractice, NPI, patientLastName, patientFirstName, patientID, 
-            date, attended 
+            date, attended, totalBottles: [{nameOfBottle, injVol, injDilution, injLLR, currBottleNumber}]
         } = req.body;
 
         const findProtocol = await protocol.findOne({ NPI: NPI });
@@ -19,23 +20,37 @@ exports.addTreatment = async (req, res) => {
             date, attended
         });
 
-        for(let i = 0; i < findProtocol.bottles.length(); i++){
-            data.bottles[i].nameOfBottle = findProtocol.bottles[i].bottleName;
-        }
-
-        //Should add patient treatment data to end of array
+        //Add patient treatment data to end of array
         const patientToFind = await patient.findById({_id: req.body.patientID},
             { $push: {treatments: data.id}},
             function(error){
                 if(error){
                     console.log(error);
+                    res.status(404).json({ message: "Patient not found" });
                 }
                 else{
                     console.log(`Treatment added to ${patientLastName}, ${patientFirstName} for ${nameOfPractice}.`)
                 }
         });
 
+        let newVialValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
+        
         //Need to add bottles of protocol if patient has no treatments
+        //Case of 1st Treatment ID added, will make values 0
+        if(patientToFind.treatments.length() == 1){
+            for(let i = 0; i < findProtocol.bottles.length(); i++){
+                data.bottles.push({
+                    nameOfBottle: findProtocol.bottles[i].bottleName,
+                    injVol: 0,
+                    injDilution: 0,
+                    injLLR: 0,
+                    currBottleNumber: "0",
+                });
+                data.lastVialTests.set(findProtocol.bottles[i].bottleName, {name: findProtocol.bottles[i].bottleName, values: newVialValues});
+            }
+            const dataToSave = await data.save();
+            res.status(200).json(dataToSave); 
+        }
 
         const treatmentLength = patientToFind.treatments.length();
         const patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
@@ -72,7 +87,7 @@ exports.getTreatment = async (req, res) => {
         const patientFirstName = req.body.patientFirstName.toString();
         const patientLastName = req.body.patientLastName.toString();
         const patientID = req.body.patientID.toString();
-        const date = req.body.date.toString();
+        const date = req.body.date;
         const data = await treatment.findOne({ nameOfPractice: nameOfPractice, NPI: NPI, 
             patientLastName: patientLastName, patientFirstName: patientFirstName, 
             patientID: patientID, date: date 
@@ -106,19 +121,25 @@ exports.deleteTreatment = async (req, res) => {
     }
 }
 
+/*
+    TODO
+    update treatments to work based of practiceID
+*/
+
+
 //update treatment according to calculations
 exports.nextTreatment = async(req, res) => {
     try{
         //Pass in patientID and NPI
         const id = req.params.id;
-        const npi = req.body.NPI.toString();
+        const npi = req.body.practiceID.toString();
 
         const patientToFind = await patient.findById(id);
         if (!patientToFind) {
             res.status(404).json({ message: "Patient not found" });
         }
 
-        const findProtocol = await protocol.findOne({ NPI: npi });
+        const findProtocol = await protocol.findOne({ practiceID: practiceID });
         if (!findProtocol) {
             res.status(404).json({ message: "Protocol not found" });
         }
@@ -175,7 +196,7 @@ exports.nextTreatment = async(req, res) => {
                 nameOfBottle: antigenName,
                 injVol: newInjVol,
                 injDilution: newDilAdjustment,
-                currBottleNumber: newBottleNumber,
+                currBottleNumber: (newBottleNumber).toString(),
             });
 
             data.nextVialTests.set(antigenName, newVialValues);

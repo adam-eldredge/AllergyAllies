@@ -55,6 +55,15 @@ const dataSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+
+    allergyMedication:{
+        type: [{
+            name: String,
+            dose: String,
+            frequency: String
+        }]
+    }
+
 }, { collection: 'Patients' })
 
 module.exports = mongoose.model('Patient', dataSchema)
