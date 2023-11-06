@@ -187,6 +187,32 @@ const resetTokens = async (req, res) => {
     }
 }
 
+/*
+    Body of medications sent as json like this:
+
+    [{
+        medication: {
+            name:
+            dose:
+            frequency:
+        },
+        ...
+    }]
+*/
+
+
+const addAllergyMedication = async (req, res) => {
+    try{
+        const { lastName, email, phone, DoB, medications  } = req.body;
+        const findPatient = await patient.findOne({lastName: lastName, email: email, phone: phone, DoB: DoB});
+        findPatient.allergyMedication = medications;
+        await findPatient.save();
+    }
+    catch(error){
+        return res.status(400).json({ message: error.message})
+    }
+}
+
 // required for const functions
 module.exports = {
     addPatient,
@@ -199,4 +225,5 @@ module.exports = {
     addTokens,
     resetTokens,
     deletePatient,
+    addAllergyMedication,
 }
