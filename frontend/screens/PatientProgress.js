@@ -37,7 +37,6 @@ export default function PatientHome({navigation}){
     const data = Array.from({ length: numVials }, (_, index) => ({
         id: index + 1,
         title: `Vial ${index + 1}`,
-        //get from backend
         progress: progress[index], 
         lastInjDate: dates[index],
         maintenanceNum: maintenanceNums[index],
@@ -66,6 +65,7 @@ export default function PatientHome({navigation}){
     const renderItem = ({ item }) => (
         <View>
         <Text style={styles.title}>{item.title}</Text>  
+        <Text style={styles.maintenance}>Maintenance Bottle: {item.maintenanceNum}</Text> 
         <View style={styles.card}>
         <View style={{flexDirection: 'row', }}>
         <AnimatedCircularProgress
@@ -122,7 +122,7 @@ export default function PatientHome({navigation}){
         <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/> 
       </View>
       <View>
-        <Text style={styles.cardSubData}>Bottle #</Text>    
+        <Text style={styles.cardSubData}>Bottle</Text>    
         <Text style={styles.cardData}>{item.bottleNum}</Text>    
       </View> 
     </View>
@@ -140,7 +140,7 @@ export default function PatientHome({navigation}){
         <Text style={styles.maintenanceSub}>Maintenance Bottle #</Text>    
         <Text style={styles.maintenanceNum}>{item.maintenanceNum}</Text>    
       </View> 
-        </View> */}
+        </View> */} 
 
 
     
@@ -170,7 +170,7 @@ export default function PatientHome({navigation}){
 
 
 <Text style={styles.container}></Text>
-<Text style = {styles.title2}>Past Appointments Attended:</Text>
+<Text style = {styles.title2}>Past Appointments Attended</Text>
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
     <View style={styles.flags}>
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         color: '#424242',
-        marginLeft: 25,
+        marginLeft: 28,
         marginBottom: 4
     },
     compliance: {
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     },
     pastAppointment: {
         margin: 10,
-        marginHorizontal: 15,
+        marginHorizontal: 22,
         marginBottom: 10,
         borderRadius: 12,
         backgroundColor: '#d1ddf2',
@@ -366,7 +366,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 20,
         padding: 20,
-        margin: 10,
+        paddingBottom: 10,
+        margin: 4,
         alignItems: 'center',
         //elevation: 3,
         shadowColor: '#000',
@@ -398,11 +399,20 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         color: "#2b2b2b"
     }, 
+    maintenance: {
+        alignSelf: 'left',
+        fontWeight: '500',
+        fontSize: 14,
+        marginBottom: 4,
+       marginLeft: 12,
+       color: '#878787',
+    }, 
     dotsContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: -14
+        marginBottom: -12
+        //marginTop: -14
       },
       dot: {
         width: 8,
