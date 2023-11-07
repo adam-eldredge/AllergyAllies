@@ -23,12 +23,15 @@ const dataSchema = new mongoose.Schema({
     },
     DoB: {
         required: false,
-        type: Date
+        type: String
     },
-
     treatments: {
         required: false,
         type: [mongoose.Schema.Types.ObjectId],
+    },
+    treatmentStartDate: {
+        required: false,
+        type: String
     },
     maintenanceBottleNumber: {
         required: false,
@@ -37,7 +40,6 @@ const dataSchema = new mongoose.Schema({
             maintenanceNumber: Number,
         }],
     },
-
     providerID: {
         require: false,
         type: String,

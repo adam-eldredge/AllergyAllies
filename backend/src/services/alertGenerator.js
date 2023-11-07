@@ -107,6 +107,41 @@ async function needsRetestAlert() {
     }
 }
 
+async function needsRefillAlert() {
+    const patientsList = await getAllPatientsHelper(providerID);
+
+    const Refills = [];
+
+    for (p of patientsList) {
+        const patientTreatment = await treatment.find({
+            providerID: p.providerID.toString(),
+            patientID: p._id.toString(),
+        });
+
+        const providerProtocol = await protocol.findOne({providerID: p.providerID});
+
+        if (!providerProtocol || !patientTreatment) {
+            continue;
+        }
+
+        for (const b of patientTreatment.bottles) {
+            const matchingBottle = providerProtocol.bottles.find(
+                (protocolBottle) => protocolBottle.bottleName === b.nameOfBottle
+            );
+
+            const bottleSize = matchingBottle.bottleSize;
+
+            const currentInjVol = b.injVol;
+
+            if (b.injTotalSum + currentInjVol * 3 >= bottleSize) {
+                b.needsRefill = true;
+            } else {
+                b.needsRefill = false;
+            }
+        }
+    }
+}
+
 // check if injections(bottle) need to be mixed ( patient is almost done with current bottle number)
     // "max injection volume is soon to be reached"
     
@@ -116,8 +151,10 @@ async function needsRetestAlert() {
 const scheduleString = '0 0 * * *';
 const missedAppointmentJob = schedule.scheduleJob(scheduleString, attritionAlert);
 const needsRetestJob = schedule.scheduleJob(scheduleString, needsRetestAlert);
+const needsRefillJob = schedule.scheduleJob(scheduleString, needsRefillAlert);
 
 module.exports = {
   missedAppointmentJob,
   needsRetestJob,
+  needsRefillJob,
 };
