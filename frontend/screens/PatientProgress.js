@@ -37,7 +37,7 @@ export default function PatientHome({navigation}){
     const data = Array.from({ length: numVials }, (_, index) => ({
         id: index + 1,
         title: `Vial ${index + 1}`,
-        progress: progress[index], //random values, get from backend
+        progress: progress[index], 
         lastInjDate: dates[index],
         maintenanceNum: maintenanceNums[index],
         bottleNum: bottleNums[index],
@@ -65,6 +65,7 @@ export default function PatientHome({navigation}){
     const renderItem = ({ item }) => (
         <View>
         <Text style={styles.title}>{item.title}</Text>  
+        <Text style={styles.maintenance}>Maintenance Bottle: {item.maintenanceNum}</Text> 
         <View style={styles.card}>
         <View style={{flexDirection: 'row', }}>
         <AnimatedCircularProgress
@@ -90,12 +91,10 @@ export default function PatientHome({navigation}){
                 )
             }
         </AnimatedCircularProgress>
+
+
         <View>
         <Text style={styles.lastInj}>Last injection:</Text>  
-
-
-
-
 
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
       <View style={styles.icon}>
@@ -123,26 +122,14 @@ export default function PatientHome({navigation}){
         <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/> 
       </View>
       <View>
-        <Text style={styles.cardSubData}>Bottle #</Text>    
+        <Text style={styles.cardSubData}>Bottle</Text>    
         <Text style={styles.cardData}>{item.bottleNum}</Text>    
       </View> 
     </View>
 
+</View>
 
-
-        
-
-        </View>
-
-
-
-
-
-
-
-        
-
-        </View>
+ </View>
 
  
        {/* <View style={{ flexDirection: 'row', alignContent: 'center' }}>
@@ -153,14 +140,13 @@ export default function PatientHome({navigation}){
         <Text style={styles.maintenanceSub}>Maintenance Bottle #</Text>    
         <Text style={styles.maintenanceNum}>{item.maintenanceNum}</Text>    
       </View> 
-        </View> */}
+        </View> */} 
 
 
     
-        </View>
+</View>
        
-
-    </View>
+</View>
       );
 
  return (
@@ -184,32 +170,49 @@ export default function PatientHome({navigation}){
 
 
 <Text style={styles.container}></Text>
-<Text style = {styles.title2}>Past Appointments Attended:</Text>
+<Text style = {styles.title2}>Past Appointments Attended</Text>
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
     <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
+        <View style={styles.onTime}>
+        <Text style={{color: 'white'}}> Attended on Time </Text>
+        </View>
     </View>
 </View>
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#e66624', marginRight: 10}}> 12 Days Late - Dose Adjustment </Text>
+    <View style={styles.attendedLate}>
+        <Text style={{color: 'white'}}> 12 Days Late - Dose Adjustment </Text>
+    </View>
     </View>
 </View>
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
-        <Text style={{color: 'white', backgroundColor:'#e55555', marginRight: 10}}> Adverse Reaction </Text>
+        <View style={styles.onTime}>
+        <Text style={{color: 'white'}}> Attended on Time </Text>
+        </View>
+        <View style={styles.adverseReaction}>
+        <Text style={{color: 'white'}}> Adverse Reaction </Text>
+        </View>
     </View>
 </View>
 <View style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
-        <Text style={{color: 'white', backgroundColor:'#498e3b', marginRight: 10}}> Attended on Time </Text>
+    <View style={styles.flags}>
+        <View style={styles.onTime}>
+        <Text style={{color: 'white'}}> Attended on Time </Text>
+        </View>
+    </View>
     </View>
 </View>
+<TouchableOpacity
+               onPress={() =>
+               navigation.navigate('Alerts') }>
+               <Text style = {styles.viewAllAppointments}>View All</Text>
+            </TouchableOpacity>
 </ScrollView>
       )
    }
@@ -226,10 +229,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     },
     title2 :{
-        marginBottom: 15,
-        textAlign: 'center',
-        fontSize: 22,
-        fontWeight: '600',
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#424242',
+        marginLeft: 28,
+        marginBottom: 4
     },
     compliance: {
         paddingTop: 10,
@@ -240,8 +244,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'purple',
         borderRadius: 60,
-
-
     },
     subtitle :{
         paddingBottom: 15,
@@ -286,19 +288,23 @@ const styles = StyleSheet.create({
     },
     pastAppointmentText: {
         fontSize: 17,
-        marginBottom: 10,
+        marginBottom: 4,
         fontWeight: '500',
         marginTop: 12,
     },
     pastAppointment: {
-        width: Dimensions.get('window').width - 30,
-        marginLeft: 15,
+        margin: 10,
+        marginHorizontal: 22,
         marginBottom: 10,
-        height: 70,
-        borderRadius: 8,
+        borderRadius: 12,
         backgroundColor: '#d1ddf2',
         paddingLeft: 20,
-        textstyle:{fontsize: 60}
+        paddingBottom: 8,
+        textstyle:{fontsize: 60},
+        shadowColor: 'black',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
     },
     maintenanceNum: {
         fontWeight: '500',
@@ -318,18 +324,50 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         alignItems: 'center',
-        //marginTop: 10,
+        borderRadius: 20,
+    },
+    onTime: {
+        borderRadius: 8, 
+        backgroundColor: '#5ba863',
+        padding: 2,
+        paddingHorizontal: 4,
+        marginRight: 6,
+        marginBottom: 6
+    },
+    adverseReaction: {
+        borderRadius: 8, 
+        backgroundColor: '#e55555',
+        padding: 2,
+        paddingHorizontal: 4,
+        marginRight: 6,
+        marginBottom: 6
+    },
+    attendedLate: {
+        borderRadius: 8, 
+        backgroundColor: '#ff955c',
+        padding: 2,
+        paddingHorizontal: 4,
+        marginRight: 6,
+        marginBottom: 6
     },
     flagText: {
         backgroundColor: 'red',
         color: 'white',
     },
-
+    viewAllAppointments: {
+      margin: 18,
+      color: '#1059d5',
+      alignSelf: 'center',
+      fontSize: 17,
+      fontWeight: '500',
+      textDecorationLine: 'underline',
+    },
     card: {
         backgroundColor: 'white',
         borderRadius: 20,
         padding: 20,
-        margin: 10,
+        paddingBottom: 10,
+        margin: 4,
         alignItems: 'center',
         //elevation: 3,
         shadowColor: '#000',
@@ -361,11 +399,20 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         color: "#2b2b2b"
     }, 
+    maintenance: {
+        alignSelf: 'left',
+        fontWeight: '500',
+        fontSize: 14,
+        marginBottom: 4,
+       marginLeft: 12,
+       color: '#878787',
+    }, 
     dotsContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: -14
+        marginBottom: -12
+        //marginTop: -14
       },
       dot: {
         width: 8,
