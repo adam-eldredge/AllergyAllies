@@ -2,16 +2,19 @@ const mongoose = require('mongoose');
 
 const dataSchema = new mongoose.Schema({
     providerID: {
-        required: true,
         type: String
     },
     reportType: {
-        required: true,
         type: String
     },
     reportName: {
-        required: true,
         type: String
+    },
+    manual: {
+        type: Boolean
+    },
+    formattedDate: {
+        type: String,
     },
     data: {
         type: Array,
