@@ -94,7 +94,16 @@ export default {
                                 name: 'j1',
                                 title: 'Vial Name',
                                 type: 'text',
-                            }]
+                            },
+                            {
+                                name: 'j2',
+                                title: 'Vial Maintenance Bottle #',
+                                type: 'text',
+                                inputType: 'Numeric',
+                                startWithNewLine: false,
+                                defaultValue: '5'
+                            }
+                            ]
                         }
                     ]
             },
