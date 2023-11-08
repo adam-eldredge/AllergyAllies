@@ -8,11 +8,11 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 import theme from './theme.js';
 import User from '../../User.js';
-import Survey from './Survey.js';
+import SurveyQuestions from './SurveyQuestions.js';
 
 export default function PracticeSurvey() {
     // ***** SURVEY OBJECT ***** //
-    const survey = new Model(Survey);
+    const survey = new Model(SurveyQuestions);
 
     // Apply theme to survey
     survey.applyTheme(theme);
