@@ -51,27 +51,75 @@ export default {
                 title: 'Protocols',
                 elements:
                     [
-                        {
+                        {   
                             name: 'f',
-                            title: 'Starting frequency of injections (# weekly)',
-                            type: 'radiogroup',
-                            colCount: '3',
-                            choices: ['1', '2', '3'],
-                            seperateSpecialChoices: 'true',
+                            title: 'Starting frequency of injections',
+                            type: 'panel',
+                            elements: [
+                                {
+                                    type: "text",
+                                    inputType: 'number',
+                                    name: "f1",
+                                    title: "Injections",
+                                    titleLocation: 'hidden',
+                                    defaultValue: '2',
+                                },
+                                {
+                                    type: "dropdown",
+                                    name: "f2",
+                                    title: 'Injections',
+                                    titleLocation: "left",
+                                    choices: [ 'Weekly', 'Monthly'],
+                                    defaultValue: 'Weekly',
+                                    startWithNewLine: false
+                                }
+                            ]
                         }, {
                             name: 'g',
-                            title: 'Frequency of Clinical Follow-up Appointments (# yearly)',
-                            type: 'radiogroup',
-                            colCount: '4',
-                            choices: ['1', '2', '3', '4'],
-                            seperateSpecialChoices: 'true'
+                            title: 'Frequency of Clinical Follow-up Appointments',
+                            type: 'panel',
+                            elements: [
+                                {
+                                    type: "text",
+                                    inputType: 'number',
+                                    name: "g1",
+                                    title: "Injections",
+                                    titleLocation: 'hidden',
+                                    defaultValue: '2',
+                                },
+                                {
+                                    type: "dropdown",
+                                    name: "g2",
+                                    title: 'Injections',
+                                    titleLocation: "left",
+                                    choices: [ 'Monthly', 'Yearly'],
+                                    defaultValue: 'Yearly',
+                                    startWithNewLine: false
+                                }
+                            ]
                         }, {
                             name: 'h',
-                            title: 'Frequency of Progress Self-Assessment (# yearly)',
-                            type: 'radiogroup',
-                            colCount: '4',
-                            choices: ['1', '2', '3', '4'],
-                            seperateSpecialChoices: 'true'
+                            title: 'Frequency of Progress Self-Assessment',
+                            type: 'panel',
+                            elements: [
+                                {
+                                    type: "text",
+                                    inputType: 'number',
+                                    name: "h1",
+                                    title: "Injections",
+                                    titleLocation: 'hidden',
+                                    defaultValue: '2',
+                                },
+                                {
+                                    type: "dropdown",
+                                    name: "h2",
+                                    title: 'Injections',
+                                    titleLocation: "left",
+                                    choices: [ 'Monthly', 'Yearly'],
+                                    defaultValue: 'Yearly',
+                                    startWithNewLine: false
+                                }
+                            ]
                         }
                     ]
             },
@@ -94,14 +142,6 @@ export default {
                                 name: 'j1',
                                 title: 'Vial Name',
                                 type: 'text',
-                            },
-                            {
-                                name: 'j2',
-                                title: 'Vial Maintenance Bottle #',
-                                type: 'text',
-                                inputType: 'Numeric',
-                                startWithNewLine: false,
-                                defaultValue: '5'
                             }
                             ]
                         }

@@ -71,14 +71,21 @@ const createSurveyObj = (json, pID) => {
             practiceAddress: json.e
         },
         protocols: {
-            startingFrequency: json.f,
-            frequencyFollowUp: json.g,
-            frequencySelfAssess: json.h
+            startingFrequency: {
+                numInjections: json.f1,
+                period: json.f2
+            },
+            frequencyFollowUp: {
+                numInjections: json.g1,
+                period: json.g2
+            },
+            frequencySelfAssess: {
+                numInjections: json.h1,
+                period: json.h2
+            }
         },
         treatments: {
-            vials: {
-                bottleName: json.j1
-            }
+            vials: json.j
         },
         antigens: {
             names: json.i
@@ -202,10 +209,18 @@ const handleProtocol = async (survey, pID) => {
         decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.reduceBottleNum
     }
 
+    let bottles = []
+    const vialNames = survey.treatments.vials.map((vial) => {
+        const bottleSchema = {
+            bottleName: vial.j1
+        }
+        bottles.push(bottleSchema)
+    })
+
     const protocol = {
         practiceID: pID,
         nextDoseAdjustments: nextDoseAdjustments,
-        bottles: survey.treatments.vials.bottleName,
+        bottles: bottles,
         vialTestReactionAdjustments: vialTestReactionAdjustments,
         missedDoseAdjustment: missedDoseAdjustments,
         largeReactionsDoseAdjustments: largeReactionsDoseAdjustments
