@@ -260,7 +260,10 @@ export default function App({navigation}) {
         <Stack.Navigator  screenOptions={() => ({
         headerTitleStyle: styles.headerTitleStyle,
         headerStyle: { backgroundColor: '#1059d5'},
-        headerTintColor: 'white'
+        headerTintColor: 'white',
+        headerTitleContainerStyle: {
+          justifyContent: 'center',
+        },
         })}>
           {state.isLoading ? (
             // We haven't finished checking for the token yet
@@ -292,7 +295,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignSelf: 'center',
     color: 'white',
-    flex: 1,
   },
   root: {
     flex: 1,
