@@ -214,11 +214,11 @@ export default function Reports({navigation}) {
                </TouchableOpacity>
             <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
             onPress={() =>
-              navigation.navigate('Injections')
+              navigation.navigate('Portal')
              }>
-               <Text style={styles.providerDashboardText}>Injections</Text>
+               <Text style={styles.providerDashboardText}>Home</Text>
               <IconButton
-                icon="needle"
+                icon="home"
                 iconColor="white"
                 size={37}
               />

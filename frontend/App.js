@@ -19,6 +19,7 @@ import InitialScreen from './screens/InitialScreen.js';
 import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
 import ViewPatients from './screens/ViewPatients.js';
+import PatientDetails from './screens/PatientDetails.js';
 import { useMemo, useReducer, useEffect } from 'react';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -174,6 +175,7 @@ const SignedInDesktopStack = (
       <Stack.Screen name="ViewPatients" component={ViewPatients} options={{ title: 'View Patients'}}/>
       <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
       <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
+      <Stack.Screen name="PatientDetails" component={PatientDetails} options={{title: 'Patient Details'}} />
   </>
 );
 

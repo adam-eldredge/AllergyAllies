@@ -37,6 +37,7 @@ export default function ViewPatients({ navigation }) {
     const PList = () => (
         <div>
             {renderData.map((p, index) =>
+            <TouchableOpacity onPress={() => handlePatientSelect(p)} key={p.id}>
                 <DataTable.Row style={index == renderData.length - 1 ? { ...stylesList[index % 2], borderBottomEndRadius: 8, borderBottomStartRadius: 8 } : stylesList[index % 2]}>
                     <DataTable.Cell>{p.firstName}</DataTable.Cell>
                     <DataTable.Cell>{p.lastName}</DataTable.Cell>
@@ -44,9 +45,14 @@ export default function ViewPatients({ navigation }) {
                     <DataTable.Cell>{p.status}</DataTable.Cell>
                     <DataTable.Cell>Patient Account</DataTable.Cell>
                 </DataTable.Row>
+            </TouchableOpacity>
             )}
         </div>
     );
+
+    function handlePatientSelect(patient) {
+       navigation.navigate('PatientDetails', { patient });
+    }
 
     function updateRenderData() {
         let newList = []
@@ -160,13 +166,13 @@ export default function ViewPatients({ navigation }) {
                      size={37}
                   />
                </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
+               <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
             onPress={() =>
-              navigation.navigate('Injections')
+              navigation.navigate('Portal')
              }>
-               <Text style={styles.providerDashboardText}>Injections</Text>
+               <Text style={styles.providerDashboardText}>Home</Text>
               <IconButton
-                icon="needle"
+                icon="home"
                 iconColor="white"
                 size={37}
               />
