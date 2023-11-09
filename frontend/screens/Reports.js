@@ -2,16 +2,51 @@ import React, { Component, useContext } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper';
 import AuthContext from '../AuthContext';
+import axios from 'axios';
+import User from '../User';
 
 
 export default function Reports({navigation}) {
 
   const { signOut } = useContext(AuthContext);
+  const userInfo = User();
+  const providerId = userInfo.providerId;
+  const attritionReport = axios.get(`http://localhost:5000/api/attritionReport/${providerId}`);
+  const maintenanceReport = axios.get(`http://localhost:5000/api/approachingMaintenanceReport/${providerId}`);
+  const refillsReport = axios.get(`http://localhost:5000/api/refillsReport/${providerId}`);
+  const needsRetestReport = axios.get(`http://localhost:5000/api/needsRetestReport/${providerId}`);
   
     return (
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: 'white'}}>
         <ScrollView style={{backgroundColor:'white'}}>
-        <Text style={styles.header}>Your Reports</Text>
+          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap',}}>
+          <Text style={styles.header}>Your Reports</Text>
+          <Text style={{fontSize: 15, color: '#1059d5', paddingLeft: 40, marginTop: 65, marginRight: 5,}}>Generate a new report of type:  </Text>
+          <TouchableOpacity
+               onPress={() =>
+                  attritionReport
+               }>
+               <Text style={{fontSize: 15, color: '#1059d5', textDecorationLine: 'underline', marginTop: 65, marginRight: 15,}}>Attrition</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+               onPress={() =>
+                  maintenanceReport
+               }>
+               <Text style={{fontSize: 15, color: '#1059d5', textDecorationLine: 'underline', marginTop: 65, marginRight: 15,}}>Maintenance</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+               onPress={() =>
+                  refillsReport
+               }>
+               <Text style={{fontSize: 15, color: '#1059d5', textDecorationLine: 'underline', marginTop: 65, marginRight: 15,}}>Refills</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+               onPress={() =>
+                  needsRetestReport
+               }>
+               <Text style={{fontSize: 15, color: '#1059d5', textDecorationLine: 'underline', marginTop: 65,}}>Needs Retest</Text>
+            </TouchableOpacity>
+          </View>
         <DataTable style={styles.table}>
           <DataTable.Header style={styles.tableHeader}>
             <DataTable.Title textStyle={{fontWeight:'bold', color: 'black', fontSize: 14}}>Past Reports</DataTable.Title>
@@ -270,6 +305,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: -10,
  },
+ reportButton:{
+  borderRadius: 8,
+  height: 30,
+  width: 140,
+  marginBottom: 10,
+  alignItems: 'center',
+  marginTop: 57,
+  marginLeft: 40,
+  justifyContent: 'center',
+},
 })
 
 const showAlert = () =>
