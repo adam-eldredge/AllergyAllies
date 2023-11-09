@@ -131,7 +131,7 @@ const largeReactionsDoseAdjustments = new mongoose.Schema({
 })
 
 const vialTestReactionAdjustments = new mongoose.Schema({
-    whealLimitToProceedWithInjection: {
+    whealLevelForAdjustment: {
         required: true,
         type: Number,
     },
@@ -139,7 +139,7 @@ const vialTestReactionAdjustments = new mongoose.Schema({
         required: true,
         type: String
     },
-    whealLevelAdjustForVialTestReactions: {
+    decreaseInjectionVol: {
         required: true,
         type: Number,
     },
@@ -150,7 +150,7 @@ const vialTestReactionAdjustments = new mongoose.Schema({
     decreaseBottleNumber: {
         required: true,
         type: Number,
-    },
+    }
 })
 
 const bottleSchema = new mongoose.Schema({

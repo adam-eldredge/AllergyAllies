@@ -67,7 +67,7 @@ const createSurveyObj = (json, pID) => {
             practiceName: json.a,
             providerName: json.b,
             practiceLogo: json.c,
-            praciceScrollingAds: json.d,
+            practiceScrollingAds: json.d,
             practiceAddress: json.e
         },
         protocols: {

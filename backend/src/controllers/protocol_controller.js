@@ -2,9 +2,31 @@ const protocol = require('../Models/protocols');
 
 exports.addProtocol = async (req, res) => {
     try {
-        const data = new protocol(req.body);
 
-        console.log(req.body)
+        const {
+            practiceID,
+            nextDoseAdjustments,
+            bottles,
+            vialTestReactionAdjustments,
+            missedDoseAdjustment,
+            largeReactionsDoseAdjustments,
+        } = req.body
+        console.log(practiceID)
+        console.log(nextDoseAdjustments)
+        console.log(bottles)
+        console.log(vialTestReactionAdjustments)
+        console.log(missedDoseAdjustment)
+        console.log(largeReactionsDoseAdjustments)
+
+        console.log(typeof(practiceID))
+        const data = new protocol ({
+            practiceID,
+            nextDoseAdjustments,
+            bottles,
+            vialTestReactionAdjustments,
+            missedDoseAdjustment,
+            largeReactionsDoseAdjustments
+    })
 
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
