@@ -18,4 +18,7 @@ router.get('/refillsReport/:providerID', reportController.generateRefillsReport)
 
 router.get('/needsRetestReport/:providerID', reportController.generateNeedsRetestReport);
 
+// body needs patientName, patientEmail report type (ApproachingMaintenance, Attrition, NeedsRetest, Refills)
+router.post('/patientReportHistory/:providerID', reportController.patientReportHistory);
+
 module.exports = router;

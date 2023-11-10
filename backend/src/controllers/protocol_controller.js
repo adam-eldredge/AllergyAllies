@@ -1,8 +1,7 @@
 const protocol = require('../Models/protocols');
 
-exports.addProtocol = async (req, res) => {
+async function addProtocol(surveyData) {
     try { 
-        // see protocol.js for bottles/vialtest format
         const { 
             providerID, appointmentSchedule, nextDoseAdjustment, missedDoseAdjustment1, missedDoseAdjustment2, 
             missedDoseAdjustment3, missedDoseAdjustment4, bottles, vialTestReactionAdjustment, 
@@ -13,14 +12,33 @@ exports.addProtocol = async (req, res) => {
             missedDoseAdjustment3, missedDoseAdjustment4, bottles, vialTestReactionAdjustment, 
         });
     
-        const dataToSave = await data.save();
-        res.status(200).json(dataToSave);
+        await data.save();
     }
     catch (error) {
-        return res.status(400).json({ message: `Issue adding protocol: ${error.message}` });
+        
     }
 }
 
+async function updateProtocol(surveyData) {
+    try { 
+        const { 
+            providerID, appointmentSchedule, nextDoseAdjustment, missedDoseAdjustment1, missedDoseAdjustment2, 
+            missedDoseAdjustment3, missedDoseAdjustment4, bottles, vialTestReactionAdjustment, 
+        } = req.body;
+
+        const data = new protocol({
+            providerID, appointmentSchedule, nextDoseAdjustment, missedDoseAdjustment1, missedDoseAdjustment2, 
+            missedDoseAdjustment3, missedDoseAdjustment4, bottles, vialTestReactionAdjustment, 
+        });
+    
+        await data.save();
+    }
+    catch (error) {
+        
+    }
+}
+
+/*
 exports.getProtocol = async (req, res) => {
     try {
         const providerID = req.params.providerID;
@@ -34,4 +52,10 @@ exports.getProtocol = async (req, res) => {
     } catch (err) {
         return res.status(400).json({ message: error.message });
     }
+}
+*/
+
+module.exports = {
+    addProtocol,
+    updateProtocol,
 }

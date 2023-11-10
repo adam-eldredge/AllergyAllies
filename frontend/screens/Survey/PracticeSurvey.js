@@ -96,6 +96,16 @@ const surveyJson = {
                                 name: 'j1',
                                 title: 'Vial Name',
                                 type: 'text',
+                            },
+                            {
+                                name: 'j1',
+                                title: 'Bottle Size (ml)',
+                                type: 'text',
+                            },
+                            {
+                                name: 'j1',
+                                title: 'Maintenance Bottle Number',
+                                type: 'text',
                             }]
                         }
                     ]

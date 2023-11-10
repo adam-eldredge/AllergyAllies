@@ -32,7 +32,6 @@ function maintenanceCSVHelper(foundReport) {
     return csv;
 }
 
-
 function attritionCSVHelper (foundReport) {
     const csvHeaders = "Patient Name,Vial Info.,Days Since Last Inj.,Attrition Date,DOB,Phone Number,Email"
 
@@ -52,7 +51,6 @@ function attritionCSVHelper (foundReport) {
     return csv;
 }
 
-// needs test and verification with williams
 function refillsCSVHelper(foundReport) {
     const headers = ["Patient","Needs Refill","Expires Soon","DoB","Phone number","Email"];
 

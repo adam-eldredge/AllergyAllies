@@ -38,6 +38,11 @@ const dataSchema = new mongoose.Schema({
             date: Date,
             // updated outside treatment controller
             needsRetest: Boolean,
+            needsRetestSnooze: {
+                active: Boolean,
+                dateOfSnooze: Date,
+                snoozeDuration: Number,
+            },
             // needs implementation: every time inj applied/appt attended, 
             // add the volume to below. New bottle = var becomes 0.
             // (for refill data)

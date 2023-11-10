@@ -1,6 +1,5 @@
 const patient = require('../Models/patient');
 const provider = require('../Models/provider');
-// const provider = require('../Models/provider');
 
 // Needs Testing
 const addPatient = async (req, res) => {

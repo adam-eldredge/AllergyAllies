@@ -1,10 +1,6 @@
 const protocol = require('../Models/protocols');
 
 function formatDate(date) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
     const month = date.getMonth()+1;
     const day = date.getDate();
     const year = date.getFullYear();

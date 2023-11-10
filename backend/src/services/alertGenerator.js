@@ -5,11 +5,14 @@ const providerAlerts = require('providerAlerts');
 
 const alertService = require('./alertService');
 
+// reaction alert creation
+// update providerIDs to practiceIDs
+
 // determine if injection(appointment) was missed
 async function attritionAlert() {
     try {
         const patientsList = await getAllPatientsHelper(); 
-
+        // not sure if we can use const considering we change data
         for (const p of patientsList) {
 
             // get last treatment info, and interval of injection according to protocol
@@ -56,7 +59,7 @@ async function needsRetestAlert() {
         // get list of all patients 
         const patientsList = await getAllPatientsHelper(providerID); 
 
-        for (p of patientsList) {
+        for (const p of patientsList) {
             const patientTreatment = await treatment.findOne({
                 _id: p._id, 
                 providerID: p.providerID 
@@ -82,15 +85,17 @@ async function needsRetestAlert() {
                 const needsRetest = currentDate >= oneYearLater;
 
                 // check patient is at maintenance
-                if (b.currBottleNumber === 'M' && b.injVol === maxInjectVol && needsRetest) {
+                if (b.currBottleNumber === 'M' && b.injVol === maxInjectVol && needsRetest && !b.needsRetestSnooze.active) {
                     containsNeedRetest = true;
+                    b.needsRetest = true;
+                    await b.save();
                     patientBottles.push({
                         bottleName: b.bottleName,
                     })
                 }
 
             }
-
+            // save patient data
             const alert = new providerAlerts({
                 NPI: p.providerID,
                 patientName: p.firstName + " " + p.lastName,
@@ -99,7 +104,6 @@ async function needsRetestAlert() {
             })
 
             await alert.save();
-
         }
 
     } catch (error) {
@@ -112,7 +116,7 @@ async function needsRefillAlert() {
 
     const Refills = [];
 
-    for (p of patientsList) {
+    for (const p of patientsList) {
         const patientTreatment = await treatment.find({
             providerID: p.providerID.toString(),
             patientID: p._id.toString(),

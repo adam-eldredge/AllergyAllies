@@ -1,11 +1,8 @@
 const patient = require('../Models/patient');
-//const provider = require('../Models/provider');
 const protocol = require('../Models/protocols')
-// const practice = require('../Models/practice');
 const treatment = require('../Models/treatment');
 const { Report } = require('../Models/report');
 const { getAllPatientsHelper } = require('../controllers/patient_controller');
-const provider = require('../Models/provider');
 
 async function generateReport(providerID, reportType, manual, data) {
     // Report name formatting
@@ -76,7 +73,7 @@ exports.getReportData = async (req, res) => {
 
 exports.generateApproachingMaintenanceReport = async (req, res) => {
     const providerID = req.params.providerID;
-    reportType = "ApproachingMaintenance";
+    const reportType = "ApproachingMaintenance";
 
     const patientsList = await getAllPatientsHelper(providerID);
 
@@ -98,16 +95,10 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
             continue;
         }
 
-        //const maxInjectVol = foundProtocol.nextDoseAdjustment.maxInjectionVol;
         const maintenanceBottles = [];
         let treatmentStartDate = new Date();
         let allBottlesAtMaintenance = true;
-
-        //  include the number of days since last injection,  last bottle # 
-        // and Maintenance Bottle # for each vial.  That can be shown as Pollens 3/6, Insects 3/5, Molds 2/6.
-        // you can report the same way. In hindsight, maybe we should consider them 
-        // approaching Maintenance when ANY of the vials start Maintenance Bottle # minus one.
-
+        
         for (const b of patientTreatment.bottles) {
             const matchingBottle = foundProtocol.bottles.find(
                 (protocolBottle) => protocolBottle.bottleName === b.nameOfBottle
@@ -227,7 +218,7 @@ exports.generateRefillsReport = async (req, res) => {
     const patientsList = await getAllPatientsHelper(providerID);
     const patientRefillsData = [];
 
-    for (p of patientsList) {
+    for (const p of patientsList) {
         const patientTreatment = await treatment.findOne({
             providerID: p.providerID.toString(),
             patientID: p._id.toString(),
@@ -310,7 +301,7 @@ exports.generateNeedsRetestReport = async (req, res) => {
 
         for (const b of patientTreatment.bottles) {
             
-            if (b.needsRetest) {
+            if (b.needsRetest && !b.needsRetestSnooze.active) {
                 patientBottles.push({
                     bottleName: b.nameOfBottle,
                     maintenanceDate: b.date
@@ -339,6 +330,69 @@ exports.generateNeedsRetestReport = async (req, res) => {
     }
 }
 
+// snoozes a patient showing up on needs retest report
+// needs test
+exports.needsRetestSnooze = async (req, res) => {
+    const providerID = req.params.providerID;
+    const patientFirstName = req.body.firstName;
+    const patientLastName = req.body.lastName;
+    const patientEmail = req.body.email;
+    const snoozeDuration = req.body.snoozeDuration;
+
+    try {
+        const foundPatient = await patient.findOne({ firstName: patientFirstName, lastName: patientLastName, email: patientEmail});
+
+        if (!foundPatient) {
+            return res.status(400).json({ message: "patient not found"});
+        }
+
+        const foundTreatment = await treatment.findOne({ providerID: providerID, patientID: foundPatient._id});
+
+        for (const b of foundTreatment.bottles) {
+            if (b.needsRetest) {
+                b.needsRetestSnooze.active = true;
+                b.needsRetestSnooze.dateOfSnooze = new Date();
+                b.snoozeDuration = snoozeDuration;
+                await b.save();
+            }
+        }
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+// needs test
+exports.patientRetested = async (req, res) => {
+    const providerID = req.params.providerID;
+    const patientFirstName = req.body.firstName;
+    const patientLastName = req.body.lastName;
+    const patientEmail = req.body.email;
+
+    try {
+        const foundPatient = await patient.findOne({ firstName: patientFirstName, lastName: patientLastName, email: patientEmail});
+
+        if (!foundPatient) {
+            return res.status(400).json({ message: "patient not found"});
+        }
+
+        const foundTreatment = await treatment.findOne({ providerID: providerID, patientID: foundPatient._id});
+
+        for (const b of foundTreatment.bottles) {
+            if (b.needsRetest) {
+                b.needsRetest = false;
+                await b.save();
+            }
+        }
+
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+
+
+
+
 /* Get records and compile functions */
 
 // need function for case where provider wants to see all logs of a specific
@@ -346,26 +400,3 @@ exports.generateNeedsRetestReport = async (req, res) => {
 // ie: Want all records of AllergyDropsRefillsReport associated with patient John
 // williams mentioned this in a prior meeting ^
 // note: These might be able to be worked in to the above ^
-
-/*
-exports.generatePatientApproachingMaintenanceReport = async (req, res) => {
-    // just search database for reports including "John Smith"
-    // compile into report
-}
-
-exports.generatePatientAttritionReport = async (req, res) => {
-
-}
-
-exports.generatePatientGeneralRefillsReport = async (req, res) => {
-
-}
-
-exports.generatePatientNeedsRetestReport = async (req, res) => {
-    
-}
-
-exports.generatePatientTokensReport = async (req, res) => {
-
-}
-*/
