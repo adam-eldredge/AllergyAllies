@@ -72,7 +72,7 @@ export default function Injections({route, navigation}){
                      type: 'panel',
                      elements: [
                         {
-                           name: 'edit' + index,
+                           name: 'b' + index,
                            title: 'Edit?',
                            titleLocation: 'left',
                            type: 'boolean',
