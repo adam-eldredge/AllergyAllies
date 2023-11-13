@@ -7,25 +7,25 @@ exports.addProtocol = async (req, res) => {
             practiceID,
             nextDoseAdjustments,
             bottles,
-            vialTestReactionAdjustments,
+            vialTestReactionAdjustment,
             missedDoseAdjustment,
-            largeReactionsDoseAdjustments,
+            largeReactionsDoseAdjustment,
         } = req.body
         console.log(practiceID)
         console.log(nextDoseAdjustments)
         console.log(bottles)
-        console.log(vialTestReactionAdjustments)
+        console.log(vialTestReactionAdjustment)
         console.log(missedDoseAdjustment)
-        console.log(largeReactionsDoseAdjustments)
+        console.log(largeReactionsDoseAdjustment)
 
         console.log(typeof(practiceID))
         const data = new protocol ({
             practiceID,
             nextDoseAdjustments,
             bottles,
-            vialTestReactionAdjustments,
+            vialTestReactionAdjustment,
             missedDoseAdjustment,
-            largeReactionsDoseAdjustments
+            largeReactionsDoseAdjustment
     })
 
         const dataToSave = await data.save();

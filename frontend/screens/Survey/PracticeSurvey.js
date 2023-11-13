@@ -193,18 +193,18 @@ const handleProtocol = async (survey, pID) => {
         }
     }
 
-    const largeReactionsDoseAdjustments = {
+    const largeReactionsDoseAdjustment = {
         whealLevelForAdjustment: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.minWhealSize,
         event: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.event,
-        decreaseInjectionVolume: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.decreaseVolume,
+        decreaseInjectionVol: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.decreaseVolume,
         decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.timesDilution,
         decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.reduceBottleNum
     }
 
-    const vialTestReactionAdjustments = {
+    const vialTestReactionAdjustment = {
         whealLevelForAdjustment: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.minWhealSize,
         event: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.event,
-        decreaseInjectionVolume: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.decreaseVolume,
+        decreaseInjectionVol: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.decreaseVolume,
         decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.timesDilution,
         decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.reduceBottleNum
     }
@@ -221,9 +221,9 @@ const handleProtocol = async (survey, pID) => {
         practiceID: pID,
         nextDoseAdjustments: nextDoseAdjustments,
         bottles: bottles,
-        vialTestReactionAdjustments: vialTestReactionAdjustments,
+        vialTestReactionAdjustment: vialTestReactionAdjustment,
         missedDoseAdjustment: missedDoseAdjustments,
-        largeReactionsDoseAdjustments: largeReactionsDoseAdjustments
+        largeReactionsDoseAdjustment: largeReactionsDoseAdjustment
     }
     console.log(protocol);
 
