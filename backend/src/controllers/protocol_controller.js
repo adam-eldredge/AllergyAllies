@@ -23,8 +23,8 @@ exports.addProtocol = async (req, res) => {
 
 exports.getProtocol = async (req, res) => {
     try {
-        const providerID = req.params.providerID;
-        const foundProtocol = await protocol.findOne({ providerID: providerID }).exec();
+        const practiceID = req.params.practiceID;
+        const foundProtocol = await protocol.findOne({ practiceID: practiceID }).exec();
 
         if (!foundProtocol) {
             return res.status(404).json({ message: "Protocol not found"});
