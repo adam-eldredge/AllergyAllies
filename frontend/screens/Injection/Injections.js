@@ -1,5 +1,5 @@
-import React, { Component, useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
+import React, { Component, useState, useEffect, useCallback } from 'react'
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView, Platform } from 'react-native'
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import User from '../../User';
 import axios from 'axios';
@@ -8,12 +8,29 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 import theme from './theme.js';
 
-export default function Injections({navigation}){
+export default function Injections({route, navigation}){
 
+   // Current user
    const userInfo = User();
+
+   // Protocol information
    const [protocol, setProtocol] = useState();
    const [queriedProtocol, setQueriedProtocol] = useState(false);
-   const [patientName, setPatientName] = useState('example name')
+
+   // Today's date
+   const date = new Date();
+
+   // Current patient *** NEEDS TO BE UPDATED ONCE PROPERLY SET UP
+   const patient = {
+      firstName: "example",
+      lastName: "person",
+      ID: '000000'
+   }
+
+   // Calculated value - NEEDS TO BE UPDATED WITH JIMMY'S CALCULATIONS
+   const [calculatedVolume, setCalculatedVolume] = useState('0');
+   const [calculatedDilution, setCalculatedDilution] = useState('0');
+   const [calculatedBottleNum, setCalculatedBottleNum] = useState('0');
 
    useEffect(() => {
       const findProtocol = async() => {
@@ -23,7 +40,6 @@ export default function Injections({navigation}){
             if (protocol.status == 200) {
                setProtocol(protocol.data.protocol);
                const bottles = protocol.data.protocol.bottles;
-               console.log(bottles);
             }
 
             setQueriedProtocol(true);
@@ -41,9 +57,10 @@ export default function Injections({navigation}){
 
    // Input Fields
    const InjectionQuestions = {
-      title: "Add an Injection",
-      description: `Patient: ${patientName}`,
+      title: `Add an Injection - ${patient.firstName} ${patient.lastName}`,
+      description: `Date: ${date}`,
       textAlign: "center",
+      completedHtml: 'Successfully added injection',
       pages:
          [
             {
@@ -55,38 +72,59 @@ export default function Injections({navigation}){
                      type: 'panel',
                      elements: [
                         {
-                           name: 'maintenance' + index,
-                           title: 'Maintenance Bottle Number:',
-                           type: 'panel',
-                           elements: [
-                              {
-                                 name: 'b' + index,
-                                 title: 'Edit?',
-                                 titleLocation: 'left',
-                                 type: 'boolean',
-                                 defaultValue: false,
-                                 valueTrue: 'Edit',
-                                 valueFalse: 'Lock'
-                              },
-                              {
-                                 name: 'a' + index,
-                                 titleLocation: 'hidden',
-                                 type: 'text',
-                                 inputType: 'number',
-                                 defaultValue: '5',
-                                 isRequired: true,
-                                 startWithNewLine: false,
-                                 enableIf: `{b${index}} == "Edit"`
-                              }
-                           ]
+                           name: 'edit' + index,
+                           title: 'Edit?',
+                           titleLocation: 'left',
+                           type: 'boolean',
+                           defaultValue: false,
+                           valueTrue: 'Edit',
+                           valueFalse: 'Lock'
                         },
                         {
                            name: 'volume' + index,
                            title: 'Injection Volume:',
+                           description: 'Calculated next dose volume',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: '0.15',
+                           defaultValue: calculatedVolume,
                            startWithNewLine: false,
+                           enableIf: `{b${index}} == "Edit"`,
+                           isRequired: true
+                        },
+                        {
+                           name: 'bottleNum' + index,
+                           title: 'Bottle Number:',
+                           description: "Patient's current bottle number for this vial.",
+                           type: 'text',
+                           inputType: 'numeric',
+                           defaultValue: calculatedBottleNum,
+                           enableIf: `{b${index}} == "Edit"`,
+                           isRequired: true
+                        },
+                        {
+                           name: 'dilution' + index,
+                           title: 'Injection Dilution:',
+                           description: "Dilution of patient's current bottle.",
+                           type: 'text',
+                           inputType: 'numeric',
+                           defaultValue: calculatedDilution,
+                           startWithNewLine: false,
+                           enableIf: `{b${index}} == "Edit"`,
+                           isRequired: true
+                        },
+                        {
+                           name: 'location' + index,
+                           title: 'Injection Location:',
+                           description: "Location of injection on patient's arm.",
+                           type: 'dropdown',
+                           choices: [
+                              'Right Upper',
+                              'Right Lower',
+                              'Left Upper',
+                              'Left Lower'
+                           ],
+                           defaultValue: 'Right Upper',
+                           enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
                      ]
@@ -100,60 +138,30 @@ export default function Injections({navigation}){
    }
 
    // ***** SURVEY OBJECT ***** //
-   const survey = new Model(InjectionQuestions);
+   const injectionForm = new Model(InjectionQuestions);
 
    // Apply theme to survey
-   survey.applyTheme(theme);
+   injectionForm.applyTheme(theme);
 
-   return (<Survey model={survey} />)
-   
-   
-   // Need to get all vials that this practice uses
-         // If not already set - add a red message to tell dr to set
-         // Input for each for maintenance bottle nums
+   injectionForm.onComplete.add((sender, options) => {
+      createInjectionObject(sender.data, protocol.bottles);
+  });
 
-   
-
-   // For each vial
-         // Bottle num input
-         // Injection Volume input
-            // Use jimmys calcs to auto get the next injection
-            // button with a +/- to increase or decrease the dosage
-         // Injection location text box
+   return <Survey model={injectionForm} />;
 }
 
+const createInjectionObject = (data, bottles) => {
+   let Injections = []
+   const numBottles = bottles.map((bottle, index) => {
+      const bottleInjection = {
+         nameOfBottle: bottle.bottleName,
+         injVol: eval(`data.volume${index}`),
+         injDilution: eval(`data.dilution${index}`),
+         currBottleNumber: eval(`data.bottleNum${index}`),
+         date: new Date()
+      }
+      Injections.push(bottleInjection)
+   })
+   console.log(Injections)
+}
 
-
-const styles = StyleSheet.create({
-   title: {
-      fontSize: 40,
-      marginTop: 40,
-      fontWeight: '600',
-      marginLeft: 100,
-      color: '#1059d5',
-   },
-   alert: {
-      width: 800,
-      height: 70,
-      marginLeft: 100,
-      marginTop: 5,
-      borderRadius: 8,
-      backgroundColor: 'white',
-      marginBottom: 5,
-   },
-   providerDashboardItem:{
-      borderRadius: 8,
-      height: 100,
-      width: 100,
-      marginBottom: 10,
-      alignItems: 'center',
-   },
-   providerDashboardText:{
-      color: 'white',
-      textAlign: 'center',
-      fontSize: 15,
-      fontWeight: '600',
-      marginTop: 20,
-      marginBottom: -10,
-   },
-})
