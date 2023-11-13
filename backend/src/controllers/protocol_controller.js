@@ -11,14 +11,7 @@ exports.addProtocol = async (req, res) => {
             missedDoseAdjustment,
             largeReactionsDoseAdjustment,
         } = req.body
-        console.log(practiceID)
-        console.log(nextDoseAdjustments)
-        console.log(bottles)
-        console.log(vialTestReactionAdjustment)
-        console.log(missedDoseAdjustment)
-        console.log(largeReactionsDoseAdjustment)
 
-        console.log(typeof(practiceID))
         const data = new protocol ({
             practiceID,
             nextDoseAdjustments,

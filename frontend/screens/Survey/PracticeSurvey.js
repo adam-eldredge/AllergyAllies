@@ -21,7 +21,6 @@ export default function PracticeSurvey() {
     const user = User();
     const saveResults = useCallback((sender) => {
         const json = sender.data;
-        console.log(json);
         sendSurvey(user, json);
     });
 
@@ -34,7 +33,6 @@ export default function PracticeSurvey() {
         default: <Survey model={survey} />
     });
 
-    console.log(rend);
     return rend;
 }
 
@@ -53,8 +51,6 @@ const sendSurvey = async (user, json) => {
         }
         else if (provider.status === 200) {
             const pID = provider.data.practiceID;
-            console.log(`practiceID: ${pID}`);
-            console.log(`JSON: ${json}`);
             createSurveyObj(json, pID);
         }
     }
@@ -228,18 +224,15 @@ const handleProtocol = async (survey, pID) => {
     console.log(protocol);
 
     // Here is where we post or patch the protocol to the database.
-    console.log('here')
     let currPracticeProtocol = await axios.get(`http://localhost:5000/api/getProtocol/${pID}`)
 
     if (currPracticeProtocol.status === 200) {
         let patch = await axios.patch(`http://localhost:5000/api/updateProtocol/${pID}`, protocol)
         console.log(patch)
-        console.log('here')
     }
     else if (currPracticeProtocol.status === 201) {
         let post = await axios.post(`http://localhost:5000/api/addProtocol`, protocol)
         console.log(post)
-        console.log('here')
     }
     console.log(currPracticeProtocol.status)
 
