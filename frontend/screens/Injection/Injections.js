@@ -20,7 +20,7 @@ export default function Injections({route, navigation}){
    // Today's date
    const date = new Date();
 
-   // Current patient *** NEEDS TO BE UPDATED ONCE PROPERLY SET UP
+   // Current Patient
    const {patient} = route.params
 
    // Calculated value - NEEDS TO BE UPDATED WITH JIMMY'S CALCULATIONS

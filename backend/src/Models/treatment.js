@@ -12,7 +12,7 @@ const dataSchema = new mongoose.Schema({
         type: String
     },
     NPI: {
-        required: true,
+        required: false,
         type: Number
     },
     patientLastName: {
@@ -36,6 +36,8 @@ const dataSchema = new mongoose.Schema({
             injLLR: Number,
             currBottleNumber: String,
             date: Date,
+            currentDoseAdvancement: Number,
+
             // updated outside treatment controller
             needsRetest: Boolean,
             // needs implementation: every time inj applied/appt attended, 

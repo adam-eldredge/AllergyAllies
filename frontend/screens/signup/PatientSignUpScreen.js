@@ -70,6 +70,8 @@ export default function PatientSignUpScreen() {
       setTimeout(() => {
         navigation.navigate('SignIn');
       }, 1000);
+
+      // Add initial blank treatment to account to be used in calculations
     }
   }
 

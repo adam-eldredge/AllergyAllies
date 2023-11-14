@@ -10,6 +10,7 @@ export default function PatientDetails({ route, navigation }) {
   const { patient } = route.params;
 
   const [protocol, setProtocol] = useState();
+  const [practice, setPractice] = useState();
   const [queriedProtocol, setQueriedProtocol] = useState(false);
 
   // Get the current bottles for this patient's practice
@@ -17,9 +18,14 @@ export default function PatientDetails({ route, navigation }) {
     const findProtocol = async () => {
       try {
         const protocol = await axios.get(`http://localhost:5000/api/getProtocol/${patient.practiceID}`)
+        const practice = await axios.get(`http://localhost:5000/api/practice/${patient.practiceID}`)
 
         if (protocol.status == 200) {
           setProtocol(protocol.data.protocol);
+        }
+        if (practice.status == 200) {
+          setPractice(practice.data);
+          console.log(practice);
         }
 
         setQueriedProtocol(true);
@@ -43,13 +49,32 @@ export default function PatientDetails({ route, navigation }) {
           <Text style={styles.prompt2}>{bottle.bottleName}</Text>
           <Text style={styles.data3}>Maintenance Bottle: x</Text>
           <Text style={styles.data3}>x% to maintenance</Text>
-          <Text style={styles.data3}>Last injection: x</Text>
-          <Text style={styles.data3}>Dosage: x</Text>
+          <Text style={styles.prompt2}>Last injection:</Text>
+          <Text style={styles.data3}>Dosage: x ml</Text>
           <Text style={styles.data3}>Bottle: x</Text>
         </View>
       )}
     </div>
   );
+
+  const PracticeSection = () => (
+    <View style={styles.section}>
+      {/* TITLE */}
+      <Text style={styles.prompt2}>Practice Info</Text>
+
+      {/* PRACTICE NAME */}
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt2}>Name: </Text>
+        <Text style={{ ...styles.data2, alignSelf: 'center', }}>{practice.practiceName}</Text>
+      </View>
+
+      {/* PRACTICE ADDRESS */}
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt2}>Phone Number: </Text>
+        <Text style={{ ...styles.data2, alignSelf: 'center', }}>{practice.practiceName}</Text>
+      </View>
+    </View>
+  )
 
 
   return (
@@ -70,6 +95,8 @@ export default function PatientDetails({ route, navigation }) {
               <IconButton icon="pencil" iconColor="green" size={10} style={{ marginTop: -4, marginLeft: -5 }} />
             </TouchableOpacity>
           </View>
+
+        <PracticeSection/>
 
           <View style={styles.section}>
             <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
@@ -94,6 +121,7 @@ export default function PatientDetails({ route, navigation }) {
             </View>
           </View>
         </View>
+        <View>
         <View>
           <View style={styles.section}>
             <View>
@@ -126,6 +154,7 @@ export default function PatientDetails({ route, navigation }) {
         </View>
       </View>
     </View>
+    </View>
   );
 }
 
@@ -135,7 +164,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: 800,
   },
-  header: {
+    header: {
     fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 20,
@@ -152,26 +181,34 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 2,
   },
+  prompt3: {
+    fontSize: 16,
+    fontWeight: '500',
+    marginLeft: 10,
+    marginTop: 2,
+  },
   data: {
-    fontSize: 18,
+    fontSize: 16,
+    marginRight: 10,
     alignSelf: 'center'
   },
   data2: {
     fontSize: 16,
     marginRight: 10,
+    marginTop: 2,
   },
   data3: {
     fontSize: 16,
     marginRight: 10,
-    marginLeft: 10,
-    marginTop: 3,
+    marginTop: 2,
   },
   section: {
     borderRadius: 10,
-    padding: 10,
+    padding: 7,
     backgroundColor: 'white',
     margin: 10,
     minWidth: 300,
+    paddingBottom: 10,
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
   },
   button: {

@@ -42,7 +42,7 @@ export default function ViewPatients({ navigation }) {
                     <DataTable.Cell>{p.firstName}</DataTable.Cell>
                     <DataTable.Cell>{p.lastName}</DataTable.Cell>
                     <DataTable.Cell>{p.email}</DataTable.Cell>
-                    <DataTable.Cell>{p.status}</DataTable.Cell>
+                    <DataTable.Cell textStyle={{ marginLeft: 20 }}>{p.status}</DataTable.Cell>
                     <DataTable.Cell>Patient Account</DataTable.Cell>
                 </DataTable.Row>
             </TouchableOpacity>
@@ -113,7 +113,7 @@ export default function ViewPatients({ navigation }) {
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>First Name</DataTable.Title>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Last Name</DataTable.Title>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Email</DataTable.Title>
-                        <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Status</DataTable.Title>
+                        <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14, marginLeft: 20 }}>Status</DataTable.Title>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Profile</DataTable.Title>
                     </DataTable.Header>
                     <PList />

@@ -17,6 +17,9 @@ router.get('/getPatientsByPractice/:practiceID', patientController.getPatientsBy
 // GET localhost:5000/api/getPatient
 router.get('/getPatient/:id', patientController.getPatient);
 
+// GET localhost:5000/api/findPatient/:email
+router.get('/findPatient/:email', patientController.findPatient);
+
 // GET localhost:5000/api/checkEmail
 router.post('/checkEmail/', patientController.checkEmail);
 
@@ -29,11 +32,17 @@ router.post('/addTokens/:id', patientController.addTokens);
 // GET localhost:5000/api/resetTokens
 router.get('/resetTokens', patientController.resetTokens);
 
+// Get localhost:5000/api/findPercentMaintenance
+router.get('/findPercentMaintenance', patientController.findPercentMaintenance);
+
 // POST localhost:5000/api/addAllergyMedication
 router.post('/addAllergyMedication', patientController.addAllergyMedication);
 
 // PATCH localhost:5000/api/:email/updateMaintenanceBottleNums
 router.patch('/:email/updateMaintenanceBottleNums', patientController.updateMaintenanceBottleNums);
+
+// GET localhost:5000/api/getAllergyMedication
+router.get('/getAllergyMedication', patientController.getAllergyMedication);
 
 module.exports = router;
 

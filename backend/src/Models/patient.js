@@ -27,7 +27,7 @@ const dataSchema = new mongoose.Schema({
     },
     treatments: {
         required: false,
-        type: [mongoose.Schema.Types.ObjectId],
+        type: [ String ], /*mongoose.Schema.Types.ObjectId*/
     },
     treatmentStartDate: {
         required: false,
