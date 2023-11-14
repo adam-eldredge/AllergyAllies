@@ -12,9 +12,12 @@ router.get('/getAllTreatments', treatmentController.getAllTreatments);
 router.post('/getTreatment', treatmentController.getTreatment);
 
 // DELETE localhost:5000/api/addTreatment
-router.delete('/deleteTreatment/:id', treatmentController.deleteTreatment);
+router.delete('/deleteTreatment', treatmentController.deleteTreatment);
 
 // POST to add next treatment
-router.post('/nextTreatment/:id', treatmentController.nextTreatment);
+router.post('/nextTreatment', treatmentController.nextTreatment);
+
+// PATCH to change values depending on doctor
+router.patch('/updateTreatment', treatmentController.updateTreatment);
 
 module.exports = router;
