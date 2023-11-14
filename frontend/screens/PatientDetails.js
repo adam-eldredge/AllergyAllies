@@ -74,7 +74,8 @@ export default function PatientDetails({ route, navigation }) {
           </View>
           </View>
        </View>
-        <View style={styles.section}>
+       <View>
+       <View style={styles.section}>
             <Text style={styles.prompt2}>Vial 1: </Text>
             <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
               <Text style={styles.prompt3}>Maintenance Bottle: </Text>
@@ -96,6 +97,7 @@ export default function PatientDetails({ route, navigation }) {
               <Text style={styles.prompt3}>Bottle: </Text>
               <Text style = {styles.data3}>x</Text>
             </View>
+          </View>
           </View>
         </View>
         <View>
