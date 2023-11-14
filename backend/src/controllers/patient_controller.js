@@ -13,8 +13,8 @@ const addPatient = async (req, res) => {
         });
         data.status = "DEFAULT";
         data.tokens = 0;
-        data.NPI = 0;
-        data.statusTime = new Date();
+        data.providerID = 0;
+        data.statusDate = new Date();
 
         const dataToSave = await data.save();
         return res.status(200).json(dataToSave);
@@ -35,7 +35,7 @@ const addPatientToProvider = async (req, res) => {
             return res.status(404).json({ message: 'Patient not found' });
         }
 
-        foundPatient.NPI = foundProvider.NPI;
+        foundPatient.providerID = foundProvider.providerID;
 
         const updatedPatient = await foundPatient.save();
 
@@ -45,11 +45,11 @@ const addPatientToProvider = async (req, res) => {
     }
 }
 
-const getAllPatientsHelper = async (NPI) => {
+const getAllPatientsHelper = async (providerID) => {
     try {
-        const patientsList = await patient.find({NPI: NPI});
+        const patientsList = await patient.find({providerID: providerID});
         return patientsList;
-    } catch (errror) {
+    } catch (error) {
         console.error('Error retrieving list of patients: ', error);
     }
 }
@@ -118,7 +118,7 @@ const deletePatient = async (req, res) => {
         if (!patientToDelete) {
             return res.status(404).json({ message: `Patient not found: ${id}` });
         }
-        const firstname = patientToDelete.firstname;
+        const firstname = patientToDelete.firstName;
 
         await patient.findByIdAndDelete(id);
         return res.status(200).json({ message: `Document with ${firstname} has been deleted..` });
@@ -187,6 +187,32 @@ const resetTokens = async (req, res) => {
     }
 }
 
+/*
+    Body of medications sent as json like this:
+
+    [{
+        medication: {
+            name:
+            dose:
+            frequency:
+        },
+        ...
+    }]
+*/
+
+
+const addAllergyMedication = async (req, res) => {
+    try{
+        const { lastName, email, phone, DoB, medications  } = req.body;
+        const findPatient = await patient.findOne({lastName: lastName, email: email, phone: phone, DoB: DoB});
+        findPatient.allergyMedication = medications;
+        await findPatient.save();
+    }
+    catch(error){
+        return res.status(400).json({ message: error.message})
+    }
+}
+
 // required for const functions
 module.exports = {
     addPatient,
@@ -199,4 +225,5 @@ module.exports = {
     addTokens,
     resetTokens,
     deletePatient,
+    addAllergyMedication,
 }

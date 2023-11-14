@@ -81,17 +81,6 @@ export default function Portal({navigation}){
       <View style = {styles.container2}>
          <View style={{flexDirection: 'row'}}>
             <Text style={styles.header2}>Welcome, {firstName}!</Text>
-            <TouchableOpacity style={{marginTop: 40, marginLeft: 540, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
-               onPress={() =>
-               signOut()
-            }>
-               <Text style={{color: 'white', size: 5, marginRight: -10, marginLeft: 12, fontWeight: 500}}>Sign out</Text>
-                  <IconButton
-                     icon="exit-to-app"
-                     iconColor="white"
-                     size={14}
-                  />
-            </TouchableOpacity>
          </View>
          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap',}}>
             <View style={{marginLeft: 100, marginRight: 170}}>
@@ -156,13 +145,13 @@ export default function Portal({navigation}){
                      size={60}
                   />
                </TouchableOpacity>
-               <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
+               <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#dc6c82'}}
                onPress={() =>
-               navigation.navigate('Injections')
+                  signOut()
                }>
-                  <Text style={styles.providerDashboardText}>Injections</Text>
+                  <Text style={styles.providerDashboardText}>Sign Out</Text>
                <IconButton
-                  icon="needle"
+                  icon="exit-to-app"
                   iconColor="white"
                   size={60}
                />

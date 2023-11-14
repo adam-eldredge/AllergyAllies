@@ -4,12 +4,18 @@ import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react
 import { useRoute } from '@react-navigation/native';
 import AuthContext from '../AuthContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import User from '../User';
+import { DataTable } from 'react-native-paper'; 
+   
 
 
 export default function PatientProfile(){
 
     const { signOut } = useContext(AuthContext);
+    const userInfo = User();
+    const firstName = userInfo.firstName;
+    const lastName = userInfo.lastName;
+    const email = userInfo.email;
 
       return (
       <ScrollView style={styles.container}>
@@ -18,8 +24,8 @@ export default function PatientProfile(){
           source={require('./profilepic.png')}
           style={styles.profilePhoto}
         />
-        <Text style={styles.name}>Jane Doe</Text>
-        <Text style={styles.grayText}> janedoe@gmail.com </Text>
+        <Text style={styles.name}>{firstName} {lastName}</Text>
+        <Text style={styles.grayText}> testemail@gmail.com </Text>
       </View>
       <View style={styles.textBoxContainer}>
         <View style={styles.textBoxDivider}> 
@@ -44,14 +50,30 @@ export default function PatientProfile(){
         <Text style={styles.textBoxSubContent}>10/17/23</Text> 
         <Text style={styles.textBoxContent}>Tracking Start Date:</Text> 
         <Text style={styles.textBoxSubContent}>10/17/23</Text>
-        <Text style={styles.textBoxContent}>Starting Bottle Number:</Text> 
-        <Text style={styles.textBoxSubContent}>1</Text>
-        <Text style={styles.textBoxContent}>Maintenace Bottle Number:</Text> 
-        <Text style={styles.textBoxSubContent}>3</Text>
-        <Text style={styles.textBoxContent}>Starting Injection Amount:</Text> 
-        <Text style={styles.textBoxSubContent}>2 mg</Text>
+            
         <Text style={styles.textBoxContent}>Frequency of Injections:</Text> 
         <Text style={styles.textBoxSubContent}>2x a week</Text>
+
+{/* 
+        <DataTable style={styles.container}> 
+      <DataTable.Header style={styles.tableHeader}> 
+        <DataTable.Title fontSize = {20}>Vial</DataTable.Title> 
+        <DataTable.Title>Maintenance Bottle #</DataTable.Title> 
+      </DataTable.Header> 
+      <DataTable.Row> 
+        <DataTable.Cell>Vial 1 (Insects)</DataTable.Cell> 
+        <DataTable.Cell>6</DataTable.Cell> 
+      </DataTable.Row> 
+  
+      <DataTable.Row> 
+        <DataTable.Cell>Vial 2 (Molds)</DataTable.Cell> 
+        <DataTable.Cell>6</DataTable.Cell> 
+      </DataTable.Row> 
+      <DataTable.Row> 
+        <DataTable.Cell>Vial 3 (Pollen)</DataTable.Cell> 
+        <DataTable.Cell>4</DataTable.Cell> 
+      </DataTable.Row> 
+    </DataTable>   */}
       </View>
 
       <TouchableOpacity
@@ -90,7 +112,8 @@ export default function PatientProfile(){
         borderBottomColor: '#e3e3e3',
         paddingLeft: 15,
         paddingBottom: 6,
-        color: '#0d3375'
+        color: '#0d3375',
+        fontWeight: '600'
       },
       textBoxDivider: {
         borderBottomWidth: 1,
@@ -103,7 +126,8 @@ export default function PatientProfile(){
         alignSelf: 'flex-start',
         paddingLeft: 15,
         paddingBottom: 8,
-        color: '#5e5e5e'
+        color: '#5e5e5e',
+        fontWeight: '400'
       },
       textBoxSubContent: {
         fontSize: 16,
@@ -112,7 +136,8 @@ export default function PatientProfile(){
         alignSelf: 'flex-start',
         paddingLeft: 15,
         paddingBottom: 6,
-        color: '#828282'
+        color: '#878787',
+        fontWeight: '400'
       },
     profilePhotoContainer: {
         alignItems: 'center',
@@ -136,7 +161,8 @@ export default function PatientProfile(){
     },
     name: {
         fontSize: 20,
-        marginTop: 8
+        marginTop: 8,
+        fontWeight: '700'
     },
     grayText: {
         fontSize: 14,
@@ -160,4 +186,7 @@ export default function PatientProfile(){
         textAlign: 'center',
         fontSize: 15,
      },
+     tableHeader: { 
+      backgroundColor: '#DCDCDC', 
+    }
   });

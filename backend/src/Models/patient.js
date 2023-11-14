@@ -23,25 +23,49 @@ const dataSchema = new mongoose.Schema({
     },
     DoB: {
         required: false,
-        type: Date
+        type: String
     },
-    NPI: {
+    treatments: {
+        required: false,
+        type: [mongoose.Schema.Types.ObjectId],
+    },
+    treatmentStartDate: {
+        required: false,
+        type: String
+    },
+    maintenanceBottleNumber: {
+        required: false,
+        type: [{
+            nameOfBottle: String,
+            maintenanceNumber: Number,
+        }],
+    },
+    providerID: {
         require: false,
-        type: Number,
+        type: String,
     },
     // DEFAULT, INACTIVE, MAINTENANCE, ATTRITION
     status: {
         require: true,
         type: String,
     },
-    statusTime: {
+    statusDate: {
         require: true,
         type: Date
     },
     tokens: {
         type: Number,
         default: 0
+    },
+
+    allergyMedication:{
+        type: [{
+            name: String,
+            dose: String,
+            frequency: String
+        }]
     }
+
 }, { collection: 'Patients' })
 
 module.exports = mongoose.model('Patient', dataSchema)

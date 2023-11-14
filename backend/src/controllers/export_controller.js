@@ -1,34 +1,17 @@
 const { Report } = require('../Models/report');
-const protocol = require('../Models/protocols');
 const PDFDocument = require('pdfkit-table');
-const fs = require("fs");
-
-function maintenanceCSVHelper (foundReport) {
-    // Convert the data to a CSV string
-    const csv = `Patient Name,Approaching Maintenance\n${foundReport.data.map(record => 
-        `${record.patientName},${record.approachingMaintenance}`).join('\n')}`;
-    return csv;
-}
-
-function attritionCSVHelper (foundReport) {
-    const csv = `Patient Name,Status,Email,Phone Number\n${foundReport.data.map(record => 
-        `${record.patientName},${record.status},${record.email},${record.phone}`).join('\n')}`;
-    return csv;
-}
-
-async function refillsCSVHelper(foundReport) {
-    const protocolBottles = await protocol.find({ NPI: foundReport.NPI }).select('bottles');
-  
-    // get bottle names from the first element in the protocolBottles array
-    const bottleNames = protocolBottles[0]?.bottles.map(bottle => bottle.bottleName) || [];
-  
-    const columnTitles = ['Patient Name', ...bottleNames, 'Email', 'Phone Number'];
-  
-    const csv = `${columnTitles.join(',')}\n${foundReport.data.map(record => 
-      `${record.patientName},${record.bottleData.join(',')},${record.email},${record.phone}`).join('\n')}`;
-  
-    return csv;
-}
+const { 
+    maintenanceCSVHelper, 
+    refillsCSVHelper, 
+    attritionCSVHelper, 
+    needsRetestCSVHelper
+} = require('../helpers/exportCSV_helper');
+const {
+    maintenancePDFHelper,
+    refillsPDFHelper,
+    attritionPDFHelper,
+    needsRetestPDFHelper,
+} = require('../helpers/exportPDF_helper');
 
 exports.getReportCSV = async (req, res) => {
     const reportID = req.params.id;
@@ -43,7 +26,7 @@ exports.getReportCSV = async (req, res) => {
         let csv;
 
         switch (foundReport.reportType) {
-            case "approachingMaintenance":
+            case "ApproachingMaintenance":
                 csv = maintenanceCSVHelper(foundReport);
                 break;
             case "Refills":
@@ -51,6 +34,9 @@ exports.getReportCSV = async (req, res) => {
                 break;
             case "Attrition":
                 csv = attritionCSVHelper(foundReport);
+                break;
+            case "NeedsRetest":
+                csv = needsRetestCSVHelper(foundReport);
                 break;
             default:
                 return res.status(400).json({ message: "Unsupported report type" });
@@ -67,74 +53,6 @@ exports.getReportCSV = async (req, res) => {
     }
 }
 
-function maintenancePDFHelper(foundReport) {
-    const headers = ["Patient Name", "Attrition"];
-
-    const table = {
-        title: `${foundReport.reportName}`,
-        headers: headers, // Define your table headers
-        rows: [], // Initialize an empty array for rows
-    };
-    
-    // Populate the rows array with data from foundReport.data
-    foundReport.data.forEach((record) => {
-        const rowData = [record.patientName, record.approachingMaintenance];
-        table.rows.push(rowData);
-    });
-
-    const tableOptions = {
-        // Specify table options here, if any
-    };
-
-    return {table, tableOptions};
-}
-
-// needs update
-function refillsPDFHelper(foundReport) {
-    const headers = ["Patient Name", "Attrition"];
-
-    const table = {
-        title: `${foundReport.reportName}`,
-        headers: headers, // Define your table headers
-        rows: [], // Initialize an empty array for rows
-    };
-    
-    // Populate the rows array with data from foundReport.data
-    foundReport.data.forEach((record) => {
-        const rowData = [record.patientName, record.approachingMaintenance];
-        table.rows.push(rowData);
-    });
-
-    const tableOptions = {
-        // Specify table options here, if any
-    };
-
-    return {table, tableOptions};
-}
-
-// needs update
-function attritionPDFHelper(foundReport) {
-    const headers = ["Patient Name", "Attrition"];
-
-    const table = {
-        title: `${foundReport.reportName}`,
-        headers: headers, // Define your table headers
-        rows: [], // Initialize an empty array for rows
-    };
-    
-    // Populate the rows array with data from foundReport.data
-    foundReport.data.forEach((record) => {
-        const rowData = [record.patientName, record.approachingMaintenance];
-        table.rows.push(rowData);
-    });
-
-    const tableOptions = {
-        // Specify table options here, if any
-    };
-
-    return {table, tableOptions};
-}
-
 exports.getReportPDF = async (req, res) => {
     const reportID = req.params.id;
 
@@ -143,7 +61,6 @@ exports.getReportPDF = async (req, res) => {
     if (!foundReport) {
         return res.status(400).json({ message: "Report not found" });
     }
-
     let doc = new PDFDocument({ margin: 30, size: 'A4' });
 
     // Set the content type and disposition for download
@@ -156,7 +73,7 @@ exports.getReportPDF = async (req, res) => {
     let tableObject;
 
     switch (foundReport.reportType) {
-        case "approachingMaintenance":
+        case "ApproachingMaintenance":
             tableObject = maintenancePDFHelper(foundReport);
             break;
         case "Refills":
@@ -164,6 +81,9 @@ exports.getReportPDF = async (req, res) => {
             break;
         case "Attrition":
             tableObject = attritionPDFHelper(foundReport);
+            break;
+        case "NeedsRetest":
+            tableObject = needsRetestPDFHelper(foundReport);
             break;
         default:
             return res.status(400).json({ message: "Unsupported report type" });

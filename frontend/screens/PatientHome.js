@@ -5,6 +5,8 @@ import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import PatientAppointments from './PatientAppointments.js';
 import PatientProfile from '../screens/PatientProfile.js';
+import PatientProgress from '../screens/PatientProgress.js';
+import Alerts from '../screens/Alerts.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator();
@@ -15,12 +17,12 @@ export default function PatientHome(){
         screenOptions={({ route }) => ({
             tabBarIcon: ({ focused, color, size }) => {
               let iconName;
-              if (route.name === 'Appointments') {
-                iconName = focused ? 'calendar' : 'calendar-outline';
+              if (route.name === 'Home') {
+                iconName = focused ? 'home' : 'home-outline';
               } else if (route.name === 'Profile') {
                 iconName = focused ? 'person' : 'person-outline';
               }
-              else if (route.name === 'History') {
+              else if (route.name === 'Progress') {
                 iconName = focused ? 'analytics' : 'analytics-outline';
               }
               else if (route.name === 'Alerts') {
@@ -32,10 +34,12 @@ export default function PatientHome(){
             },
             tabBarActiveTintColor: '#1059d5',
             tabBarInactiveTintColor: 'gray',
+            headerShown: false
           })}
         >
-        <Tab.Screen name="Appointments" component={PatientAppointments} />
-        <Tab.Screen name="History" component={PatientAppointments} />
+        <Tab.Screen name="Home" component={PatientAppointments} />
+        <Tab.Screen name="Progress" component={PatientProgress} />
+        <Tab.Screen name="Alerts" component={Alerts} />
         <Tab.Screen name="Profile" component={PatientProfile} />
         </Tab.Navigator>
       )

@@ -20,18 +20,17 @@ exports.addProtocol = async (req, res) => {
             missedDoseAdjustment,
             largeReactionsDoseAdjustment
     })
-
         const dataToSave = await data.save();
         res.status(200).json(dataToSave);
     }
     catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(400).json({ message: `Issue adding protocol: ${error.message}` });
     }
 }
 
 exports.getProtocol = async (req, res) => {
     try {
-        const practiceID = req.params.practiceID
+        const practiceID = req.params.practiceID;
         const foundProtocol = await protocol.findOne({ practiceID: practiceID }).exec();
 
         if (!foundProtocol) {

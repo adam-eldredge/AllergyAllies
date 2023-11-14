@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-/* Needs Rework - for multiple vial/shot types */
 const nextDoseAdjustments = new mongoose.Schema({
     // also known as injection frequency
     injectionInterval: { // Num days before considered missed
@@ -103,7 +102,6 @@ const missedDoseAdjustments = new mongoose.Schema ({
             type: Boolean,
         }
     }
-    
 })
 
 // dose adjustments for skin reactions to medicine
@@ -120,11 +118,11 @@ const largeReactionsDoseAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    decreaseVialConcentration: {
+    adjustVialConcentration: {
         required: true,
         type: Number,
     },
-    decreaseBottleNumber: {
+    adjustBottleNumber: {
         required: true,
         type: Number,
     }
@@ -143,11 +141,7 @@ const vialTestReactionAdjustments = new mongoose.Schema({
         required: true,
         type: Number,
     },
-    decreaseVialConcentration: {
-        required: true,
-        type: Number,
-    },
-    decreaseBottleNumber: {
+    adjustBottleNumber: {
         required: true,
         type: Number,
     }
@@ -182,7 +176,12 @@ const dataSchema = new mongoose.Schema({
         required: false,
         type: String
     },
-    nextDoseAdjustments: nextDoseAdjustments,
+    nextDoseAdjustment: nextDoseAdjustments,
+    missedDoseAdjustment1: missedDoseAdjustments,
+    missedDoseAdjustment2: missedDoseAdjustments,
+    missedDoseAdjustment3: missedDoseAdjustments,
+    missedDoseAdjustment4: missedDoseAdjustments,
+    largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
     bottles: [bottleSchema],
     vialTestReactionAdjustment: vialTestReactionAdjustments,
     missedDoseAdjustment: missedDoseAdjustments,
