@@ -6,6 +6,7 @@ import Portal from './screens/Portal.js';
 import AllAlerts from './screens/AllAlerts.js';
 import Reports from './screens/Reports.js';
 import Injections from './screens/Injection/Injections.js';
+import Maintenance from './screens/Injection/MaintenanceBottleNum.js';
 import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
@@ -175,6 +176,7 @@ const SignedInDesktopStack = (
       <Stack.Screen name="ViewPatients" component={ViewPatients} options={{ title: 'View Patients'}}/>
       <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
       <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
+      <Stack.Screen name="Maintenance" component={Maintenance} options={{title: 'Maintenance'}} />
       <Stack.Screen name="PatientDetails" component={PatientDetails} options={{title: 'Patient Details'}} />
   </>
 );

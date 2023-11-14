@@ -21,11 +21,7 @@ export default function Injections({route, navigation}){
    const date = new Date();
 
    // Current patient *** NEEDS TO BE UPDATED ONCE PROPERLY SET UP
-   const patient = {
-      firstName: "example",
-      lastName: "person",
-      ID: '000000'
-   }
+   const {patient} = route.params
 
    // Calculated value - NEEDS TO BE UPDATED WITH JIMMY'S CALCULATIONS
    const [calculatedVolume, setCalculatedVolume] = useState('0');

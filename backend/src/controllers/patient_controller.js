@@ -213,6 +213,24 @@ const addAllergyMedication = async (req, res) => {
     }
 }
 
+const updateMaintenanceBottleNums = async (req, res) => {
+    try{
+        const email = req.params.email;
+        const query = {email : email}
+        const update = {maintenanceBottleNumber: req.body}
+
+        let p = await patient.findOne(query);
+        console.log(email);
+        console.log(p);
+        let updated = await patient.updateOne(query, update)
+        
+        return res.status(200).json({patient: updated})
+    }
+    catch(error){
+        return res.status(400).json({ message: error.message})
+    }
+}
+
 // required for const functions
 module.exports = {
     addPatient,
@@ -226,4 +244,5 @@ module.exports = {
     resetTokens,
     deletePatient,
     addAllergyMedication,
+    updateMaintenanceBottleNums
 }

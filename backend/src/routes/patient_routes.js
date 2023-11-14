@@ -32,5 +32,8 @@ router.get('/resetTokens', patientController.resetTokens);
 // POST localhost:5000/api/addAllergyMedication
 router.post('/addAllergyMedication', patientController.addAllergyMedication);
 
+// PATCH localhost:5000/api/:email/updateMaintenanceBottleNums
+router.patch('/:email/updateMaintenanceBottleNums', patientController.updateMaintenanceBottleNums);
+
 module.exports = router;
 
