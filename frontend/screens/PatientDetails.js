@@ -8,43 +8,52 @@ import axios from 'axios';
 
 export default function PatientDetails({ route, navigation }) {
   const { patient } = route.params;
-
+  
   return (
     <View style={styles.container}>
       <View style={{flex: 1, flexDirection: 'row',}}>
-        <View style={{borderRightWidth: 1, borderColor: '#1059d5',}}>
-          <IconButton
-          icon="account-circle"
-          iconColor="gray"
-          size={150}
-          style={{alignSelf: 'center', marginBottom: -10, marginTop: -5}}
-          />
-          <Text style={styles.prompt}>{patient.firstName} {patient.lastName}</Text>
-          <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.email}</Text>
-          <Text style={{fontSize: 12, alignSelf: 'center', marginBottom: 15, color: 'green'}}>edit patient info</Text>
-          <View style={{flex: 1, flexDirection: 'row', borderTopWidth: 1, borderColor: '#1059d5', paddingTop: 15}}>
+        <View>
+          <View style={styles.section}>
+            <IconButton
+            icon="account-circle"
+            iconColor="gray"
+            size={150}
+            style={{alignSelf: 'center', marginBottom: -10, marginTop: -5}}
+            />
+            <Text style={styles.prompt}>{patient.firstName} {patient.lastName}</Text>
+            <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.email}</Text>
+            <TouchableOpacity style={{marginLeft: 10, alignSelf: 'center', flex: 1, flexDirection: 'row', marginTop: 5}}>
+              <Text style={{fontSize: 12, marginBottom: 10, color: 'green',}}>edit patient info</Text>
+              <IconButton icon="pencil" iconColor="green" size={10} style={{marginTop: -4, marginLeft: -5}}/>
+            </TouchableOpacity>
+          </View>
+          
+          <View style={styles.section}>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Date of Birth: </Text>
             <Text style={{...styles.data2, alignSelf: 'center',}}>07/09/2001     </Text>
           </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 10}}>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Height: </Text>
             <Text style={{...styles.data2, alignSelf: 'center',}}>x'xx</Text>
           </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 10}}>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Weight: </Text>
             <Text style={{...styles.data2, alignSelf: 'center',}}>xx lb</Text>
           </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 10}}>
-            <Text style={styles.prompt2}>Medical Practice: </Text>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt2}>Practice: </Text>
             <Text style={{...styles.data2, alignSelf: 'center',}}>ENT Specialists of Nashville     </Text>
           </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 10, paddingBottom: 10}}>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Status: </Text>
             <Text style={{...styles.data2, alignSelf: 'center',}}>{patient.status}</Text>
           </View>
+          </View>
         </View>
-        <View style={{paddingTop: 10, marginBottom: 10}}>
-          <View style={{borderBottomColor: '#1059d5', borderBottomWidth: 1, width: 425}}>
+        <View>
+        <View style={styles.section}>
+          <View>
             <Text style={styles.prompt2}>Current Allergy Medications: </Text>
             <Text style={styles.data2}>   {'>'} xxx</Text>
             <Text style={styles.data2}>   {'>'} xxx</Text>
@@ -55,12 +64,32 @@ export default function PatientDetails({ route, navigation }) {
           <Text style={styles.data2}>   Treatment start date of 11/01/2023</Text>
           <Text style={styles.data2}>   Tracking start date of 11/05/2023</Text>
           <Text style={{...styles.data2, paddingBottom: 15}}>   Frequency of injections: 2x/week</Text>
-
-          <View style={{borderTopColor: '#1059d5', borderTopWidth: 1, width: 425, paddingTop: 10,}}>
-            <Text style={styles.prompt2}>Notes: </Text>
-            <Text style={styles.data2}>   {'>'} xxx</Text>
-            <Text style={styles.data2}>   {'>'} xxx</Text>
-            <Text style={styles.data2}>   {'>'} xxx</Text>
+        </View>
+        <View style={styles.section}>
+            <Text style={styles.prompt2}>Vial 1: </Text>
+            <Text style={styles.data3}>Maintenance Bottle: x</Text>
+            <Text style = {styles.data3}>x% to maintenance</Text>
+            <Text style={styles.data3}>Last injection: x</Text> 
+            <Text style={styles.data3}>Dosage: x</Text>
+            <Text style={styles.data3}>Bottle: x</Text>
+          </View>
+        </View>
+        <View>
+        <View style={styles.section}>
+            <Text style={styles.prompt2}>Vial 2: </Text>
+            <Text style={styles.data3}>Maintenance Bottle: x</Text>
+            <Text style = {styles.data3}>x% to maintenance</Text>
+            <Text style={styles.data3}>Last injection: x</Text> 
+            <Text style={styles.data3}>Dosage: x</Text>
+            <Text style={styles.data3}>Bottle: x</Text>
+          </View>
+        <View style={styles.section}>
+            <Text style={styles.prompt2}>Vial 3: </Text>
+            <Text style={styles.data3}>Maintenance Bottle: x</Text>
+            <Text style = {styles.data3}>% to Maintenance: x</Text>
+            <Text style={styles.data3}>Last Injection: x</Text> 
+            <Text style={styles.data3}>Dosage: x</Text>
+            <Text style={styles.data3}>Bottle: x</Text>
           </View>
         </View>
       </View>
@@ -72,10 +101,7 @@ const styles = StyleSheet.create({
     container: {
         marginTop: 40,
         alignSelf: 'center',
-        backgroundColor: 'white',
         width: 800,
-        borderWidth: 2,
-        borderColor: '#1059d5',
     },
     header: {
     fontSize: 30,
@@ -88,9 +114,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   prompt2: {
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: '600',
     color: '#1059d5',
     marginLeft: 10,
+    marginRight: 2,
   },
   data: {
     fontSize: 18,
@@ -99,5 +127,18 @@ const styles = StyleSheet.create({
   data2: {
     fontSize: 16,
     marginRight: 10,
+  },
+  data3: {
+    fontSize: 16,
+    marginRight: 10,
+    marginLeft: 10,
+    marginTop: 3,
+  },
+  section: {
+    borderRadius: 10,
+    padding: 10,
+    backgroundColor: 'white',
+    margin: 10,
+    boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
   },
 });
