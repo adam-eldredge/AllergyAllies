@@ -7,7 +7,7 @@ const { Report } = require('../Models/report');
 const { getAllPatientsHelper } = require('../controllers/patient_controller');
 const provider = require('../Models/provider');
 
-async function generateReport(providerID, reportType, data) {
+async function generateReport(providerID, reportType, manual, data) {
     // Report name formatting
     const currentDate = new Date();
     const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); 
@@ -21,6 +21,8 @@ async function generateReport(providerID, reportType, data) {
             providerID,
             reportType,
             reportName,
+            formattedDate,
+            manual,
             data: data,
         });
 
@@ -50,7 +52,7 @@ exports.deleteReport = async (req, res) => {
 exports.getAllReportNames = async (req, res) => {
     const providerID = req.params.providerID; 
     try {
-        const reports = await Report.find({ providerID: providerID}).select('-data -createdAt -updatedAt -__v');
+        const reports = await Report.find({ providerID: providerID}).select('-providerID -data -createdAt -updatedAt -__v');
         return res.status(200).json({ reports });
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -96,22 +98,47 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
             continue;
         }
 
-        const maxInjectVol = foundProtocol.nextDoseAdjustment.maxInjectionVol;
+        //const maxInjectVol = foundProtocol.nextDoseAdjustment.maxInjectionVol;
         const maintenanceBottles = [];
-        let treatmentStartDate;
+        let treatmentStartDate = new Date();
+        let allBottlesAtMaintenance = true;
+
+        //  include the number of days since last injection,  last bottle # 
+        // and Maintenance Bottle # for each vial.  That can be shown as Pollens 3/6, Insects 3/5, Molds 2/6.
+        // you can report the same way. In hindsight, maybe we should consider them 
+        // approaching Maintenance when ANY of the vials start Maintenance Bottle # minus one.
 
         for (const b of patientTreatment.bottles) {
-            if (b.currBottleNumber === 'M') {
-                maintenanceBottles.push(b.nameOfBottle);
+            const matchingBottle = foundProtocol.bottles.find(
+                (protocolBottle) => protocolBottle.bottleName === b.nameOfBottle
+            );
+
+            let patientCurrentBottleNumber = b.currBottleNumber;
+
+            // check if bottle meets approaching maint. def.
+            if (patientCurrentBottleNumber !== matchingBottle.numbBottles - 1 || patientCurrentBottleNumber !== 'M') {
+                allBottlesAtMaintenance = false;
+                // rename to avoid "M/7" in report
+                if(patientCurrentBottleNumber === 'M') {
+                    patientCurrentBottleNumber = matchingBottle.numbBottles;
+                } 
+            }
+
+            // eg: Pollen 3/7, Mold 7/7 (M)
+            maintenanceBottles.push(`${b.nameOfBottle} ${patientCurrentBottleNumber}/${matchingBottle.numbBottles}`);
+
+            // get earliest treatment date
+            if(treatmentStartDate > b.date) {
                 treatmentStartDate = b.date;
             }
         }
 
-        if (maintenanceBottles.length > 0) {
+        if (maintenanceBottles.length > 0 && !allBottlesAtMaintenance) {
             approachingMaintenanceData.push({
                 patientName: p.firstName + " " + p.lastName,
                 maintenanceBottles: maintenanceBottles,
                 startDate: treatmentStartDate,
+                DOB: p.DoB,
                 phoneNumber: p.phone,
                 email: p.email,
             });
@@ -120,12 +147,14 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
 
     // Generate the report
     try {
-        const savedReport = await generateReport(providerID, reportType, approachingMaintenanceData);
+        const manual = true;
+        const savedReport = await generateReport(providerID, reportType, manual, approachingMaintenanceData);
         return res.status(200).json(savedReport);
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
 }
+
 
 exports.generateAttritionReport = async (req, res) => {
     try {
@@ -133,148 +162,126 @@ exports.generateAttritionReport = async (req, res) => {
         const reportType = "Attrition";
         const patientsList = await getAllPatientsHelper(providerID); 
         const patientAttrition = [];
+        const today = new Date();
 
         for (const p of patientsList) {
-            if (p.status == "ATTRITION") {
-                patientAttrition.push({
-                    patientName: p.firstName + " " + p.lastName,
-                    //status: p.status,
-                    statusDate: p.statusDate,
-                    email: p.email,
-                    phone: p.phone
-                })
+            
+            if (p.status !== "ATTRITION") {
+                continue;
             }
+
+            const patientBottles = [];
+            const foundTreatment = await treatment.findOne({
+                providerID: p.providerID.toString(),
+                patientID: p._id.toString()
+            });
+
+            const foundProtocol = await protocol.findOne({ providerID: p.providerID });
+
+            if (!foundTreatment || !foundProtocol) {
+                continue;
+            }
+
+            for(const b of foundTreatment.bottles) {
+                // find protocol to find out max bottle number
+                const matchingBottle = foundProtocol.bottles.find(
+                    (protocolBottle) => protocolBottle.bottleName === b.nameOfBottle
+                );
+    
+                let patientCurrentBottleNumber = b.currBottleNumber;
+                
+                if(patientCurrentBottleNumber === 'M') {
+                    patientCurrentBottleNumber = matchingBottle.numbBottles;
+                } 
+                
+                // eg: Pollen 3/7, Mold 7/7 (M)
+                patientBottles.push(`${b.nameOfBottle} ${patientCurrentBottleNumber}/${matchingBottle.numbBottles}`);
+            }
+
+            const timeDiff= today - p.statusDate;
+            const daysSinceLastInjection = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            patientAttrition.push({
+                patientName: p.firstName + " " + p.lastName,
+                bottlesInfo: patientBottles,
+                daysSinceLastInjection: daysSinceLastInjection,
+                statusDate: p.statusDate,
+                DOB: p.DoB,
+                phone: p.phone,
+                email: p.email,
+            });
+            
         }
 
-        const savedReport = await generateReport(providerID, reportType, patientAttrition);
+        const manual = true;
+        const savedReport = await generateReport(providerID, reportType, manual, patientAttrition);
         return res.status(200).json(savedReport);
     } catch (error) {
-        return res.status(400).json({ message:`Error in attrition error.message` }); 
+        return res.status(400).json({ message:`Error in attrition ${error.message}` }); 
     }
 }
 
 // composite collection of all refill data for each patient
-exports.generateGeneralRefillsReport = async (req, res) => {
-    // can be done by using other refill functions to return arrays
-    // w/ specific data, then attaching to name
-}
-
-exports.generateAllergyDropsRefillsReport = async (req, res) => {
-    // find out bottle volume
-    // find out volume of each injection currently
-    // needs refill if patient will run out soon 
-    
-    const providerID = req.params.providerID; 
-    const reportType = "DropsRefills";
-    const patientsList = await getAllPatientsHelper(providerID); 
-    const patientRefills = [];
-
-    // get rate of expiration/injection based on treatment dosage
-    for (const p of patientsList) {
-        // using time would probably be better here
-        // calculate by what day the bottle should be close to empty, based on vol and dosageRate
-        const dropsBottleVolume = 40, dose = 1, frequency = 7, doseInMl = 0.05; 
-        const dateStartedTreatment = new Date('2023-10-20');
-
-        const daysUntilRefill = dropsBottleVolume / (dose * doseInMl * frequency);
-
-        const refillNeededDate = new Date(dateStartedTreatment.getDate() + daysUntilRefill);
-        const currentDate = new Date();
-
-        if (currentDate >= refillNeededDate) {
-            const patientData = {
-                patientName: p.firstName,
-                needsRefill: true,
-            };
-
-            patientRefills.push(patientData);
-        }
-    }
-
-    try {
-        const savedReport = await generateReport(providerID, reportType, patientRefills);
-        return res.status(200).json(savedReport);
-    } catch (error) {
-        return res.status(400).json({ message: error.message }); 
-    }
-    
-}
-
-exports.generateAllergyShotsRefillsReport = async (req, res) => {
-    const providerID = req.params.providerID;  
-    const reportType = "ShotsRefills";
-    const patientsList = await getAllPatientsHelper(providerID); 
-    const patientRefills = [];
-
-    const practiceAntigens = "Pollen, Insects, Mold"; // <- input received
-    const Antigens = practiceAntigens.split(',').map(antigen => antigen.trim());
-    const numbAntigens = Antigens.length
-
-    const practiceArray = [];
-    for (let i = 0; i < numbAntigens; i++) {
-        practiceArray.push( { antigen: Antigens[i], bottleVol: 50});
-    }
-
-    // get rate of expiration/injection based on treatment dosage
-    for (const p of patientsList) {
-        const patientData = {
-            patientName: p.firstName,
-            refillData: [],
-        };
-
-        // calculates refill needed based on summing past dosage amounts and subtracting from volume
-        for (const a of practiceArray) {
-            const shotsTaken = 4;
-            const dosageAmounts = [0.1, 0.2, 0.3, 0.4]; // scan from treatment
-            const totalVolumeSpent = dosageAmounts.reduce((acc, amount) => acc + amount, 0);
-
-            const needsRefill = a.bottleVol - totalVolumeSpent < 3;
-
-            patientData.refillData.push({
-                antigen: a.antigen,
-                needsRefill: needsRefill,
-            });
-        }
-
-        patientRefills.push(patientData);
-    }
-
-    try {
-        const savedReport = await generateReport(providerID, reportType, patientRefills);
-        return res.status(200).json(savedReport);
-    } catch (error) {
-        return res.status(400).json({ message: error.message }); 
-    }
-}
-
-// need method of having patient notify if they used it (checking expiration pointless then)
-exports.generateEpipenRefillsReport = async (req, res) => {
-    /*
-    Epi-pen Refill reminder
-    Date of expiration needs to be input
-    Reminder pops up 10 days prior to expiration date
-    Snooze vs Dismiss reminder function 
-    */
-    const providerID = req.params.providerID; 
-    const reportType = "EpipenRefill";
-
+exports.generateRefillsReport = async (req, res) => {
+    const providerID = req.params.providerID;
+    const reportType = "Refills";
     const patientsList = await getAllPatientsHelper(providerID);
-    const expirationDate = new Date();
-    const currentDate = new Date();
-
-    const epipenRefillsArray = []
+    const patientRefillsData = [];
 
     for (p of patientsList) {
-        if (currentDate >= expirationDate) {
-            epipenRefillsArray.push({
-                patientName: p.firstName + " " + p.lastName,
-                needsEpipenRefill: true
-            });
+        const patientTreatment = await treatment.findOne({
+            providerID: p.providerID.toString(),
+            patientID: p._id.toString(),
+        });
+
+        const providerProtocol = await protocol.findOne({providerID: p.providerID});
+
+        if (!providerProtocol || !patientTreatment) {
+            continue;
         }
+
+        // also need to check for expiration. Can have provider insert expiration date each time,
+        // or just include as survey question (After how many days do your vials expire?)
+
+        const bottleRefillsData = [];
+        const bottleExpirationData = [];
+        for (const b of patientTreatment.bottles) {
+            const currentDate = new Date();
+            // check if bottle will expire within two weeks
+            const expireSoonDate = b.expirationDate;
+            expireSoonDate.setDate(expireSoonDate.getDate() - 7);
+
+            const expiresSoon = currentDate >= expireSoonDate;
+
+            if(expiresSoon) {
+                bottleExpirationData.push({
+                    bottleName: b.nameOfBottle,
+                    expirationDate: b.expirationDate,
+                });
+            }
+            else if (b.needsRefill) {
+                const matchingBottle = providerProtocol.bottles.find(
+                    (protocolBottle) => protocolBottle.bottleName === b.nameOfBottle
+                );
+
+                bottleRefillsData.push({
+                    bottleName: b.nameOfBottle,
+                    volumeLeft: matchingBottle.bottleSize - b.injSumForBottleNumber,
+                });
+            }
+        }
+
+        patientRefillsData.push({
+            patientName: p.firstName + " " + p.lastName,
+            refillData: bottleRefillsData,
+            expirationData: bottleExpirationData,
+            DOB: p.DoB,
+            phone: p.phone,
+            email: p.email,
+        });
     }
 
     try {
-        const savedReport = await generateReport(providerID, reportType, epipenRefillsArray);
+        const savedReport = await generateReport(providerID, reportType, true, patientRefillsData);
         return res.status(200).json(savedReport);
     } catch (error) {
         return res.status(400).json({ message: error.message }); 
@@ -315,6 +322,8 @@ exports.generateNeedsRetestReport = async (req, res) => {
             needsRetestOutput.push({
                 patientName: p.firstName + " " + p.lastName,
                 bottles: patientBottles,
+                treatmentStartDate: p.treatmentStartDate,
+                DOB: p.DoB,
                 phoneNumber: p.phone,
                 email: p.email,
             })
@@ -322,7 +331,8 @@ exports.generateNeedsRetestReport = async (req, res) => {
     }
 
     try {
-        const savedReport = await generateReport(providerID, reportType, needsRetestOutput);
+        const manual = true;
+        const savedReport = await generateReport(providerID, reportType, manual, needsRetestOutput);
         return res.status(200).json(savedReport);
     } catch (error) {
         return res.status(400).json({ message: error.message }); 
@@ -349,18 +359,6 @@ exports.generatePatientAttritionReport = async (req, res) => {
 
 exports.generatePatientGeneralRefillsReport = async (req, res) => {
 
-}
-
-exports.generatePatientAllergyDropsRefillsReport = async (req, res) => {
-    
-}
-
-exports.generatePatientAllergyShotsRefillsReport = async (req, res) => {
-    
-}
-
-exports.generatePatientEpipenRefillsReport = async (req, res) => {
-    
 }
 
 exports.generatePatientNeedsRetestReport = async (req, res) => {

@@ -27,7 +27,6 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
-
     bottles: {
         required: false,
         type: [{
@@ -37,11 +36,20 @@ const dataSchema = new mongoose.Schema({
             injLLR: Number,
             currBottleNumber: String,
             date: Date,
-            needsRetest: Boolean,
             currentDoseAdvancement: Number
+
+            // updated outside treatment controller
+            needsRetest: Boolean,
+            // needs implementation: every time inj applied/appt attended, 
+            // add the volume to below. New bottle = var becomes 0.
+            // (for refill data)
+            injSumForBottleNumber: Number,
+            needsRefill: Boolean,
+            // needs working out: provider can insert exp date each time treatment updated
+            // or we get numb days till expirations occur in provider survey.
+            expirationDate: Date,
         }],
     },
-
     lastVialTests: {
         type: Map,
         of: new mongoose.Schema({
@@ -64,7 +72,6 @@ const dataSchema = new mongoose.Schema({
             }
         })
     },
-
     date: {
         required: true,
         type: Date
