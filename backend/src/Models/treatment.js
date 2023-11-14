@@ -36,7 +36,7 @@ const dataSchema = new mongoose.Schema({
             injLLR: Number,
             currBottleNumber: String,
             date: Date,
-            currentDoseAdvancement: Number
+            currentDoseAdvancement: Number,
 
             // updated outside treatment controller
             needsRetest: Boolean,
