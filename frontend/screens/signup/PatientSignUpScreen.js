@@ -13,6 +13,7 @@ export default function PatientSignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [practiceCode, setPracticeCode] = useState('');
+  const [pracID, setPracID] = useState('');
 
   const handleSignUp = async () => {
 
@@ -22,7 +23,7 @@ export default function PatientSignUpScreen() {
       const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
 
       const practiceID = practice.data._id;
-      console.log(practiceID)
+      setPracID(practiceID)
       if (!practiceID) {
         setDisplay('Invalid Practice ID');
         success = false;
@@ -66,12 +67,28 @@ export default function PatientSignUpScreen() {
       success = false;
     }
     if (success) {
-      setDisplay('Account successfully created! Returning to sign in screen...');
-      setTimeout(() => {
-        navigation.navigate('SignIn');
-      }, 1000);
-
       // Add initial blank treatment to account to be used in calculations
+      const patient = await axios.get(`http://localhost:5000/api/findPatient/${email}`)
+      const pID = patient.data._id
+
+      console.log(pID)
+
+      const toAdd = {
+        patientLastName: lastName,
+        patientFirstName: firstName,
+        patientID: pID,
+        date: new Date(),
+        practiceID: pracID
+      }
+
+      const addingTreatment = await axios.post(`http://localhost:5000/api/addTreatment`, toAdd)
+
+
+
+      setDisplay('Account successfully created! Returning to sign in screen...');
+      // setTimeout(() => {
+      //   navigation.navigate('SignIn');
+      // }, 1000);
     }
   }
 

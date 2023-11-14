@@ -95,6 +95,22 @@ const getPatient = async (req, res) => {
     }
 }
 
+// Get patient by id
+const findPatient = async (req, res) => {
+    try {
+        const email = req.params.email;
+        const foundPatient = await patient.findOne({email: email});
+        if (foundPatient) {
+            return res.status(200).json(foundPatient);
+        } else {
+            return res.status(404).json({ message: `Patient not found: ${email}` });
+        }
+    }
+    catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+}
+
 // Get patient by email
 const checkEmail = async (req, res) => {
     try {
@@ -387,5 +403,6 @@ module.exports = {
     findPercentMaintenance,
     getAllergyMedication,
     updateMaintenanceBottleNums,
-    updateLLR
+    updateLLR,
+    findPatient
 }

@@ -124,17 +124,50 @@ export default function PatientDetails({ route, navigation }) {
         <View>
         <View>
           <View style={styles.section}>
-            <View>
-              <Text style={styles.prompt2}>Current Allergy Medications: </Text>
-              <Text style={styles.data2}>   {'>'} xxx</Text>
-              <Text style={styles.data2}>   {'>'} xxx</Text>
-              <Text style={{ ...styles.data2, marginBottom: 10 }}>   {'>'} xxx</Text>
+            <Text style={styles.prompt2}>Current Allergy Medications: </Text>
+            <Text style={{...styles.data2, marginLeft: 10}}>xxx</Text>
+            <Text style={{...styles.data2, marginLeft: 10}}>xxx</Text>
+          </View>
+          <View style={styles.section}>
+          <Text style={{...styles.prompt2, paddingTop: 10}}>Treatment Information: </Text>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt3}>Treatment start date: </Text>
+            <Text style = {styles.data3}>11/01/2023</Text>
+          </View>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt3}>Tracking start date: </Text>
+            <Text style = {styles.data3}>11/05/2023</Text>
+          </View>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt3}>Frequency of injections: </Text>
+            <Text style = {styles.data3}>2x/week</Text>
+          </View>
+          </View>
+       </View>
+       <View>
+       <View style={styles.section}>
+            <Text style={styles.prompt2}>Vial 1: </Text>
+            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+              <Text style={styles.prompt3}>Maintenance Bottle: </Text>
+              <Text style = {styles.data3}>x</Text>
             </View>
-
-            <Text style={{ ...styles.prompt2, paddingTop: 10 }}>Treatment Information: </Text>
-            <Text style={styles.data2}>   Treatment start date of 11/01/2023</Text>
-            <Text style={styles.data2}>   Tracking start date of 11/05/2023</Text>
-            <Text style={{ ...styles.data2, paddingBottom: 15 }}>   Frequency of injections: 2x/week</Text>
+            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+              <Text style={styles.prompt3}>% to Maintenance: </Text>
+              <Text style = {styles.data3}>x</Text>
+            </View>
+            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+              <Text style={styles.prompt3}>Last Injection: </Text>
+              <Text style = {styles.data3}>x</Text>
+            </View>
+            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+              <Text style={styles.prompt3}>Dosage: </Text>
+              <Text style = {styles.data3}>x</Text>
+            </View>
+            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+              <Text style={styles.prompt3}>Bottle: </Text>
+              <Text style = {styles.data3}>x</Text>
+            </View>
+          </View>
           </View>
         </View>
         <Vials />
@@ -153,7 +186,6 @@ export default function PatientDetails({ route, navigation }) {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
     </View>
   );
 }

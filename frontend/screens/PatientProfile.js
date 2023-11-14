@@ -28,8 +28,10 @@ export default function PatientProfile() {
   useEffect(() => {
 
     const findPatient = async () => {
-      const patientObj = await axios.get(`http://localhost:5000/api/findPatient/${email}`)
-      setPatient(patientObj.data)
+      if (email){
+        const patientObj = await axios.get(`http://localhost:5000/api/findPatient/${email}`)
+        setPatient(patientObj.data)
+      }
     }
     if (!patient) { findPatient(); }
 
@@ -45,11 +47,11 @@ export default function PatientProfile() {
     }
     if (!protocol && patient) { findProtocol(); }
 
-    const getFirstTreatment = async () => {
-      const treatment = await axios.get(`http://localhost:5000/api/getFirstTreatment/${patient.practiceID}`)
-      setProtocol(protocolObj.data.protocol)
-    }
-    if (!protocol && patient) { findProtocol(); }
+    // const getFirstTreatment = async () => {
+    //   const treatment = await axios.get(`http://localhost:5000/api/getFirstTreatment/${patient.practiceID}`)
+    //   setProtocol(protocolObj.data.protocol)
+    // }
+    // if (!protocol && patient) { findProtocol(); }
 
     if (practice && patient && protocol) { setLoading(false) }
 

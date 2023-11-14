@@ -2,7 +2,6 @@ const treatment = require('../Models/treatment');
 const patient = require('../Models/patient');
 const protocol = require('../Models/protocols');
 const practice = require('../Models/practice');
-const treatment = require('../Models/treatment');
 
 
 exports.firstTreatment = async (req, res) => {
@@ -38,6 +37,7 @@ exports.addTreatment = async (req, res) => {
         const { patientLastName, patientFirstName, patientID, date, practiceID, //Need to find out how this information is sent to here
         } = req.body;
 
+        console.log(practiceID)
         const findProtocol = await protocol.findOne({ practiceID: practiceID });
         if (!findProtocol) {
             res.status(404).json({ message: "Protocol not found" });
