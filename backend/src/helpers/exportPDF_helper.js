@@ -1,6 +1,10 @@
 const protocol = require('../Models/protocols');
 
 function formatDate(date) {
+    if (!date) {
+        return `N/A`;
+    }
+
     const month = date.getMonth()+1;
     const day = date.getDate();
     const year = date.getFullYear();
@@ -70,14 +74,14 @@ function refillsPDFHelper(foundReport) {
 }
 
 function attritionPDFHelper(foundReport) {
-    const headers = ["Patient Name", "Vial Info.", "Days Since Last Injection", "Attrition Date", "DoB","Phone number", "Email"];
+    const headers = ["Patient Name", "Vial Info.", "Days Since Last Injection", "Date of Last Injection", "DoB","Phone number", "Email"];
     const rows = [];
 
     // populate rows for each patient
     foundReport.data.forEach((patient) => {
         const rowData = [
             patient.patientName,
-            patient.bottlesInfo.join(', '),
+            patient.bottlesInfo.join('\n'),
             patient.daysSinceLastInjection,
             formatDate(patient.statusDate),
             patient.DOB,
@@ -103,19 +107,15 @@ function attritionPDFHelper(foundReport) {
 
 function needsRetestPDFHelper(foundReport) {
     // Initialize headers and rows
-    const headers = ["Patient","Needs Retest For","Maintenance Dates","Treatment Start Date","DOB","Phone number","Email"];
+    const headers = ["Patient Name","Treatment Start Date","Maintenance Date","Date Last Tested","DOB","Phone number","Email"];
     const rows = [];
 
     foundReport.data.forEach((patient) => {
-        // Extract the bottle names and maintenance dates separately
-        const bottleNames = patient.bottles.map(bottle => bottle.bottleName).join('\n');
-        const maintenanceDates = patient.bottles.map(bottle => formatDate(bottle.maintenanceDate)).join('\n');
-
         const rowData = [
             patient.patientName,
-            bottleNames,
-            maintenanceDates,
             patient.treatmentStartDate,
+            patient.maintenanceDate,
+            formatDate(patient.dateLastTested),
             patient.DOB,
             patient.phoneNumber,
             patient.email,

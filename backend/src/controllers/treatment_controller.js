@@ -12,7 +12,7 @@ exports.addTreatment = async (req, res) => {
 
         const findProtocol = await protocol.findOne({ NPI: NPI });
         if (!findProtocol) {
-            res.status(404).json({ message: "Protocol not found" });
+            res.status(401).json({ message: "Protocol not found" });
         }
 
         const data = new treatment({
@@ -26,7 +26,7 @@ exports.addTreatment = async (req, res) => {
             function(error){
                 if(error){
                     console.log(error);
-                    res.status(404).json({ message: "Patient not found" });
+                    res.status(402).json({ message: "Patient not found" });
                 }
                 else{
                     console.log(`Treatment added to ${patientLastName}, ${patientFirstName} for ${nameOfPractice}.`)
@@ -110,7 +110,7 @@ exports.deleteTreatment = async (req, res) => {
         const id = req.params.id;
         const treatmentToDelete = await treatment.findById(id);
         if (!treatmentToDelete) {
-            res.status(404).json({ message: "Treatment not found" });
+            res.status(403).json({ message: "Treatment not found" });
         }
 
         await treatment.findByIdAndDelete(id);
@@ -136,14 +136,13 @@ exports.nextTreatment = async(req, res) => {
 
         const patientToFind = await patient.findById(id);
         if (!patientToFind) {
-            res.status(404).json({ message: "Patient not found" });
+            res.status(405).json({ message: "Patient not found" });
         }
 
         const findProtocol = await protocol.findOne({ practiceID: practiceID });
         if (!findProtocol) {
-            res.status(404).json({ message: "Protocol not found" });
+            res.status(406).json({ message: "Protocol not found" });
         }
-
 
         //Find the last treatment of the patient 
         const treatmentLength = patientToFind.treatments.length();

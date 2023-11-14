@@ -60,7 +60,9 @@ const dataSchema = new mongoose.Schema({
             values: {
                 dilution: Number, 
                 bottleNumber: String, 
-                whealSize: Number
+                whealSize: Number,
+                // needs implementation
+                date: Date,
             }
         })
     },

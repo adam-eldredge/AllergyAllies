@@ -33,7 +33,7 @@ function maintenanceCSVHelper(foundReport) {
 }
 
 function attritionCSVHelper (foundReport) {
-    const csvHeaders = "Patient Name,Vial Info.,Days Since Last Inj.,Attrition Date,DOB,Phone Number,Email"
+    const csvHeaders = "Patient Name,Vial Info.,Days Since Last Inj.,Date of Last Injection,DOB,Phone Number,Email"
 
     const csvData = foundReport.data.map(patient => {
         const patientName = patient.patientName;

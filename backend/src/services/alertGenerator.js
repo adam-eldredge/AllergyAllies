@@ -4,6 +4,12 @@ const protocol = require('protocol');
 const providerAlerts = require('providerAlerts');
 
 const alertService = require('./alertService');
+const provider = require('../Models/provider');
+const Patient = require('../Models/patient');
+
+const { getAllPatientsHelper } = require('../controllers/patient_controller');
+
+/* This file generates alerts for the provider and updates patient status*/
 
 // reaction alert creation
 // update providerIDs to practiceIDs
@@ -11,7 +17,7 @@ const alertService = require('./alertService');
 // determine if injection(appointment) was missed
 async function attritionAlert() {
     try {
-        const patientsList = await getAllPatientsHelper(); 
+        const patientsList = await Patient.find(); 
         // not sure if we can use const considering we change data
         for (const p of patientsList) {
 
@@ -107,10 +113,11 @@ async function needsRetestAlert() {
         }
 
     } catch (error) {
-        return res.status(400).json({ message: error.message }); 
+        console.error(error); 
     }
 }
 
+// needs update - logic broken
 async function needsRefillAlert() {
     const patientsList = await getAllPatientsHelper(providerID);
 
@@ -146,6 +153,67 @@ async function needsRefillAlert() {
     }
 }
 
+// at maintenance alert - all vials at M and highest concentration
+async function maintenanceAlert() {
+    try {
+        const patientsList = await Patient.find();
+        let patientAtMaintenance = true;
+
+        for (const patient of patientsList) {
+            const patientTreatment = treatment.findOne({
+                providerID: patient.providerID,
+                patientID: patient._id,
+            });
+
+            if (!patientTreatment) {
+                continue;
+            }
+
+            const foundProvider = provider.findById(patient.providerID);
+
+            if (!foundProvider) {
+                continue;
+            }
+
+            const foundProtocol = protocol.findOne({
+                practiceID: provider.practiceID,
+            });
+
+            if (!foundProtocol) {
+                continue;
+            }
+
+            for (const bottle of patientTreatment.bottles) {
+                if (bottle.injVol !== foundProtocol.maxInjectionVol || bottle.currBottleNumber !== 'M') {
+                    patientAtMaintenance = false;
+                }
+            }
+        }
+
+        // change patient status to maint if not already, or remove current maintenance status
+        if (patientAtMaintenance && patient.status !== 'MAINTENANCE') {
+            patient.status === 'MAINTENANCE';
+            patient.statusDate === new Date();
+            await patient.save();
+
+            const alert = new providerAlerts({
+                NPI: p.providerID,
+                patientName: p.firstName + " " + p.lastName,
+                alertType: "AttritionAlert",
+            })
+            await alert.save();
+
+        } else if (!patientAtMaintenance && patient.status === 'MAINTENANCE' ) {
+            patient.status === 'DEFAULT';
+            patient.statusDate === new Date();
+            await patient.save();
+        }
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 // check if injections(bottle) need to be mixed ( patient is almost done with current bottle number)
     // "max injection volume is soon to be reached"
     
@@ -156,9 +224,11 @@ const scheduleString = '0 0 * * *';
 const missedAppointmentJob = schedule.scheduleJob(scheduleString, attritionAlert);
 const needsRetestJob = schedule.scheduleJob(scheduleString, needsRetestAlert);
 const needsRefillJob = schedule.scheduleJob(scheduleString, needsRefillAlert);
+const maintenanceJob = schedule.scheduleJob(scheduleString, maintenanceAlert);
 
 module.exports = {
   missedAppointmentJob,
   needsRetestJob,
   needsRefillJob,
+  maintenanceJob
 };
