@@ -8,209 +8,11 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 import theme from './theme.js';
 import User from '../../User.js';
-
-// ***** SURVEY QUESTIONS ***** //
-const surveyJson = {
-    title: "Allergy Allies - Initial Practice Survey",
-    description: `Welcome , Please fill out all fields to finish setting up your practice!`,
-    textAlign: "center",
-    pages:
-        [
-            {
-                name: 'Practice Info',
-                title: 'Practice Information',
-                elements:
-                    [
-                        {
-                            name: 'a',
-                            title: 'Practice Name',
-                            type: 'text',
-
-                        },
-                        {
-                            name: 'b',
-                            title: 'Treating Physician/Provider Name',
-                            type: 'dropdown'
-                        },
-                        {
-                            name: 'c',
-                            title: 'Practice Logo',
-                            type: 'file',
-                        },
-                        {
-                            name: 'd',
-                            title: 'Practice Scrolling Ads',
-                            type: 'file',
-                        },
-                        {
-                            name: 'e',
-                            title: 'Practice Address',
-                            type: 'text',
-
-                        }
-                    ],
-                showQuestionNumbers: 'false'
-            },
-            {
-                name: 'Protocols',
-                title: 'Protocols',
-                elements:
-                    [
-                        {
-                            name: 'f',
-                            title: 'Starting frequency of injections (# weekly)',
-                            type: 'radiogroup',
-                            colCount: '3',
-                            choices: ['1', '2', '3'],
-                            seperateSpecialChoices: 'true',
-                        }, {
-                            name: 'g',
-                            title: 'Frequency of Clinical Follow-up Appointments (# yearly)',
-                            type: 'radiogroup',
-                            colCount: '4',
-                            choices: ['1', '2', '3', '4'],
-                            seperateSpecialChoices: 'true'
-                        }, {
-                            name: 'h',
-                            title: 'Frequency of Progress Self-Assessment (# yearly)',
-                            type: 'radiogroup',
-                            colCount: '4',
-                            choices: ['1', '2', '3', '4'],
-                            seperateSpecialChoices: 'true'
-                        }
-                    ]
-            },
-            {
-                name: 'Treatment',
-                title: 'Treatment',
-                elements:
-                    [
-                        {
-                            name: 'j',
-                            title: 'Treatment Vials',
-                            type: 'paneldynamic',
-                            panelCount: '0',
-                            maxPanelCount: '100',
-                            confirmDelete: 'true',
-                            templateElements: [{
-                                name: 'j1',
-                                title: 'Vial Name',
-                                type: 'text',
-                            }]
-                        }
-                    ]
-            },
-            {
-                name: 'Antigens',
-                title: 'Antigens',
-                elements:
-                    [
-                        {
-                            name: 'i',
-                            title: 'Antigens Tested',
-                            type: 'paneldynamic',
-                            panelCount: '0',
-                            maxPanelCount: '100',
-                            confirmDelete: 'true',
-                            templateElements: [{
-                                name: 'i1',
-                                title: 'Antigen Name',
-                                type: 'text',
-                            }
-                            ]
-                        }
-                    ]
-            },
-            {
-                name: 'Dose Adjustments',
-                title: 'Dose Adjustments',
-                elements:
-                    [
-                        {
-                            name: 'k',
-                            title: 'Dose Advancements',
-                            type: 'panel',
-                            elements: [{
-                                name: 'k1',
-                                title: 'Automatic',
-                                type: 'radiogroup',
-                                colCount: '3',
-                                choices: ['Default', 'Customize', 'Disable'],
-                                seperateSpecialChoices: 'true'
-                            },
-                            {
-                                name: 'k2',
-                                title: 'Advancement (ml)',
-                                type: 'text',
-                                inputType: 'numeric',
-                                placeholder: '0.05',
-                                min: '0',
-                                max: '0.50',
-                                default: '0.05',
-                                visibleIf: "{k1} = 'Customize'"
-                            },
-                            {
-                                name: 'k3',
-                                title: 'Dose Adjustment Threshold (Days Missed)',
-                                type: 'text',
-                                inputType: 'numeric',
-                                placeholder: '10',
-                                min: '0',
-                                max: '30',
-                                default: '10',
-                                visibleIf: "{k1} = 'Customize'"
-                            },
-                            {
-                                name: 'k4',
-                                title: 'What events trigger a dose adjustment?',
-                                type: 'checkbox',
-                                visibleIf: "{k1} = 'Customize'",
-                                choices: [
-                                    {
-                                        text: "Vial Test Reaction",
-                                    },
-                                    {
-                                        text: "Immediate Injection Reaction",
-                                    },
-                                    {
-                                        text: "Delayed Injection Reaction",
-                                    },
-                                    {
-                                        text: "Missed Injection Adjustment"
-                                    }
-                                ]
-                            }
-                            ]
-
-                        }, {
-                            name: 'l',
-                            title: 'General Rules for Dose Adjustments',
-                            type: 'text',
-
-                        }, {
-                            name: 'm',
-                            title: 'General Rules for Adjustments',
-                            type: 'text',
-
-                        }, {
-                            name: 'n',
-                            title: 'Dose Adjustments Defaults',
-                            type: 'text',
-
-                        }
-                    ]
-            }
-        ],
-    showTOC: 'true',
-    completeText: 'Submit',
-    showPreviewBeforeComplete: 'showAllQuestions',
-    showQuestionNumbers: 'false',
-    questionErrorLocation: 'bottom',
-};
+import SurveyQuestions from './SurveyQuestions.js';
 
 export default function PracticeSurvey() {
     // ***** SURVEY OBJECT ***** //
-    const survey = new Model(surveyJson);
+    const survey = new Model(SurveyQuestions);
 
     // Apply theme to survey
     survey.applyTheme(theme);
@@ -219,7 +21,6 @@ export default function PracticeSurvey() {
     const user = User();
     const saveResults = useCallback((sender) => {
         const json = sender.data;
-        console.log(json);
         sendSurvey(user, json);
     });
 
@@ -232,7 +33,6 @@ export default function PracticeSurvey() {
         default: <Survey model={survey} />
     });
 
-    console.log(rend);
     return rend;
 }
 
@@ -244,7 +44,6 @@ const sendSurvey = async (user, json) => {
     }
     else {
         const userID = user.id;
-        console.log(userID);
         const provider = await axios.get(`http://localhost:5000/api/getProvider/${userID}`);
 
         if (provider.status === 404) {
@@ -252,52 +51,201 @@ const sendSurvey = async (user, json) => {
         }
         else if (provider.status === 200) {
             const pID = provider.data.practiceID;
-            console.log(`practiceID: ${pID}`);
-            console.log(`JSON: ${json}`);
-            const surveyData = JSON.stringify(createSurveyObj(json));
-            const data = { pID, surveyData };
-            const posted = axios.post('http://localhost:5000/api/addSurvey', data);
+            createSurveyObj(json, pID);
         }
     }
 
 }
 
-const createSurveyObj = (json) => {
+const createSurveyObj = (json, pID) => {
     const survey = {
         practiceInfo: {
             practiceName: json.a,
             providerName: json.b,
             practiceLogo: json.c,
-            praciceScrollingAds: json.d,
+            practiceScrollingAds: json.d,
             practiceAddress: json.e
         },
         protocols: {
-            startingFrequency: json.f,
-            frequencyFollowUp: json.g,
-            frequencySelfAssess: json.h
-        },
-        antigens: {
-            antigensTested: {
-                antigen: json.i1,
-                vialNum: json.i2
+            startingFrequency: {
+                numInjections: json.f1,
+                period: json.f2
             },
-            numVials: {
-                vialName: json.j1,
-                vialNum: json.j2
+            frequencyFollowUp: {
+                numInjections: json.g1,
+                period: json.g2
+            },
+            frequencySelfAssess: {
+                numInjections: json.h1,
+                period: json.h2
             }
         },
+        treatments: {
+            vials: json.j
+        },
+        antigens: {
+            names: json.i
+        },
         doseAdjustments: {
-            doseAdvancements: {
-                default: json.k1,
-                advancement: json.k2
+            automaticDoseAdvancements: {
+                option: json.k1,
+                initialInjectionVolume: json.k2,
+                volumeIncrement: json.k3,
+                maxInjectionVolume: json.k4
             },
-            doseAdjustment: json.l,
-            adjustmentRules: json.m,
-            adjustmentDefaults: json.n
-        }
+            generalAdjustmentRules: {
+                option: json.l1,
+                triggerEvents: json.l2,
+                missedInjectionAdjustment: {
+                    maxNumDaysBeforeAdjustment: json.l31,
+                    range1: {
+                        start: json.l3a1,
+                        end: json.l3a2,
+                        event: json.l3a3,
+                        decreaseVolume: json.l3a31,
+                        timesDilution: json.l3a32,
+                        reduceBottleNum: json.l3a33
+                    },
+                    range2: {
+                        start: json.l3b1,
+                        end: json.l3b2,
+                        event: json.l3b3,
+                        decreaseVolume: json.l3b31,
+                        timesDilution: json.l3b32,
+                        reduceBottleNum: json.l3b33
+                    },
+                    range3: {
+                        start: json.l3c1,
+                        end: json.l3c2,
+                        event: json.l3c3,
+                        decreaseVolume: json.l3c31,
+                        timesDilution: json.l3c32,
+                        reduceBottleNum: json.l3c33
+                    },
+                    range4: {
+                        start: json.l3d1,
+                        restartTreatment: json.l3d11
+                    },
+                },
+                largeLocalReactionAdjustment: {
+                    minWhealSize: json.l41,
+                    event: json.l4a,
+                    decreaseVolume: json.l4a1,
+                    timesDilution: json.l4a2,
+                    reduceBottleNum: json.l4a3
+                },
+                vialTestReactionAdjustment: {
+                    minWhealSize: json.l51,
+                    event: json.l5a,
+                    decreaseVolume: json.l5a1,
+                    timesDilution: json.l5a2,
+                    reduceBottleNum: json.l5a3
+                }
+            }
+        },
+        default: {
 
+        }
     };
+    console.log(survey);
+    handleProtocol(survey, pID);
     return survey;
+}
+
+const handleProtocol = async (survey, pID) => {
+    const nextDoseAdjustments = {
+        injectionInterval: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.maxNumDaysBeforeAdjustment,
+        startingInjectionVol: survey.doseAdjustments.automaticDoseAdvancements.initialInjectionVolume,
+        maxInjectionVol: survey.doseAdjustments.automaticDoseAdvancements.maxInjectionVolume,
+        injectionVolumeIncreaseInterval: survey.doseAdjustments.automaticDoseAdvancements.volumeIncrement
+    }
+
+    const missedDoseAdjustments = {
+        doseAdjustMissedDays: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.maxNumDaysBeforeAdjustment,
+        range1: {
+            days: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range1.end,
+            event: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range1.event,
+            injectionVolumeDecrease: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range1.decreaseVolume,
+            decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range1.timesDilution,
+            decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range1.reduceBottleNum
+        },
+        range2: {
+            days: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range2.end,
+            event: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range2.event,
+            injectionVolumeDecrease: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range2.decreaseVolume,
+            decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range2.timesDilution,
+            decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range2.reduceBottleNum
+        },
+        range3: {
+            days: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range3.end,
+            event: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range3.event,
+            injectionVolumeDecrease: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range3.decreaseVolume,
+            decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range3.timesDilution,
+            decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range3.reduceBottleNum
+        },
+        range4: {
+            days: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.start,
+            restartTreatment: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.restartTreatment
+        }
+    }
+
+    const largeReactionsDoseAdjustment = {
+        whealLevelForAdjustment: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.minWhealSize,
+        event: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.event,
+        decreaseInjectionVol: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.decreaseVolume,
+        decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.timesDilution,
+        decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.reduceBottleNum
+    }
+
+    const vialTestReactionAdjustment = {
+        whealLevelForAdjustment: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.minWhealSize,
+        event: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.event,
+        decreaseInjectionVol: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.decreaseVolume,
+        decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.timesDilution,
+        decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.reduceBottleNum
+    }
+
+    let bottles = []
+    const vialNames = survey.treatments.vials.map((vial) => {
+        const bottleSchema = {
+            bottleName: vial.j1
+        }
+        bottles.push(bottleSchema)
+    })
+
+    const protocol = {
+        practiceID: pID,
+        nextDoseAdjustments: nextDoseAdjustments,
+        bottles: bottles,
+        vialTestReactionAdjustment: vialTestReactionAdjustment,
+        missedDoseAdjustment: missedDoseAdjustments,
+        largeReactionsDoseAdjustment: largeReactionsDoseAdjustment
+    }
+    console.log(protocol);
+
+    // Here is where we post or patch the protocol to the database.
+    let currPracticeProtocol = await axios.get(`http://localhost:5000/api/getProtocol/${pID}`)
+
+    if (currPracticeProtocol.status === 200) {
+        let patch = await axios.patch(`http://localhost:5000/api/updateProtocol/${pID}`, protocol)
+        console.log(patch)
+    }
+    else if (currPracticeProtocol.status === 201) {
+        let post = await axios.post(`http://localhost:5000/api/addProtocol`, protocol)
+        console.log(post)
+    }
+    console.log(currPracticeProtocol.status)
+
+
+    return protocol;
+}
+
+const getBottleSchema = (bottleName) => {
+    const bottleSchema = {
+        bottleName: bottleName
+    }
+
+    return bottleSchema
 }
 
 const styles = StyleSheet.create({
