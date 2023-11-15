@@ -43,7 +43,7 @@ export default function ViewPatients({ navigation }) {
                     <DataTable.Cell>{p.lastName}</DataTable.Cell>
                     <DataTable.Cell>{p.email}</DataTable.Cell>
                     <DataTable.Cell textStyle={{ marginLeft: 20 }}>{p.status}</DataTable.Cell>
-                    <DataTable.Cell>Patient Account</DataTable.Cell>
+                    <DataTable.Cell textStyle={{ marginLeft: 20 }}>Patient Account</DataTable.Cell>
                 </DataTable.Row>
             </TouchableOpacity>
             )}

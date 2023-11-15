@@ -16,16 +16,13 @@ export default function PatientDetails({ route, navigation }) {
           <View style={styles.section}>
             <IconButton
             icon="account-circle"
-            iconColor="gray"
+            iconColor="green"
             size={150}
             style={{alignSelf: 'center', marginBottom: -10, marginTop: -5}}
             />
             <Text style={styles.prompt}>{patient.firstName} {patient.lastName}</Text>
             <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.email}</Text>
-            <TouchableOpacity style={{marginLeft: 10, alignSelf: 'center', flex: 1, flexDirection: 'row', marginTop: 5}}>
-              <Text style={{fontSize: 12, marginBottom: 10, color: 'green',}}>edit patient info</Text>
-              <IconButton icon="pencil" iconColor="green" size={10} style={{marginTop: -4, marginLeft: -5}}/>
-            </TouchableOpacity>
+            <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.phone}</Text>
           </View>
           
           <View style={styles.section}>
@@ -35,15 +32,15 @@ export default function PatientDetails({ route, navigation }) {
           </View>
           <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Height: </Text>
-            <Text style={styles.data}>x'xx</Text>
+            <Text style={styles.data}>{patient.height} in</Text>
           </View>
           <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Weight: </Text>
-            <Text style={styles.data}>xx lb</Text>
+            <Text style={styles.data}>{patient.weight} lb</Text>
           </View>
           <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Practice: </Text>
-            <Text style={styles.data}>ENT Specialists of Nashville     </Text>
+            <Text style={styles.data}>{patient.practice}</Text>
           </View>
           <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Status: </Text>
