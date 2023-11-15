@@ -289,8 +289,8 @@ async function maintenanceAlert() {
             }
             // change patient status to maint if not already, or remove current maintenance status
             if (patientAtMaintenance && patient.status !== 'MAINTENANCE') {
-                patient.status === 'MAINTENANCE';
-                patient.statusDate === new Date();
+                patient.status = 'MAINTENANCE';
+                patient.statusDate = new Date();
                 await patient.save();
 
                 const alert = createAlert(patient, "MaintenanceAlert");
