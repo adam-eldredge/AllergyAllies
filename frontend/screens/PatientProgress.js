@@ -4,6 +4,7 @@ import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Alerts from './Alerts.js';
+import InjectionInfo from './InjectionInfo.js';
 import ViewAllAppointments from './ViewAllAppointments.js';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Carousel from 'react-native-reanimated-carousel';
@@ -14,7 +15,7 @@ import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
 
 const Tab = createBottomTabNavigator();
 
-export default function PatientHome({navigation}){
+export default function PatientProgress({navigation}){
 
     //get from backend: from practice survey
     const numVials = 3;
@@ -171,24 +172,27 @@ export default function PatientHome({navigation}){
 
 
 <Text style={styles.container}></Text>
-<Text style = {styles.title2}>Past Appointments Attended</Text>
-<View style = {styles.pastAppointment}>
+<Text style = {styles.title2}>Past Injections </Text>
+<TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
     <View style={styles.flags}>
         <View style={styles.onTime}>
         <Text style={{color: 'white'}}> Attended on Time </Text>
         </View>
     </View>
-</View>
-<View style = {styles.pastAppointment}>
+</TouchableOpacity>
+<TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
     <View style={styles.attendedLate}>
         <Text style={{color: 'white'}}> 12 Days Late - Dose Adjustment </Text>
     </View>
     </View>
-</View>
-<View style = {styles.pastAppointment}>
+</TouchableOpacity>
+<TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
         <View style={styles.onTime}>
@@ -198,8 +202,9 @@ export default function PatientHome({navigation}){
         <Text style={{color: 'white'}}> Adverse Reaction </Text>
         </View>
     </View>
-</View>
-<View style = {styles.pastAppointment}>
+</TouchableOpacity>
+<TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
     <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
     <View style={styles.flags}>
     <View style={styles.flags}>
@@ -208,7 +213,7 @@ export default function PatientHome({navigation}){
         </View>
     </View>
     </View>
-</View>
+</TouchableOpacity>
 <TouchableOpacity
                onPress={() =>
                navigation.navigate('ViewAllAppointments') }>

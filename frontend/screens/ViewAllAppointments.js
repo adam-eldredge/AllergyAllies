@@ -6,23 +6,26 @@ export default function ViewAllAppointments({navigation}){
    return (
     <ScrollView style = {styles.container}>
     <Text style = {styles.title2}>Past Appointments Attended</Text>
-    <View style = {styles.pastAppointment}>
+    <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
         <View style={styles.flags}>
             <View style={styles.onTime}>
             <Text style={{color: 'white'}}> Attended on Time </Text>
             </View>
         </View>
-    </View>
-    <View style = {styles.pastAppointment}>
+    </TouchableOpacity>
+    <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
         <View style={styles.flags}>
         <View style={styles.attendedLate}>
             <Text style={{color: 'white'}}> 12 Days Late - Dose Adjustment </Text>
         </View>
         </View>
-    </View>
-    <View style = {styles.pastAppointment}>
+    </TouchableOpacity>
+    <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
         <View style={styles.flags}>
             <View style={styles.onTime}>
@@ -32,8 +35,9 @@ export default function ViewAllAppointments({navigation}){
             <Text style={{color: 'white'}}> Adverse Reaction </Text>
             </View>
         </View>
-    </View>
-    <View style = {styles.pastAppointment}>
+    </TouchableOpacity>
+    <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
         <View style={styles.flags}>
         <View style={styles.flags}>
@@ -42,16 +46,18 @@ export default function ViewAllAppointments({navigation}){
             </View>
         </View>
         </View>
-    </View>
-    <View style = {styles.pastAppointment}>
+    </TouchableOpacity>
+    <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
         <View style={styles.flags}>
         <View style={styles.onTime}>
         <Text style={{color: 'white'}}> Attended on Time </Text>
         </View>
         </View>
-    </View>
-    <View style = {styles.pastAppointment}>
+    </TouchableOpacity>
+    <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
         <View style={styles.flags}>
         <View style={styles.attendedLate}>
@@ -61,31 +67,34 @@ export default function ViewAllAppointments({navigation}){
             <Text style={{color: 'white'}}> Adverse Reaction </Text>
             </View>
         </View>
-    </View>
-    <View style = {styles.pastAppointment}>
+    </TouchableOpacity>
+    <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
         <View style={styles.flags}>
         <View style={styles.onTime}>
         <Text style={{color: 'white'}}> Attended on Time </Text>
         </View>
         </View>
-    </View>
-    <View style = {styles.pastAppointment}>
+    </TouchableOpacity>
+    <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
         <View style={styles.flags}>
         <View style={styles.onTime}>
         <Text style={{color: 'white'}}> Attended on Time </Text>
         </View>
         </View>
-    </View>
-    <View style = {styles.pastAppointment}>
+        </TouchableOpacity>
+        <TouchableOpacity  onPress={() =>
+               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
         <View style={styles.flags}>
         <View style={styles.onTime}>
         <Text style={{color: 'white'}}> Attended on Time </Text>
         </View>
         </View>
-    </View>
+        </TouchableOpacity>
     <Text>   </Text>
     <Text>  </Text>
     <Text>  </Text>
