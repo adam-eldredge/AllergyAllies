@@ -2,7 +2,6 @@ const treatment = require('../Models/treatment');
 const patient = require('../Models/patient');
 const protocol = require('../Models/protocols');
 const practice = require('../Models/practice');
-const treatment = require('../Models/treatment');
 
 // Post method
 exports.addTreatment = async (req, res) => {
@@ -17,7 +16,6 @@ exports.addTreatment = async (req, res) => {
                 injLLR: Number,
                 currBottleNumber: String,
                 date: Date,
-                needsRetest: Boolean,
                 currentDoseAdvancement: Number
             }],
         */
@@ -732,4 +730,3 @@ exports.nextTreatment = async(req, res) => {
         res.status(400).json({ message: err.message })
     }
 }
-

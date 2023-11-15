@@ -2,7 +2,6 @@ const patient = require('../Models/patient');
 const protocols = require('../Models/protocols');
 const provider = require('../Models/provider');
 const treatment = require('../Models/treatment');
-// const provider = require('../Models/provider');
 
 // Needs Testing
 const addPatient = async (req, res) => {
