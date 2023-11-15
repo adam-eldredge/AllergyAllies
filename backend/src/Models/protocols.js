@@ -152,14 +152,8 @@ const bottleSchema = new mongoose.Schema({
         require: true,
         type: String,
     },
-    bottleSize: {
-        require: false,
-        type: Number
-    },
-    numbBottles: {
-        require: false,
-        type: Number
-    }
+    //missedDoseAdjustment: missedDoseAdjustments,
+    largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
 })
 
 // we need default values 
