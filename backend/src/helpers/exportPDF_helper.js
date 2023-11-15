@@ -1,8 +1,8 @@
 const protocol = require('../Models/protocols');
 
 function formatDate(date) {
-    if (!date) {
-        return `N/A`;
+    if (date === "N/A"){
+        return date;
     }
 
     const month = date.getMonth()+1;
@@ -114,7 +114,7 @@ function needsRetestPDFHelper(foundReport) {
         const rowData = [
             patient.patientName,
             patient.treatmentStartDate,
-            patient.maintenanceDate,
+            formatDate(patient.maintenanceDate),
             formatDate(patient.dateLastTested),
             patient.DOB,
             patient.phoneNumber,

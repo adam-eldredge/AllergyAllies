@@ -1,6 +1,6 @@
 const protocol = require('../Models/protocols');
 
-exports.addProtocol = async (req, res) => {
+const addProtocol = async (req, res) => {
     try {
 
         const {
@@ -47,8 +47,8 @@ async function updateProtocol(surveyData) {
     }
 }
 
-/*
-exports.getProtocol = async (req, res) => {
+
+const getProtocol = async (req, res) => {
     try {
         const practiceID = req.params.practiceID;
         const foundProtocol = await protocol.findOne({ practiceID: practiceID }).exec();
@@ -63,25 +63,8 @@ exports.getProtocol = async (req, res) => {
     }
 }
 
-exports.updateProtocol = async (req, res) => {
-    try {
-        const practiceID = req.params.practiceID
-
-        const query = { practiceID : practiceID }
-        let foundProtocol = await protocol.updateOne(query, req.body)
-
-        if (!foundProtocol) {
-            return res.status(400).json({ message: "Protocol not found"});
-        }
-
-        return res.status(200).json({ protocol: foundProtocol });
-    } catch (err) {
-        return res.status(400).json({ message: err.message });
-    }
-}
-*/
-
 module.exports = {
     addProtocol,
     updateProtocol,
+    getProtocol,
 }

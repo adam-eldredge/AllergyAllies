@@ -2,7 +2,6 @@ const treatment = require('../Models/treatment');
 const patient = require('../Models/patient');
 const protocol = require('../Models/protocols');
 const practice = require('../Models/practice');
-const treatment = require('../Models/treatment');
 
 // Post method
 exports.addTreatment = async (req, res) => {
@@ -17,7 +16,6 @@ exports.addTreatment = async (req, res) => {
                 injLLR: Number,
                 currBottleNumber: String,
                 date: Date,
-                needsRetest: Boolean,
                 currentDoseAdvancement: Number
             }],
         */
@@ -26,7 +24,7 @@ exports.addTreatment = async (req, res) => {
 
         const findProtocol = await protocol.findOne({ practiceID: practiceID });
         if (!findProtocol) {
-            res.status(401).json({ message: "Protocol not found" });
+            res.status(404).json({ message: "Protocol not found" });
         }
 
         const findPractice = await practice.findById(practiceID);
@@ -46,7 +44,7 @@ exports.addTreatment = async (req, res) => {
             function(error){
                 if(error){
                     console.log(error);
-                    res.status(402).json({ message: "Patient not found" });
+                    res.status(404).json({ message: "Patient not found" });
                 }
                 else{
                     console.log(`Treatment added to ${patientLastName}, ${patientFirstName} for ${nameOfPractice}.`)
@@ -139,7 +137,7 @@ exports.deleteTreatment = async (req, res) => {
             DoB: DoB, date: date 
         });
         if (!treatmentToDelete) {
-            res.status(403).json({ message: "Treatment not found" });
+            res.status(404).json({ message: "Treatment not found" });
         }
 
         await treatment.findByIdAndDelete(id);
@@ -185,13 +183,14 @@ exports.nextTreatment = async(req, res) => {
 
         const patientToFind = await patient.findById(id);
         if (!patientToFind) {
-            res.status(405).json({ message: "Patient not found" });
+            res.status(404).json({ message: "Patient not found" });
         }
 
         const findProtocol = await protocol.findOne({ practiceID: pracID });
         if (!findProtocol) {
-            res.status(406).json({ message: "Protocol not found" });
+            res.status(404).json({ message: "Protocol not found" });
         }
+
 
         //Find the last treatment of the patient 
         const treatmentLength = patientToFind.treatments.length();
@@ -731,4 +730,3 @@ exports.nextTreatment = async(req, res) => {
         res.status(400).json({ message: err.message })
     }
 }
-

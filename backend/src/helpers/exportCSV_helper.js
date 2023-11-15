@@ -1,10 +1,9 @@
 const protocol = require('../Models/protocols');
 
 function formatDate(date) {
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
+    if (date === "N/A"){
+        return date;
+    }
     const month = date.getMonth()+1;
     const day = date.getDate();
     const year = date.getFullYear();
@@ -12,19 +11,18 @@ function formatDate(date) {
     return `${month}-${day}-${year}`;
 }
 
-
 function maintenanceCSVHelper(foundReport) {
-    const csvHeaders = "Patient Name,Vial Info,Treatment Start Date,Phone number,Email";
+    const csvHeaders = "Patient,Vial Info,Treatment Start Date,DoB,Phone number,Email";
 
     const csvData = foundReport.data.map(patient => {
         const patientName = patient.patientName;
-        const approachingMaintenanceFor = patient.maintenanceBottles.join(', ');
+        const approachingMaintenanceFor = patient.maintenanceBottles.join('\n');
         const treatmentStartDate = formatDate(patient.startDate);
         const DOB = patient.DOB;
         const phoneNumber = patient.phoneNumber;
         const email = patient.email;
 
-        return `${patientName},"${approachingMaintenanceFor}",${DOB},${treatmentStartDate},${phoneNumber},${email}`;
+        return `${patientName},"${approachingMaintenanceFor}",${treatmentStartDate},${DOB},${phoneNumber},${email}`;
     }).join('\n');
 
     const csv = csvHeaders + '\n' + csvData;
@@ -33,11 +31,11 @@ function maintenanceCSVHelper(foundReport) {
 }
 
 function attritionCSVHelper (foundReport) {
-    const csvHeaders = "Patient Name,Vial Info.,Days Since Last Inj.,Date of Last Injection,DOB,Phone Number,Email"
+    const csvHeaders = "Patient Name,Vial Info.,Days Since Last Injection,Date of Last Injection,DOB,Phone Number,Email"
 
     const csvData = foundReport.data.map(patient => {
         const patientName = patient.patientName;
-        const bottlesInfo = patient.bottlesInfo.join(', ');
+        const bottlesInfo = patient.bottlesInfo.join('\n');
         const daysSinceLastInjection = patient.daysSinceLastInjection;
         const attritionDate = formatDate(patient.statusDate);
         const DOB = patient.DOB;
@@ -68,12 +66,18 @@ function refillsCSVHelper(foundReport) {
 }
 
 function needsRetestCSVHelper(foundReport) {
-    const columnTitles = ["Patient","Needs Retest For","Maintenance Dates","Treatment Start Date","DOB","Phone number","Email"];
+    const columnTitles = ["Patient","Treatment Start Date","Maintenance Date","Date Last Tested","DOB","Phone number","Email"];
 
     const csvData = foundReport.data.map(patient => {
-        const bottleNames = patient.bottles.map(bottle => bottle.bottleName).join(', ');
-        const maintenanceDates = patient.bottles.map(bottle => formatDate(bottle.maintenanceDate)).join(', ');
-        return `${patient.patientName},"${bottleNames}","${maintenanceDates}",${patient.treatmentStartDate},${patient.DOB},${patient.phoneNumber},${patient.email}`;
+        return [
+            patient.patientName,
+            patient.treatmentStartDate,
+            formatDate(patient.maintenanceDate),
+            formatDate(patient.dateLastTested),
+            patient.DOB,
+            patient.phoneNumber,
+            patient.email
+        ].join(',');
     });
 
     const csv = `${columnTitles.join(',')}\n${csvData.join('\n')}`;

@@ -58,7 +58,17 @@ const dataSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-
+    needsRetestData: {
+        type: {
+            needsRetest: Boolean,
+            needsRetestSnooze: {
+                active: Boolean,
+                dateOfSnooze: Date,
+                snoozeDuration: Number,
+            },
+        },
+        required: false,
+    },
     allergyMedication:{
         type: [{
             name: String,

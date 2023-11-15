@@ -1,123 +1,224 @@
 const schedule = require('node-schedule');
-const treatment = require('treatment');
-const protocol = require('protocol');
-const providerAlerts = require('providerAlerts');
+const treatment = require('../Models/treatment');
+const Protocol = require('../Models/protocols');
+const providerAlerts = require('../Models/alert');
 
-const alertService = require('./alertService');
-const provider = require('../Models/provider');
+//const alertService = require('./alertService');
+const Provider = require('../Models/provider');
 const Patient = require('../Models/patient');
 
 const { getAllPatientsHelper } = require('../controllers/patient_controller');
 
 /* This file generates alerts for the provider and updates patient status*/
 
-// reaction alert creation
-// update providerIDs to practiceIDs
+/* TODO:
+    reaction alert creation
+    check if injections(bottle) need to be mixed ( patient is almost done with current bottle number)
+    ^ "max injection volume is soon to be reached" ^
+    check if injections(bottle) is expiring, make alert
+        *mixed and expired require storing bottleSize; 
+*/
+
+async function checkIfRecentAlertExists(patient, alertType) {
+    const oldAlert = await providerAlerts.findOne({
+        providerID: patient.providerID,
+        patientName: patient.firstName + " " + patient.lastName,
+        alertType: alertType
+    }).sort({ date: -1});
+
+    if (!oldAlert) { return true; }
+
+    // if its been 10 days since we last sent an alert, send it again.
+    const today = new Date();
+    const dayDifference = Math.floor((today - oldAlert.date) / (1000 * 60 * 60 * 24));
+
+    if (dayDifference < 10) {
+        return false;
+    } 
+
+    return true;
+}
+
+async function createAlert(patient, alertType) {
+
+    const makeAlert = await checkIfRecentAlertExists(patient, alertType);
+
+    if (!makeAlert) {
+        return undefined;
+    }
+
+    const today = new Date();
+    const alert = new providerAlerts({
+        providerID: patient.providerID,
+        patientName: patient.firstName + " " + patient.lastName,
+        alertType: alertType,
+        date: today
+    })
+    await alert.save();
+
+    return alert;
+}
 
 // determine if injection(appointment) was missed
 async function attritionAlert() {
+    console.log("Attrition Job running");
     try {
         const patientsList = await Patient.find(); 
-        // not sure if we can use const considering we change data
-        for (const p of patientsList) {
+        // this array is just used in testing
+        const alertsArray = [];
 
+        for (const patient of patientsList) {
             // get last treatment info, and interval of injection according to protocol
-            const patientTreatment = treatment.findOne({
-                _id: p._id, 
-                NPI: p.NPI 
-            });
+            const patientTreatment = await treatment.findOne({
+                providerID: patient.providerID,
+                patientID: patient._id,
+            }).sort({ date: -1});
 
-            const providerProtocol = protocol.findOne(p.NPI);
+            const provider = await Provider.findById(patient.providerID);
 
-            if (!patientTreatment || !providerProtocol) {
+            if (!patientTreatment || !provider) {
                 continue;
             }
 
+            const protocol = await Protocol.findOne({
+                practiceID: provider.practiceID
+            });
+
+            if (!protocol) {
+                continue;
+            }
+
+            const injectionInterval = protocol.nextDoseAdjustment.injectionInterval;
             const lastInjectionDate = patientTreatment.date;
+
             const currentDate = new Date();
 
-            const injectionInterval = providerProtocol.nextDoseAdjustments.injectionInterval;
-            const attritionRisk = currentDate > (lastInjectionDate + injectionInterval)
+            const apptExpirationDate = new Date(lastInjectionDate);
+            apptExpirationDate.setDate(apptExpirationDate.getDate() + injectionInterval);
+
+            const attritionRisk = currentDate > apptExpirationDate;
 
             // patient missed an injection
-            if (attritionRisk && !patientTreatment.attended) {
-                p.status = "ATTRITION";
-                await p.save();
+            if (attritionRisk && !patientTreatment.attended && patient.status !== "ATTRITION") {
+                patient.status = "ATTRITION";
+                await patient.save();
 
-                const alert = new providerAlerts({
-                    NPI: p.providerID,
-                    patientName: p.firstName + " " + p.lastName,
-                    alertType: "AttritionAlert",
-                })
-
-                await alert.save();
-                // await alertService.alertMissedAppointment(p._id, p.NPI);
+                const alert = createAlert(patient, "AttritionAlert");
+                alertsArray.push(alert);
             }
         }
+        return alertsArray;
     } catch (error) {
         console.error('Error with checking missed appt: ', error);
     }
 }
 
+async function needsRetestSnoozeCheck(patient) {
+    if (!patient.needsRetestData || !patient.needsRetestData.needsRetestSnooze) {
+        return;
+    } 
+
+    const dateOfSnooze = patient.needsRetestData.needsRetestSnooze.dateOfSnooze;
+    const snoozeDuration = patient.needsRetestData.needsRetestSnooze.snoozeDuration;
+
+    const snoozeExpirationDate = new Date(dateOfSnooze);
+    snoozeExpirationDate.setDate(snoozeExpirationDate.getDate() + snoozeDuration);
+
+    const today = new Date();
+
+    if (today > snoozeExpirationDate) {
+        patient.needsRetestData.needsRetestSnooze.active = false;
+        await patient.save();
+    }
+}
+
 // needs test
 async function needsRetestAlert() {
+    console.log("Needs Retest Job running");
+
+    const formatDate = (dateString) => {
+        const dateArray = dateString.split('-');
+        const month = parseInt(dateArray[0]) - 1;
+        const day = parseInt(dateArray[1]);
+        const year = parseInt(dateArray[2]);
+
+        const treatmentStartDate = new Date(year, month, day);
+
+        return treatmentStartDate;
+    }
+
+    const alertsArray = [];
     try {
         // get list of all patients 
-        const patientsList = await getAllPatientsHelper(providerID); 
+        const patientsList = await Patient.find(); 
 
-        for (const p of patientsList) {
-            const patientTreatment = await treatment.findOne({
-                _id: p._id, 
-                providerID: p.providerID 
-            });
-
-            const foundProtocol = await protocol.findOne({ providerID: p.providerID});
-
-            if (!foundProtocol || !patientTreatment) {
+        for (const patient of patientsList) {
+            if (patient.status !== "MAINTENANCE") {
                 continue;
             }
 
-            const maxInjectVol = foundProtocol.nextDoseAdjustment.maxInjectionVol;
-            const patientBottles = [];
-
-            let containsNeedRetest = false;
-            for (const b of patientTreatment.bottles) {
-                // dates
-                const bottleStartDate = b.date;
-                const oneYearLater = new Date(patientTreatmentStartDate);
-                oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
-                const currentDate = new Date();
-
-                const needsRetest = currentDate >= oneYearLater;
-
-                // check patient is at maintenance
-                if (b.currBottleNumber === 'M' && b.injVol === maxInjectVol && needsRetest && !b.needsRetestSnooze.active) {
-                    containsNeedRetest = true;
-                    b.needsRetest = true;
-                    await b.save();
-                    patientBottles.push({
-                        bottleName: b.bottleName,
-                    })
-                }
-
+            const patientTreatment = await treatment.findOne({
+                providerID: patient.providerID,
+                patientID: patient._id,
+            }).sort({ date: -1});
+            
+            if (!patientTreatment) {
+                continue;
             }
-            // save patient data
-            const alert = new providerAlerts({
-                NPI: p.providerID,
-                patientName: p.firstName + " " + p.lastName,
-                alertType: "NeedsRetestAlert",
-                bottles: patientBottles
-            })
 
-            await alert.save();
+            const provider = await Provider.findById(patient.providerID);
+
+            if (!provider) {
+                continue;
+            }
+
+            const protocol = await Protocol.findOne({
+                practiceID: provider.practiceID
+            });
+
+            if (!protocol) {
+
+                continue;
+            }
+
+            // check is needsRetestSnooze is expired and update if so
+            needsRetestSnoozeCheck(patient);
+
+            const maxInjectVol = protocol.nextDoseAdjustment.maxInjectionVol;
+            let needsRetest = true;
+
+            const treatmentStartDate = formatDate(patient.treatmentStartDate);
+
+            // calculate 18 months from treatmentStartDate
+            const oneYearLater = new Date(treatmentStartDate);
+            oneYearLater.setMonth(oneYearLater.getMonth() + 18);
+
+            const currentDate = new Date();
+
+            const oneYearHasPassed = currentDate >= oneYearLater;
+            
+            for (const b of patientTreatment.bottles) {
+                // patient is assumed to need retest; if need retest definitions not satisf. then set false.
+                if (b.currBottleNumber !== 'M' || b.injVol !== maxInjectVol || !oneYearHasPassed || patient.needsRetestData.needsRetestSnooze.active) {
+                    needsRetest = false;
+                }
+            }
+
+            if (needsRetest) {
+                // save patient data
+                const alert = createAlert(patient, "NeedsRetestAlert");
+                alertsArray.push(alert);
+            }   
         }
+
+        return alertsArray;
 
     } catch (error) {
         console.error(error); 
     }
 }
 
-// needs update - logic broken
+// refills not working - no bottle size for vials, no current epipen/allergy drops support in project
 async function needsRefillAlert() {
     const patientsList = await getAllPatientsHelper(providerID);
 
@@ -155,59 +256,54 @@ async function needsRefillAlert() {
 
 // at maintenance alert - all vials at M and highest concentration
 async function maintenanceAlert() {
+    console.log("Maintenance Job running");
+    const alertsArray = [];
     try {
         const patientsList = await Patient.find();
         let patientAtMaintenance = true;
 
         for (const patient of patientsList) {
-            const patientTreatment = treatment.findOne({
+
+            if(!patient.providerID) { continue; }
+            const patientTreatment = await treatment.findOne({
                 providerID: patient.providerID,
                 patientID: patient._id,
+            }).sort({ date: -1});
+            
+            if (!patientTreatment) {continue;}
+
+            const provider = await Provider.findById(patient.providerID);
+
+            if (!provider) {continue;}
+                
+            const protocol = await Protocol.findOne({
+                practiceID: provider.practiceID
             });
 
-            if (!patientTreatment) {
-                continue;
-            }
-
-            const foundProvider = provider.findById(patient.providerID);
-
-            if (!foundProvider) {
-                continue;
-            }
-
-            const foundProtocol = protocol.findOne({
-                practiceID: provider.practiceID,
-            });
-
-            if (!foundProtocol) {
-                continue;
-            }
-
+            if (!protocol) { continue;}
+               
             for (const bottle of patientTreatment.bottles) {
-                if (bottle.injVol !== foundProtocol.maxInjectionVol || bottle.currBottleNumber !== 'M') {
+                if (bottle.injVol !== protocol.nextDoseAdjustment.maxInjectionVol || bottle.currBottleNumber !== 'M') {
                     patientAtMaintenance = false;
                 }
             }
+            // change patient status to maint if not already, or remove current maintenance status
+            if (patientAtMaintenance && patient.status !== 'MAINTENANCE') {
+                patient.status === 'MAINTENANCE';
+                patient.statusDate === new Date();
+                await patient.save();
+
+                const alert = createAlert(patient, "MaintenanceAlert");
+                alertsArray.push(alert);
+
+            } else if (!patientAtMaintenance && patient.status === 'MAINTENANCE' ) {
+                patient.status === 'DEFAULT';
+                patient.statusDate === new Date();
+                await patient.save();
+            }
         }
 
-        // change patient status to maint if not already, or remove current maintenance status
-        if (patientAtMaintenance && patient.status !== 'MAINTENANCE') {
-            patient.status === 'MAINTENANCE';
-            patient.statusDate === new Date();
-            await patient.save();
-
-            const alert = new providerAlerts({
-                NPI: p.providerID,
-                patientName: p.firstName + " " + p.lastName,
-                alertType: "AttritionAlert",
-            })
-            await alert.save();
-
-        } else if (!patientAtMaintenance && patient.status === 'MAINTENANCE' ) {
-            patient.status === 'DEFAULT';
-            patient.statusDate === new Date();
-            await patient.save();
-        }
+        return alertsArray;
 
     } catch (error) {
         console.error(error);
@@ -216,19 +312,22 @@ async function maintenanceAlert() {
 
 // check if injections(bottle) need to be mixed ( patient is almost done with current bottle number)
     // "max injection volume is soon to be reached"
-    
 // check if injections(bottle) is expiring 
 
 // This string means: run daily, at midnight
 const scheduleString = '0 0 * * *';
 const missedAppointmentJob = schedule.scheduleJob(scheduleString, attritionAlert);
 const needsRetestJob = schedule.scheduleJob(scheduleString, needsRetestAlert);
-const needsRefillJob = schedule.scheduleJob(scheduleString, needsRefillAlert);
+//const needsRefillJob = schedule.scheduleJob(scheduleString, needsRefillAlert);
 const maintenanceJob = schedule.scheduleJob(scheduleString, maintenanceAlert);
 
 module.exports = {
-  missedAppointmentJob,
-  needsRetestJob,
-  needsRefillJob,
-  maintenanceJob
+    attritionAlert,
+    needsRetestAlert,
+    maintenanceAlert,
+
+    missedAppointmentJob,
+    needsRetestJob,
+    //needsRefillJob,
+    maintenanceJob
 };

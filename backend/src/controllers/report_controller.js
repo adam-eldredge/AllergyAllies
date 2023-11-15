@@ -3,11 +3,18 @@ const protocol = require('../Models/protocols')
 const treatment = require('../Models/treatment');
 const { Report } = require('../Models/report');
 const provider = require('../Models/provider');
-const practice = require('../Models/practice');
 
 const { getAllPatientsHelper } = require('../controllers/patient_controller');
 const { generateReport, findMatchingBottle } = require('../helpers/reportHelper');
 
+async function getTreatment(providerID, patientID) {
+    const patientTreatment = await treatment.findOne({
+        providerID: providerID.toString(),
+        patientID: patientID.toString(),
+    }).sort({ date: -1});
+    
+    return patientTreatment;
+}
 
 exports.deleteReport = async (req, res) => {
     const reportID = req.params.id;
@@ -23,6 +30,19 @@ exports.deleteReport = async (req, res) => {
     };
 
     return res.status(200).json({message: "Report deleted"})
+}
+
+exports.deleteAllReports = async (req, res) => {
+    try {
+        const result = await Report.deleteMany({});
+        if (result.deletedCount > 0) {
+            return res.status(200).json({ message: "All reports deleted"});
+        } else {
+            return res.status(201).json({ message: "No reports found"});
+        }
+    } catch (error) {
+        return res.status(401).json(error.message);
+    }
 }
 
 exports.getAllReportNames = async (req, res) => {
@@ -67,9 +87,7 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
         }
 
         // find treatment data
-        const patientTreatment = await treatment.findOne({
-            patientID: p._id.toString(),
-        });
+        const patientTreatment = await getTreatment(providerID, p._id)
 
         if (!patientTreatment) {
             continue;
@@ -119,9 +137,13 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
 
     // Generate the report
     try {
-        const manual = true;
-        const savedReport = await generateReport(providerID, reportType, manual, approachingMaintenanceData);
-        return res.status(200).json(savedReport);
+        if (approachingMaintenanceData.length > 0) {
+            const manual = true;
+            const savedReport = await generateReport(providerID, reportType, manual, approachingMaintenanceData);
+            return res.status(200).json(savedReport);
+        } else {
+            return res.status(201).json({message: "No patients approaching maintenance"});
+        }
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
@@ -138,33 +160,31 @@ exports.generateAttritionReport = async (req, res) => {
         //const foundProvider = await provider.findById(providerID);
 
         for (const p of patientsList) {
-            
+
             if (p.status !== "ATTRITION") {
                 continue;
             }
 
             const patientBottles = [];
-            const foundTreatment = await treatment.findOne({
-                providerID: p.providerID.toString(),
-                patientID: p._id.toString()
-            });
+            const foundTreatment = await getTreatment(providerID, p._id);
 
             if (!foundTreatment) {
+                console.log("treatment not found in attrition report");
                 continue;
             }
 
-            for(const b of foundTreatment.bottles) {
+            for(const bottle of foundTreatment.bottles) {
                 // find protocol to find out max bottle number
-                const matchingBottle = findMatchingBottle(p.maintenanceBottleNumber, bottle.nameOfBottle);
+                const matchingBottle = await findMatchingBottle(p, bottle);
     
-                let treatmentCurrentBottleNumber = b.currBottleNumber;
+                let treatmentCurrentBottleNumber = bottle.currBottleNumber;
                 
                 if(treatmentCurrentBottleNumber === 'M') {
                     treatmentCurrentBottleNumber = matchingBottle.maintenanceNumber;
                 } 
                 
                 // eg: Pollen 3/7, Mold 7/7 (M)
-                patientBottles.push(`${b.nameOfBottle} ${treatmentCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
+                patientBottles.push(`${bottle.nameOfBottle} ${treatmentCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
             }
 
             const timeDiff= today - p.statusDate;
@@ -180,15 +200,20 @@ exports.generateAttritionReport = async (req, res) => {
             });
         }
 
-        const manual = true;
-        const savedReport = await generateReport(providerID, reportType, manual, patientAttrition);
-        return res.status(200).json(savedReport);
+        if (patientAttrition.length > 0) {
+            const manual = true;
+            const savedReport = await generateReport(providerID, reportType, manual, patientAttrition);
+            return res.status(200).json(savedReport);
+        } else {
+            return res.status(201).json({message: "No patients at risk of attrition."})
+        }
+        
     } catch (error) {
         return res.status(400).json({ message:`Error in attrition ${error.message}` }); 
     }
 }
 
-// composite collection of all refill data for each patient
+// not working - requires a vial size associated with vials 
 exports.generateRefillsReport = async (req, res) => {
     const providerID = req.params.providerID;
     const reportType = "Refills";
@@ -258,7 +283,6 @@ exports.generateRefillsReport = async (req, res) => {
     }
 }
 
-// needs testing
 exports.generateNeedsRetestReport = async (req, res) => {
     const providerID = req.params.providerID; 
     const reportType = "NeedsRetest";
@@ -274,6 +298,7 @@ exports.generateNeedsRetestReport = async (req, res) => {
 
         // get newest treatment data
         const patientTreatment = await treatment.findOne({
+            providerID: p.providerID,
             patientID: p._id.toString(),
         }).sort({ date: -1});
 
@@ -289,23 +314,25 @@ exports.generateNeedsRetestReport = async (req, res) => {
             dateLastTested = patientTreatment.lastVialTests.date;
         }
 
-        if (patientBottles.length > 0) {
-            needsRetestOutput.push({
-                patientName: p.firstName + " " + p.lastName,
-                treatmentStartDate: p.treatmentStartDate,
-                maintenanceDate: p.statusDate,
-                dateLastTested,
-                DOB: p.DoB,
-                phoneNumber: p.phone,
-                email: p.email,
-            })
-        }
+        needsRetestOutput.push({
+            patientName: p.firstName + " " + p.lastName,
+            treatmentStartDate: p.treatmentStartDate,
+            maintenanceDate: p.statusDate,
+            dateLastTested,
+            DOB: p.DoB,
+            phoneNumber: p.phone,
+            email: p.email,
+        });
     }
 
     try {
-        const manual = true;
-        const savedReport = await generateReport(providerID, reportType, manual, needsRetestOutput);
-        return res.status(200).json(savedReport);
+        if (needsRetestOutput.length > 0) {
+            const manual = true;
+            const savedReport = await generateReport(providerID, reportType, manual, needsRetestOutput);
+            return res.status(200).json(savedReport);
+        } else {
+            return res.status(201).json({message: "No patients need retest"});
+        }
     } catch (error) {
         return res.status(400).json({ message: error.message }); 
     }
@@ -327,7 +354,10 @@ exports.needsRetestSnooze = async (req, res) => {
             return res.status(400).json({ message: "patient not found"});
         }
 
-        const foundTreatment = await treatment.findOne({ providerID: providerID, patientID: foundPatient._id});
+        const foundTreatment = await treatment.findOne({
+            providerID: p.providerID,
+            patientID: p._id.toString(),
+        }).sort({ date: -1});;
 
         for (const b of foundTreatment.bottles) {
             if (b.needsRetest) {
@@ -369,6 +399,7 @@ exports.patientRetested = async (req, res) => {
         return res.status(404).json({ message: error.message });
     }
 }
+
 
 
 

@@ -8,7 +8,9 @@ router.get('/getAllReportNames/:providerID', reportController.getAllReportNames)
 // :id -> report id
 router.get('/getReportData/:id', reportController.getReportData);
 
-router.get('/deleteReport/:id', reportController.deleteReport);
+router.delete('/deleteReport/:id', reportController.deleteReport);
+
+router.delete('/deleteAllReports', reportController.deleteAllReports);
 
 router.get('/approachingMaintenanceReport/:providerID', reportController.generateApproachingMaintenanceReport);
 
