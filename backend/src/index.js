@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv').config(); 
+const dotenv = require('dotenv').config();
+const alertGenerator = require('./services/alertGenerator'); //leave this, does not need value read to work
 
 const app = express();
 // To protect version information
@@ -25,8 +26,9 @@ const provider_routes = require('./routes/provider_routes');
 const report_routes = require('./routes/report_routes');
 const export_routes = require('./routes/export_routes');
 const practice_routes = require('./routes/practice_routes');
-const auth_routes = require('./routes/auth_routes');
 const protocol_routes = require('./routes/protocol_routes');
+const auth_routes = require('./routes/auth_routes');
+const treatment_routes = require('./routes/treatment_routes');
 
 // Use statements
 app.use('/api', patient_routes);
@@ -36,6 +38,7 @@ app.use('/api', survey_routes);
 app.use('/api', report_routes);
 app.use('/api', export_routes);
 app.use('/api', protocol_routes);
+app.use('/api', treatment_routes);
 
 app.use('/auth', auth_routes);
 

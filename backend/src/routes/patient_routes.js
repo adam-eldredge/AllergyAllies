@@ -29,4 +29,14 @@ router.post('/addTokens/:id', patientController.addTokens);
 // GET localhost:5000/api/resetTokens
 router.get('/resetTokens', patientController.resetTokens);
 
+// Get localhost:5000/api/findPercentMaintenance
+router.get('/findPercentMaintenance', patientController.findPercentMaintenance);
+
+// POST localhost:5000/api/addAllergyMedication
+router.post('/addAllergyMedication', patientController.addAllergyMedication);
+
+// GET localhost:5000/api/getAllergyMedication
+router.get('/getAllergyMedication', patientController.getAllergyMedication);
+
 module.exports = router;
+

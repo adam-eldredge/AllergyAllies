@@ -13,6 +13,17 @@ export default function PatientSignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [practiceCode, setPracticeCode] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
+  const [DoB, setDob] = useState('');
+
+  const isNumeric = (value) => {
+    return /^[0-9]+$/.test(value);
+  };
+
+  const isValidDate = (date) => {
+    return /\d{4}-\d{2}-\d{2}/.test(date);
+  };
 
   const handleSignUp = async () => {
 
@@ -24,7 +35,7 @@ export default function PatientSignUpScreen() {
       const practiceID = practice.data._id;
       console.log(practiceID)
       if (!practiceID) {
-        setDisplay('Invalid Practice ID');
+        setDisplay('Invalid Practice Code');
         success = false;
         return;
       }
@@ -36,7 +47,26 @@ export default function PatientSignUpScreen() {
             lastName,
             email,
             password,
-            practiceID
+            practiceID,
+            height,
+            weight,
+            DoB,
+          }
+
+          if (!isNumeric(height)) {
+            setDisplay('Invalid height.');
+            success = false;
+            return;
+          }
+          if (!isNumeric(weight)) {
+            setDisplay('Invalid weight.');
+            success = false;
+            return;
+          }
+          if (!isValidDate(DoB)) {
+            setDisplay('Invalid date of birth.');
+            success = false;
+            return;
           }
 
           const emailExists = await axios.post('http://localhost:5000/api/checkEmail', { email });
@@ -110,6 +140,34 @@ export default function PatientSignUpScreen() {
         value={practiceCode}
         autoCapitalize="none"
         onChangeText={setPracticeCode} />
+
+      <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <TextInput style={styles.shortInput}
+          underlineColorAndroid="transparent"
+          placeholder="Height (in)"
+          placeholderTextColor="#7a7a7a"
+          value={height}
+          autoCapitalize="none"
+          onChangeText={setHeight} />
+
+        <TextInput style={styles.shortInput}
+          underlineColorAndroid="transparent"
+          placeholder="Weight (lbs)"
+          placeholderTextColor="#7a7a7a"
+          value={weight}
+          autoCapitalize="none"
+          onChangeText={setWeight} />
+      </View>
+
+      <TextInput
+        style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Date of Birth (YYYY-MM-DD)"
+        placeholderTextColor="#7a7a7a"
+        value={DoB}
+        autoCapitalize="none"
+        onChangeText={setDob}
+      />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"

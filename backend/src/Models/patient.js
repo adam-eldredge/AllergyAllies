@@ -23,13 +23,25 @@ const dataSchema = new mongoose.Schema({
     },
     DoB: {
         required: false,
-        type: Date
+        type: String
     },
-
+    height: {
+        required: false,
+        type: String
+    },
+    weight: {
+        required: false,
+        type: String
+    },
     treatments: {
         required: false,
-        type: [mongoose.Schema.Types.ObjectId],
+        type: [ String ], /*mongoose.Schema.Types.ObjectId*/
     },
+    treatmentStartDate: {
+        required: false,
+        type: String
+    },
+    // use this instead of protocols
     maintenanceBottleNumber: {
         required: false,
         type: [{
@@ -37,7 +49,6 @@ const dataSchema = new mongoose.Schema({
             maintenanceNumber: Number,
         }],
     },
-
     providerID: {
         require: false,
         type: String,
@@ -55,6 +66,25 @@ const dataSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    needsRetestData: {
+        type: {
+            needsRetest: Boolean,
+            needsRetestSnooze: {
+                active: Boolean,
+                dateOfSnooze: Date,
+                snoozeDuration: Number,
+            },
+        },
+        required: false,
+    },
+    allergyMedication:{
+        type: [{
+            name: String,
+            dose: String,
+            frequency: String
+        }]
+    }
+
 }, { collection: 'Patients' })
 
 module.exports = mongoose.model('Patient', dataSchema)

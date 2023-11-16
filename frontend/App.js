@@ -5,7 +5,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Portal from './screens/Portal.js';
 import AllAlerts from './screens/AllAlerts.js';
 import Reports from './screens/Reports.js';
-import Injections from './screens/Injections.js';
+import Injections from './screens/Injection/Injections.js';
 import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
 import SignInScreen from './screens/SignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
@@ -19,7 +19,10 @@ import InitialScreen from './screens/InitialScreen.js';
 import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
 import ViewPatients from './screens/ViewPatients.js';
+
 import ViewAllAppointments from './screens/ViewAllAppointments.js';
+import PatientDetails from './screens/PatientDetails.js';
+
 import { useMemo, useReducer, useEffect } from 'react';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -180,6 +183,7 @@ const SignedInDesktopStack = (
       <Stack.Screen name="ViewPatients" component={ViewPatients} options={{ title: 'View Patients'}}/>
       <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
       <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
+      <Stack.Screen name="PatientDetails" component={PatientDetails} options={{title: 'Patient Details'}} />
   </>
 );
 
@@ -264,7 +268,10 @@ export default function App({navigation}) {
         <Stack.Navigator  screenOptions={() => ({
         headerTitleStyle: styles.headerTitleStyle,
         headerStyle: { backgroundColor: '#1059d5'},
-        headerTintColor: 'white'
+        headerTintColor: 'white',
+        headerTitleContainerStyle: {
+          justifyContent: 'center',
+        },
         })}>
           {state.isLoading ? (
             // We haven't finished checking for the token yet
@@ -296,7 +303,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     alignSelf: 'center',
     color: 'white',
-    flex: 1,
   },
   root: {
     flex: 1,

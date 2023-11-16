@@ -3,6 +3,18 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert,
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 
 export default function AllAlerts({navigation}){
+   useEffect(() => {
+      const getPatients = async () => {
+          const patients = await axios.get(`http://localhost:5000/api/getPatientsByPractice/${practiceID}`)
+          if (patients.status == 200) {
+              setPatientsArray(patients.data)
+              setRenderData(patients.data)
+          }
+          setQueriedPatients(true);
+      }
+
+      if (!queriedPatients) { getPatients() }
+   })
    return (
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#fcfcfc'}}>
       <ScrollView style={{ backgroundColor: '#fcfcfc'}}>
@@ -153,11 +165,11 @@ export default function AllAlerts({navigation}){
                </TouchableOpacity>
             <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
             onPress={() =>
-              navigation.navigate('Injections')
+              navigation.navigate('Portal')
              }>
-               <Text style={styles.providerDashboardText}>Injections</Text>
+               <Text style={styles.providerDashboardText}>Home</Text>
               <IconButton
-                icon="needle"
+                icon="home"
                 iconColor="white"
                 size={37}
               />

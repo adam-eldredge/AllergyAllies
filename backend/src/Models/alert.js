@@ -2,14 +2,17 @@ const mongoose = require('mongoose');
 
 const alertSchema = new mongoose.Schema({
     providerID: {
-        type: Number
+        type: String
     },
     patientName: {
         type: String
     },
     alertType: {
         type: String
+    },
+    date: {
+        type: Date
     }
 }, { collection: 'ProviderAlerts'});
 
-module.exports = mongoose.model('treatment', alertSchema);
+module.exports = mongoose.model('alert', alertSchema);

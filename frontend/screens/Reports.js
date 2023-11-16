@@ -1,173 +1,177 @@
-import React, { Component, useContext } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
+import React, { useState, useContext } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal } from 'react-native';
 import { DataTable, IconButton } from 'react-native-paper';
+import axios from 'axios';
+import User from '../User';
 import AuthContext from '../AuthContext';
 
-
-export default function Reports({navigation}) {
-
+export default function Reports({ navigation }) {
+  const userInfo = User();
   const { signOut } = useContext(AuthContext);
+  const providerId = userInfo.providerId;
+  const [reports, setReports] = useState([]);
+  const [attritionError, setAttritionError] = useState(null);
+  const [maintenanceError, setMaintenanceError] = useState(null);
+  const [refillError, setRefillError] = useState(null);
+  const [needsRetestError, setNeedsRetestError] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+
+  const generateAttritionReport = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/attritionReport/${providerId}`);
+      const newReport = {
+        type: 'Attrition',
+        dateGenerated: new Date().toLocaleDateString(),
+        data: response.data,
+      };
+
+      setReports((prevReports) => [...prevReports, newReport]);
+      setAttritionError(null);
+    } catch (error) {
+      console.error('Error fetching attrition report:', error);
+      setAttritionError('Error fetching attrition report. Please try again.');
+    }
+  };
+
+  const generateApproachingMaintenanceReport = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/approachingMaintenanceReport/${providerId}`);
+      const newReport = {
+        type: 'Approaching Maintenance',
+        dateGenerated: new Date().toLocaleDateString(),
+        data: response.data,
+      };
+
+      setReports((prevReports) => [...prevReports, newReport]);
+      setMaintenanceError(null);
+    } catch (error) {
+      console.error('Error fetching Approaching Maintenance report:', error);
+      setMaintenanceError('Error fetching Approaching Maintenance report. Please try again.');
+    }
+  };
+
+  const needsRetestReport = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/needsRetestReport/${providerId}`);
+      const newReport = {
+        type: 'Needs Retest',
+        dateGenerated: new Date().toLocaleDateString(),
+        data: response.data,
+      };
+
+      setReports((prevReports) => [...prevReports, newReport]);
+      setNeedsRetestError(null);
+    } catch (error) {
+      console.error('Error fetching Needs Retest report:', error);
+      setNeedsRetestError('Error fetching Needs Retest report. Please try again.');
+    }
+  };
+
+  const refillsReport = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/refillsReport/${providerId}`);
+      const newReport = {
+        type: 'Refills',
+        dateGenerated: new Date().toLocaleDateString(),
+        data: response.data,
+      };
   
-    return (
-      <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: 'white'}}>
-        <ScrollView style={{backgroundColor:'white'}}>
-        <Text style={styles.header}>Your Reports</Text>
+      setReports((prevReports) => [...prevReports, newReport]);
+      setRefillError(null); // Fix the typo here
+    } catch (error) {
+      console.error('Error fetching Refills report:', error);
+      setRefillError('Error fetching Refills report. Please try again.'); // Fix the typo here
+    }
+  };
+
+  const openModal = (report) => {
+    setSelectedReport(report);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedReport(null);
+  };
+
+  return (
+    <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: 'white' }}>
+      <ScrollView style={{ backgroundColor: 'white' }}>
+        <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap' }}>
+          <Text style={styles.header}>Your Reports</Text>
+          <Text style={{ fontSize: 15, color: '#1059d5', paddingLeft: 40, marginTop: 65, marginRight: 5 }}>
+            Generate a new report of type:{' '}
+          </Text>
+          <TouchableOpacity onPress={generateAttritionReport}>
+            <Text style={{ fontSize: 15, color: '#1059d5', textDecorationLine: 'underline', marginTop: 65, marginRight: 15 }}>
+              Attrition
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={generateApproachingMaintenanceReport}>
+            <Text style={{ fontSize: 15, color: '#1059d5', textDecorationLine: 'underline', marginTop: 65, marginRight: 15 }}>
+              Approaching Maintenance
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={refillsReport}>
+            <Text style={{ fontSize: 15, color: '#1059d5', textDecorationLine: 'underline', marginTop: 65, marginRight: 15 }}>
+              Refills
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={needsRetestReport}>
+            <Text style={{ fontSize: 15, color: '#1059d5', textDecorationLine: 'underline', marginTop: 65, marginRight: 15 }}>
+              Needs Retest
+            </Text>
+          </TouchableOpacity>
+          
+        </View>
+
         <DataTable style={styles.table}>
           <DataTable.Header style={styles.tableHeader}>
-            <DataTable.Title textStyle={{fontWeight:'bold', color: 'black', fontSize: 14}}>Past Reports</DataTable.Title>
-            <DataTable.Title textStyle={{fontWeight:'bold', color: 'black', fontSize: 14}}>Type</DataTable.Title>
-            <DataTable.Title textStyle={{fontWeight:'bold', color: 'black', fontSize: 14}}>Date Generated</DataTable.Title>
-            <DataTable.Title textStyle={{fontWeight:'bold', color: 'black', fontSize: 14}}>Notes</DataTable.Title>
+            <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Past Reports</DataTable.Title>
+            <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Type</DataTable.Title>
+            <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Date Generated</DataTable.Title>
           </DataTable.Header>
-          <DataTable.Row style={styles.tableRow2}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Attrition_09_12_2023</DataTable.Cell>
-            <DataTable.Cell>automated</DataTable.Cell>
-            <DataTable.Cell>09/12/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Row style={styles.tableRow1}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Maintenance_09_1...</DataTable.Cell>
-            <DataTable.Cell>manual</DataTable.Cell>
-            <DataTable.Cell>09/12/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Row style={styles.tableRow2}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Refills_09_12_2023</DataTable.Cell>
-            <DataTable.Cell>automated</DataTable.Cell>
-            <DataTable.Cell>09/12/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Row style={styles.tableRow1}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>NeedsRetest_09_1...</DataTable.Cell>
-            <DataTable.Cell>manual</DataTable.Cell>
-            <DataTable.Cell>09/11/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Row style={styles.tableRow2}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Refills_09_06_2023</DataTable.Cell>
-            <DataTable.Cell>automated</DataTable.Cell>
-            <DataTable.Cell>09/06/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Row style={styles.tableRow1}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Attrition_09_05_2023</DataTable.Cell>
-            <DataTable.Cell>automated</DataTable.Cell>
-            <DataTable.Cell>09/05/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Row style={styles.tableRow2}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Maintenance_09_0...</DataTable.Cell>
-            <DataTable.Cell>manual</DataTable.Cell>
-            <DataTable.Cell>09/05/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Row style={styles.tableRow1}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>NeedsRetest_09_0...</DataTable.Cell>
-            <DataTable.Cell>manual</DataTable.Cell>
-            <DataTable.Cell>09/04/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
-          <DataTable.Row style={{...styles.tableRow2, borderBottomEndRadius: 8, borderBottomStartRadius: 8}}>
-            <DataTable.Cell textStyle={{color: '#1059d5', textDecorationLine: 'underline'}}>Maintenance_09_0...</DataTable.Cell>
-            <DataTable.Cell>manual</DataTable.Cell>
-            <DataTable.Cell>09/04/2023</DataTable.Cell>
-            <DataTable.Cell>
-              additional info here
-              <TouchableOpacity style={{flexDirection: 'row', justifyContent: 'flex-end', marginLeft: 20}}>
-                <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={17}
-                  onPress={showAlert}
-                />
-              </TouchableOpacity>
-            </DataTable.Cell>
-          </DataTable.Row>
+
+          {reports.map((report, index) => (
+            <DataTable.Row key={index} style={index % 2 === 0 ? styles.tableRow2 : styles.tableRow1}>
+              <DataTable.Cell>
+                {report.data ? (
+                  <TouchableOpacity onPress={() => openModal(report)}>
+                    <Text style={{ color: '#1059d5', textDecorationLine: 'underline' }}>View</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <Text>No patients at risk of attrition.</Text>
+                )}
+              </DataTable.Cell>
+              <DataTable.Cell>{report.type}</DataTable.Cell>
+              <DataTable.Cell>{report.dateGenerated}</DataTable.Cell>
+            </DataTable.Row>
+          ))}
         </DataTable>
-        <View style={{height: 30}}></View>
-        </ScrollView>
-        <View style={{flex: 1}}>
-        <TouchableOpacity style={{marginTop: 50, marginBottom: 10, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
+
+        {attritionError && (
+          <View>
+            <Text style={{ color: 'red' }}>{attritionError}</Text>
+          </View>
+        )}
+
+        <View style={{ height: 30 }}></View>
+      </ScrollView>
+
+      <Modal visible={modalVisible} transparent={true} animationType="slide" onRequestClose={closeModal}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text>{selectedReport && selectedReport.data ? JSON.stringify(selectedReport.data, null, 2) : ''}</Text>
+            <TouchableOpacity onPress={closeModal}>
+              <Text style={{ color: 'blue', marginTop: 10 }}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      <View style={{backgroundColor: '#fcfcfc', flex: 1,}}>
+      <TouchableOpacity style={{marginTop: 50, marginBottom: 10, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
                onPress={() =>
                   signOut()
                }>
@@ -214,27 +218,22 @@ export default function Reports({navigation}) {
                </TouchableOpacity>
             <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
             onPress={() =>
-              navigation.navigate('Injections')
+              navigation.navigate('Portal')
              }>
-               <Text style={styles.providerDashboardText}>Injections</Text>
+               <Text style={styles.providerDashboardText}>Home</Text>
               <IconButton
-                icon="needle"
+                icon="home"
                 iconColor="white"
                 size={37}
               />
             </TouchableOpacity>
-        </View>
       </View>
-      );
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 23,
-    paddingLeft: 10,
-    paddingRight: 10,
-  },
-  header:{
+  header: {
     fontSize: 40,
     marginTop: 40,
     fontWeight: '600',
@@ -255,6 +254,17 @@ const styles = StyleSheet.create({
   tableRow2: {
     backgroundColor: '#ebebeb',
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 8,
+    elevation: 5,
+  },
   providerDashboardItem:{
     borderRadius: 8,
     height: 100,
@@ -270,28 +280,4 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: -10,
  },
-})
-
-const showAlert = () =>
-  Alert.alert(
-    'Delete this alert?',
-    'This action cannot be undone!',
-    [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-        //onPress: () => Alert.alert('add in delete functionality'),
-      },
-      {
-         text: 'Yes',
-         style: 'cancel',
-       },
-    ],
-    {
-      cancelable: true,
-      onDismiss: () =>
-        Alert.alert(
-          'This alert was dismissed by tapping outside of the alert dialog.',
-        ),
-    },
-  );
+});

@@ -1,15 +1,16 @@
 const patient = require('../Models/patient');
+const protocols = require('../Models/protocols');
 const provider = require('../Models/provider');
-// const provider = require('../Models/provider');
+const treatment = require('../Models/treatment');
 
 // Needs Testing
 const addPatient = async (req, res) => {
     // implement duplicate check
     try {
-        const { firstName, lastName, email, phone, password, DoB } = req.body;
+        const { firstName, lastName, email, phone, password, DoB, height, weight } = req.body;
 
         const data = new patient({
-            firstName, lastName, email, phone, password, DoB
+            firstName, lastName, email, phone, password, DoB, height, weight
         });
         data.status = "DEFAULT";
         data.tokens = 0;
@@ -187,6 +188,170 @@ const resetTokens = async (req, res) => {
     }
 }
 
+
+//This has to be called AFTER nextTreatment has been called ONCE
+/*
+    This method returns an array of numbers corresponding to the vials from the protocol and in patient bottles
+*/
+const findPercentMaintenance = async (req, res) => {
+    try{
+
+        const id = req.params.id;
+        const foundPatient = await patient.findById(id);
+        if (!foundPatient) {
+            return res.status(404).json({ message: `Patient not found ${id}`});
+        }
+
+        const foundProtocol = await protocols.findOne( {providerID: foundPatient.providerID} );
+        if (!foundProtocol) {
+            return res.status(404).json({ message: `Protocol not found.`});
+        }
+
+        //Find the last treatment of the patient 
+        const treatmentLength = foundPatient.treatments.length();
+
+        if(treatmentLength < 3){
+            return res.status(404).json({ message: `Not enough patient data`});
+        }
+
+        const patientNextTreatmentID = foundPatient.treatments[treatmentLength - 1];
+        const patientLastTreatmentID = foundPatient.treatments[treatmentLength - 2];
+        const patientSecondToLastTreatmentID = foundPatient.treatments[treatmentLength - 3];
+        const nextTreatment = await treatment.findById(patientNextTreatmentID);
+        const lastTreatment = await treatment.findById(patientLastTreatmentID);
+        const secondToLastTreatment = await treatment.findById(patientSecondToLastTreatmentID);
+        let array = [];
+
+        if(nextTreatment.attended == false && lastTreatment.attended == true && secondToLastTreatment.attended == true){
+            for(let i = 0; i < lastTreatment.bottles.length(); i++){
+
+                let lastInjVol = lastTreatment.bottles[i].injVol;
+                let secLastInjVol = secondToLastTreatment.bottles[i].injVol;
+                let lastDoseAdvancement = lastTreatment.bottles[i].currentDoseAdvancement;
+                let secLastDoseAdvancement = secondToLastTreatment.bottles[i].currentDoseAdvancement;
+                let lastTreatmentBN = lastTreatment.bottles[i].currBottleNumber;
+                let secLastTreatmentBN = secondToLastTreatment.bottles[i].currBottleNumber;
+                let ptMaintBottle = foundPatient.maintenanceBottleNumber[i].maintenanceNumber;
+                let injVolIncreaseInterval = foundProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval;
+    
+    
+                let percentMaintenance = 0;
+                const totalInjCountForMaint = (foundProtocol.nextDoseAdjustment.maxInjectionVol / injVolIncreaseInterval) * ptMaintBottle
+    
+                if(lastInjVol >= (secLastInjVol + injVolIncreaseInterval)){
+                    lastDoseAdvancement = secLastDoseAdvancement + 1;
+                    await lastTreatment.save();
+                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                }
+                else{
+                    if(lastInjVol == secLastInjVol){
+                        lastDoseAdvancement = secLastDoseAdvancement;
+                        await lastTreatment.save();
+                        array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                    }
+                    else{
+                        if((parseInt(lastTreatmentBN) > secLastTreatmentBN) && (parseInt(lastTreatmentBN) < ptMaintBottle))
+                        {
+                            lastDoseAdvancement = secLastDoseAdvancement + 1;
+                            await lastTreatment.save();
+                            array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                        }
+                        else{
+                            if(lastTreatmentBN == "M"){
+                                lastDoseAdvancement = totalInjCountForMaint;
+                                await lastTreatment.save();
+                                array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                            }
+                            else{
+                                if((lastDoseAdvancement - ((secLastInjVol - lastInjVol) / injVolIncreaseInterval)) < 1)
+                                {
+                                    lastDoseAdvancement = 1;
+                                    await lastTreatment.save();
+                                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                                }
+                                else{
+                                    lastDoseAdvancement = (lastDoseAdvancement - ((secLastInjVol - lastInjVol) / injVolIncreaseInterval));
+                                    await lastTreatment.save();
+                                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            return res.status(404).json({message: `Next Treatment not calculated or past treatments are not valid`});
+        }
+
+        //Sending over array of percent maintenance for each vial in the same order as stored in treatment
+        return res.status(200).json({array, message: `Array of maintenance sent`});
+    }
+    catch(error){
+        console.log(error);
+        return res.status(404).json({ message: `Error`});
+    }
+}
+
+/*
+    Body of medications sent as json like this:
+
+    [{
+        medication: {
+            name:
+            dose:
+            frequency:
+        },
+        ...
+    }]
+*/
+
+
+const addAllergyMedication = async (req, res) => {
+    try{
+        const { lastName, email, phone, DoB, medications  } = req.body;
+        const findPatient = await patient.findOne({lastName: lastName, email: email, phone: phone, DoB: DoB});
+        findPatient.allergyMedication = medications;
+        await findPatient.save();
+    }
+    catch(error){
+        return res.status(400).json({ message: error.message})
+    }
+}
+
+// Get medication by id
+const getAllergyMedication = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const foundPatient = await patient.findById(id);
+        if (foundPatient) {
+            return res.status(200).json(foundPatient.allergyMedication);
+        } else {
+            return res.status(404).json({ message: `Patient not found: ${id}` });
+        }
+    }
+    catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+}
+
+const updateLLR = async (req, res) => {
+    try {
+        const { patientID, date, bottleName, injLLR } = req.body;
+        //const treatmentToUpdate = await treatment.findOneAndUpdate({patientID: patientID}, {...req.body} );
+        const treatmentToUpdate = await treatment.findOne(
+            { patientID: patientID, date: date}
+        );
+        const treatmentIndex = treatmentToUpdate.bottles.findIndex(bottleName == bottleName);
+        treatmentToUpdate.bottles[treatmentIndex].injLLR = injLLR;
+        await treatmentToUpdate.save();
+        res.status(200).json({ message: 'Successful update'});
+        
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
 // required for const functions
 module.exports = {
     addPatient,
@@ -199,4 +364,8 @@ module.exports = {
     addTokens,
     resetTokens,
     deletePatient,
+    addAllergyMedication,
+    findPercentMaintenance,
+    getAllergyMedication,
+    updateLLR
 }
