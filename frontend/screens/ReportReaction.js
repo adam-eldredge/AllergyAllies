@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback, ScrollView, TextInput, View } from 'react-native';
+import { StyleSheet, Text, Keyboard, KeyboardAvoidingView, Alert, TouchableOpacity, Platform, TouchableWithoutFeedback, ScrollView, TextInput, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 
@@ -25,14 +25,14 @@ const DropdownComponent = () => {
   const [vialValue, setVialValue] = useState(null);
   const [isFocusVial, setIsFocusVial] = useState(false);
 
-  const [notesValue, onChangeNotes] = React.useState(null);
+  const [notesValue, setNotesValue] = React.useState(null);
 
   const renderWhealSizeLabel = () => {
    
       return (
-        <Text style={[styles.label]}>
-          Wheal size
-        </Text>
+        <Text style = {styles.label}>
+        Wheal size <Text style={{ color: '#e55555' }}>*</Text>
+        </Text> 
       );
 
   };
@@ -40,20 +40,56 @@ const DropdownComponent = () => {
   const renderVialNumLabel = () => {
    
     return (
-      <Text style={[styles.label]}>
-        Which injection are you reporting a reaction for?
-      </Text>
+        <Text style = {styles.label}>
+        Which injection are you reporting a reaction for? <Text style={{ color: '#e55555' }}>*</Text>
+        </Text> 
     );
 
-    const handleSubmit = () => {
-        // send data to backend
-      };
+   
 
 };
 
+const handleSubmit = () => {
+
+
+
+   //error if wheal size or vial number not filled out
+  if (vialValue === null) {
+    Alert.alert('Error', 'Please select an injection');
+    return;
+  }
+  else if (whealValue === null) {
+    Alert.alert('Error', 'Please select a wheal size');
+    //return;
+  }
+  else {
+   //show alert
+  Alert.alert(
+    'Thank You',
+    'Reaction Submitted',
+    [
+      {
+        text: 'OK'
+      },
+    ]
+  );
+
+  //send whealValue, vialValue, and notesValue to backend
+
+  //reset inputs
+  setNotesValue(null)
+  setWhealValue(null)
+  setVialValue(null)
+
+}
+
+}
+
+
   return (
-    <KeyboardAvoidingView style={styles.container}>
-    <ScrollView>
+
+<KeyboardAvoidingView style={styles.container} behavior='position'>
+<ScrollView contentContainerStyle={styles.scrollContainer}>
 <View style = {styles.titleContainer}>
 <Text style = {styles.title}>Report a Reaction </Text>
 <Text style = {styles.subtitle}>If you are experiencing an adverse reaction to a recent injection, report it here. </Text>
@@ -111,24 +147,33 @@ const DropdownComponent = () => {
       />
     </View>
 
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <View style={styles.dropdownContainer}>
         <Text style = {styles.label}>Notes</Text>
         <TextInput
         editable
         multiline
-        numberOfLines={4}
-        maxLength={40}
+        numberOfLines={6}
+        maxLength={300}
         placeholder={'Add any notes about your reaction here.'}
-        onChangeNotes={notes => onChangeNotes(notes)}
+        onChangeText={notes => setNotesValue(notes)}
         value={notesValue}
-        style={styles.notesContainer}
+        style={[styles.notesContainer, { color: 'black', fontStyle: 'normal' }]}
+        //returnKeyType={'done'}
+        blurOnSubmit={true}
+        onSubmitEditing={()=>{Keyboard.dismiss()}}
       />
       </View>
-      </TouchableWithoutFeedback>
     </View>
+    <TouchableOpacity
+      style = {styles.submitButton}
+      onPress={handleSubmit}>
+      <Text style = {styles.submitButtonText}>Submit</Text>
+    </TouchableOpacity>
     </ScrollView>
     </KeyboardAvoidingView>
+
+    
+
   );
 };
 
@@ -137,7 +182,13 @@ export default DropdownComponent;
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    marginTop: 8,
+    paddingTop: 4,
+    flex: 1
+
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center'
 
   },
   dropdownContainer: {
@@ -223,5 +274,25 @@ subtitle2: {
    color: '#878787',
    fontStyle: 'italic'
 }, 
+submitButton: {
+    backgroundColor: 'white',
+    padding: 15,
+    paddingHorizontal: 1,
+    borderRadius: 8,
+    margin: 20,
+    width: '50%',
+    //justifyContent: 'flex-end',
+    alignItems: 'center',
+    shadowColor: 'black',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: .1,
+    shadowRadius: 3,
+},
+submitButtonText:{
+    color: '#E55555',
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: '600',
+},
 
 });

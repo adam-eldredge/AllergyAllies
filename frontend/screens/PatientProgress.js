@@ -382,7 +382,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
       },
     cardData: {
-        alignSelf: 'left',
+        //alignSelf: 'left',
         fontWeight: '500',
         fontSize: 15,
         marginBottom: 10,
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
         color: "#2b2b2b"
     }, 
     cardSubData: {
-        alignSelf: 'left',
+        //alignSelf: 'left',
         fontWeight: '400',
         fontSize: 12,
         color: '#878787',
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
         marginTop: 8
     }, 
     lastInj: {
-        alignSelf: 'left',
+        //alignSelf: 'left',
         fontWeight: '500',
         fontSize: 15,
         marginBottom: 2,
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
         color: "#2b2b2b"
     }, 
     maintenance: {
-        alignSelf: 'left',
+        //alignSelf: 'left',
         fontWeight: '500',
         fontSize: 14,
         marginBottom: 4,

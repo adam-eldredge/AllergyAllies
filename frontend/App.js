@@ -158,7 +158,7 @@ const SignedInMobileStack = (
       <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
       <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
       <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
-      <Stack.Screen name = "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false, animationTypeForReplace: 'push'}} />
+      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false, animationTypeForReplace: 'push'}} />
       <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'Injection Info'}} />
      
   </>
