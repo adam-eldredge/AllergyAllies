@@ -1,5 +1,5 @@
 const schedule = require('node-schedule');
-const treatment = require('../Models/treatment');
+const Treatment = require('../Models/treatment');
 const Protocol = require('../Models/protocols');
 const providerAlerts = require('../Models/alert');
 
@@ -59,37 +59,51 @@ async function createAlert(patient, alertType) {
     return alert;
 }
 
-// determine if injection(appointment) was missed
 async function attritionAlert() {
+
+    const patientsList = await Patient.find();
+    if (!patientsList) {return;}
+
+    const bundleArray = []
+    for (const patient of patientsList) {
+        if (!patient.practiceID) { continue; }
+
+        const treatment = await Treatment.findOne({
+            patiendID: patient._id,
+            attended: false
+        });
+
+        if (!treatment) {continue;}
+
+        const protocol = await Protocol.findOne({
+            practiceID: patient.practiceID
+        });
+
+        if (!protocol) {continue;}
+
+        const patientPracticeTreatmentBundle = {
+            patient: patient,
+            protocol: protocol,
+            treatment: treatment
+        }
+
+        bundleArray.push(patientPracticeTreatmentBundle);
+    }
+
+    await attritionAlertLogic(bundleArray);
+}
+
+// determine if injection(appointment) was missed
+async function attritionAlertLogic(bundleArray) {
     console.log("Attrition Job running");
     try {
-        const patientsList = await Patient.find(); 
         // this array is just used in testing
         const alertsArray = [];
 
-        for (const patient of patientsList) {
-            // get last treatment info, and interval of injection according to protocol
-            const patientTreatment = await treatment.findOne({
-                providerID: patient.providerID,
-                patientID: patient._id,
-            }).sort({ date: -1});
+        for (const bundle of bundleArray) {
 
-            const provider = await Provider.findById(patient.providerID);
-
-            if (!patientTreatment || !provider) {
-                continue;
-            }
-
-            const protocol = await Protocol.findOne({
-                practiceID: provider.practiceID
-            });
-
-            if (!protocol) {
-                continue;
-            }
-
-            const injectionInterval = protocol.nextDoseAdjustment.injectionInterval;
-            const lastInjectionDate = patientTreatment.date;
+            const injectionInterval = bundle.protocol.nextDoseAdjustment.injectionInterval;
+            const lastInjectionDate = bundle.treatment.patientTreatment.date;
 
             const currentDate = new Date();
 
@@ -99,11 +113,16 @@ async function attritionAlert() {
             const attritionRisk = currentDate > apptExpirationDate;
 
             // patient missed an injection
-            if (attritionRisk && !patientTreatment.attended && patient.status !== "ATTRITION") {
-                patient.status = "ATTRITION";
-                await patient.save();
+            if (attritionRisk && bundle.patient.status !== "ATTRITION") {
+                bundle.patient.status = "ATTRITION";
+                const patientInDB = await Patient.findById(bundle.patient.patientID);
+                let alert;
 
-                const alert = createAlert(patient, "AttritionAlert");
+                if (patientInDB) {
+                    await bundle.patient.save();
+                }
+
+                alert = await createAlert(bundle.patient, "AttritionAlert");
                 alertsArray.push(alert);
             }
         }
@@ -297,8 +316,8 @@ async function maintenanceAlert() {
                 alertsArray.push(alert);
 
             } else if (!patientAtMaintenance && patient.status === 'MAINTENANCE' ) {
-                patient.status === 'DEFAULT';
-                patient.statusDate === new Date();
+                patient.status = 'DEFAULT';
+                patient.statusDate = new Date();
                 await patient.save();
             }
         }
