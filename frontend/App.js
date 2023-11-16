@@ -19,7 +19,10 @@ import InitialScreen from './screens/InitialScreen.js';
 import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
 import ViewPatients from './screens/ViewPatients.js';
+
+import ViewAllAppointments from './screens/ViewAllAppointments.js';
 import PatientDetails from './screens/PatientDetails.js';
+
 import { useMemo, useReducer, useEffect } from 'react';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -27,6 +30,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import jwt_decode from 'jwt-decode';
 import PatientAppointments from './screens/PatientAppointments.js';
 import InitialMobileScreen from './screens/InitialMobileScreen.js'
+import InjectionInfo from './screens/InjectionInfo.js';
+//import AppointmentInfo from './screens/AppointmentInfo';
 
 // Secure store doesn't work on web, only iOS and android ^
 
@@ -152,10 +157,13 @@ const InitialDesktopStack = (
 
 const SignedInMobileStack = (
   <>
-      <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Allergy Ally'}} />
+      <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'AllergyAlly'}} />
       <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
       <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
       <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
+      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false, animationTypeForReplace: 'push'}} />
+      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'Injection Info'}} />
+     
   </>
 );
 
