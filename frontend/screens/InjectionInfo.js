@@ -241,7 +241,6 @@ const styles = StyleSheet.create({
     },
     pastAppointmentText: {
         fontSize: 17,
-        marginBottom: 4,
         fontWeight: '500',
         marginTop: 12,
         marginLeft: 20,
