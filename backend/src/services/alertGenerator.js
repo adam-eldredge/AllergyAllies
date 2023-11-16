@@ -59,8 +59,8 @@ async function createAlert(patient, alertType) {
     return alert;
 }
 
-async function attritionAlert() {
-
+// creates array of patients, relevant protocol, and treatment
+async function getPatientsProtocolsTreatments(alertType) {
     const patientsList = await Patient.find();
     if (!patientsList) {return;}
 
@@ -68,9 +68,14 @@ async function attritionAlert() {
     for (const patient of patientsList) {
         if (!patient.practiceID) { continue; }
 
+        let attended = true;
+        if (alertType === "attrition") {
+            attended = false;
+        }
+
         const treatment = await Treatment.findOne({
-            patiendID: patient._id,
-            attended: false
+            patientID: patient._id,
+            attended: attended
         });
 
         if (!treatment) {continue;}
@@ -90,6 +95,12 @@ async function attritionAlert() {
         bundleArray.push(patientPracticeTreatmentBundle);
     }
 
+    return bundleArray;
+}
+
+async function attritionAlert() {
+    const alertType = "attrition";
+    const bundleArray = await getPatientsProtocolsTreatments(alertType);
     await attritionAlertLogic(bundleArray);
 }
 
@@ -99,30 +110,29 @@ async function attritionAlertLogic(bundleArray) {
     try {
         // this array is just used in testing
         const alertsArray = [];
-
+        if (bundleArray.length === 0) { return alertsArray; }
         for (const bundle of bundleArray) {
 
             const injectionInterval = bundle.protocol.nextDoseAdjustment.injectionInterval;
-            const lastInjectionDate = bundle.treatment.patientTreatment.date;
-
+            const lastInjectionDate = bundle.treatment.date;
             const currentDate = new Date();
 
             const apptExpirationDate = new Date(lastInjectionDate);
             apptExpirationDate.setDate(apptExpirationDate.getDate() + injectionInterval);
-
+     
             const attritionRisk = currentDate > apptExpirationDate;
 
             // patient missed an injection
             if (attritionRisk && bundle.patient.status !== "ATTRITION") {
                 bundle.patient.status = "ATTRITION";
-                const patientInDB = await Patient.findById(bundle.patient.patientID);
-                let alert;
 
+                const patientInDB = await Patient.findById(bundle.patient._id);
                 if (patientInDB) {
-                    await bundle.patient.save();
+                    patientInDB.status = "ATTRITION";
+                    patientInDB.statusDate = new Date();
+                    await patientInDB.save();
                 }
-
-                alert = await createAlert(bundle.patient, "AttritionAlert");
+                const alert = await createAlert(bundle.patient, "AttritionAlert");
                 alertsArray.push(alert);
             }
         }
@@ -132,8 +142,10 @@ async function attritionAlertLogic(bundleArray) {
     }
 }
 
-async function needsRetestSnoozeCheck(patient) {
-    if (!patient.needsRetestData || !patient.needsRetestData.needsRetestSnooze) {
+async function needsRetestSnoozeCheck(patientTemp) {
+
+    const patient = await Patient.findById(patientTemp._id);
+    if (!patient || !patient.needsRetestData || !patient.needsRetestData.needsRetestSnooze) {
         return;
     } 
 
@@ -151,8 +163,14 @@ async function needsRetestSnoozeCheck(patient) {
     }
 }
 
-// needs test
 async function needsRetestAlert() {
+    const alertType = "needsRetest";
+    const bundleArray = await getPatientsProtocolsTreatments(alertType);
+    await needsRetestAlertLogic(bundleArray);
+}
+
+// needs test
+async function needsRetestAlertLogic(bundleArray) {
     console.log("Needs Retest Job running");
 
     const formatDate = (dateString) => {
@@ -167,46 +185,19 @@ async function needsRetestAlert() {
     }
 
     const alertsArray = [];
+    if (bundleArray.length === 0) { return alertsArray; }
+    
     try {
         // get list of all patients 
-        const patientsList = await Patient.find(); 
 
-        for (const patient of patientsList) {
-            if (patient.status !== "MAINTENANCE") {
-                continue;
-            }
-
-            const patientTreatment = await treatment.findOne({
-                providerID: patient.providerID,
-                patientID: patient._id,
-            }).sort({ date: -1});
-            
-            if (!patientTreatment) {
-                continue;
-            }
-
-            const provider = await Provider.findById(patient.providerID);
-
-            if (!provider) {
-                continue;
-            }
-
-            const protocol = await Protocol.findOne({
-                practiceID: provider.practiceID
-            });
-
-            if (!protocol) {
-
-                continue;
-            }
-
+        for (const bundle of bundleArray) {
             // check is needsRetestSnooze is expired and update if so
-            needsRetestSnoozeCheck(patient);
+            needsRetestSnoozeCheck(bundle.patient);
 
-            const maxInjectVol = protocol.nextDoseAdjustment.maxInjectionVol;
+            const maxInjectVol = bundle.protocol.nextDoseAdjustment.maxInjectionVol;
             let needsRetest = true;
 
-            const treatmentStartDate = formatDate(patient.treatmentStartDate);
+            const treatmentStartDate = formatDate(bundle.patient.treatmentStartDate);
 
             // calculate 18 months from treatmentStartDate
             const oneYearLater = new Date(treatmentStartDate);
@@ -216,16 +207,17 @@ async function needsRetestAlert() {
 
             const oneYearHasPassed = currentDate >= oneYearLater;
             
-            for (const b of patientTreatment.bottles) {
+            for (const b of bundle.treatment.bottles) {
+                const needsRetestSnoozeStatus = bundle.patient.needsRetestData.needsRetestSnooze.active;
                 // patient is assumed to need retest; if need retest definitions not satisf. then set false.
-                if (b.currBottleNumber !== 'M' || b.injVol !== maxInjectVol || !oneYearHasPassed || patient.needsRetestData.needsRetestSnooze.active) {
+                if (b.currBottleNumber !== 'M' || b.injVol !== maxInjectVol || !oneYearHasPassed || needsRetestSnoozeStatus) {
                     needsRetest = false;
                 }
             }
 
             if (needsRetest) {
                 // save patient data
-                const alert = createAlert(patient, "NeedsRetestAlert");
+                const alert = await createAlert(bundle.patient, "NeedsRetestAlert");
                 alertsArray.push(alert);
             }   
         }
@@ -273,52 +265,51 @@ async function needsRefillAlert() {
     }
 }
 
-// at maintenance alert - all vials at M and highest concentration
 async function maintenanceAlert() {
+    const alertType = "maintenance";
+    const bundleArray = await getPatientsProtocolsTreatments(alertType);
+    await maintenanceAlertLogic(bundleArray);
+}
+
+// at maintenance alert - all vials at M and highest concentration
+async function maintenanceAlertLogic(bundleArray) {
     console.log("Maintenance Job running");
+
     const alertsArray = [];
+    if (bundleArray.length === 0) { 
+        console.log("no bundles");
+        return alertsArray; 
+    }
     try {
-        const patientsList = await Patient.find();
         let patientAtMaintenance = true;
 
-        for (const patient of patientsList) {
+        for (const bundle of bundleArray) {
 
-            if(!patient.providerID) { continue; }
-            const patientTreatment = await treatment.findOne({
-                providerID: patient.providerID,
-                patientID: patient._id,
-            }).sort({ date: -1});
-            
-            if (!patientTreatment) {continue;}
-
-            const provider = await Provider.findById(patient.providerID);
-
-            if (!provider) {continue;}
-                
-            const protocol = await Protocol.findOne({
-                practiceID: provider.practiceID
-            });
-
-            if (!protocol) { continue;}
-               
-            for (const bottle of patientTreatment.bottles) {
-                if (bottle.injVol !== protocol.nextDoseAdjustment.maxInjectionVol || bottle.currBottleNumber !== 'M') {
+            const maxInjectVol = bundle.protocol.nextDoseAdjustment.maxInjectionVol;
+            for (const bottle of bundle.treatment.bottles) {
+                if (bottle.injVol !== maxInjectVol || bottle.currBottleNumber !== 'M') {
                     patientAtMaintenance = false;
                 }
             }
-            // change patient status to maint if not already, or remove current maintenance status
-            if (patientAtMaintenance && patient.status !== 'MAINTENANCE') {
-                patient.status = 'MAINTENANCE';
-                patient.statusDate = new Date();
-                await patient.save();
 
-                const alert = createAlert(patient, "MaintenanceAlert");
+            const patientInDB = await Patient.findById(bundle.patient._id);
+            // change patient status to maint if not already, or remove current maintenance status
+            if (patientAtMaintenance && bundle.patient.status !== 'MAINTENANCE') {
+                if (patientInDB) {
+                    patientInDB.status = 'MAINTENANCE';
+                    patientInDB.statusDate = new Date();
+                    await patientInDB.save();
+                }
+
+                const alert = await createAlert(bundle.patient, "MaintenanceAlert");
                 alertsArray.push(alert);
 
-            } else if (!patientAtMaintenance && patient.status === 'MAINTENANCE' ) {
-                patient.status = 'DEFAULT';
-                patient.statusDate = new Date();
-                await patient.save();
+            } else if (!patientAtMaintenance && bundle.patient.status === 'MAINTENANCE' ) {
+                if (patientInDB) {
+                    patientInDB.status = 'DEFAULT';
+                    patientInDB.statusDate = new Date();
+                    await patientInDB.save();
+                }
             }
         }
 
@@ -328,10 +319,6 @@ async function maintenanceAlert() {
         console.error(error);
     }
 }
-
-// check if injections(bottle) need to be mixed ( patient is almost done with current bottle number)
-    // "max injection volume is soon to be reached"
-// check if injections(bottle) is expiring 
 
 // This string means: run daily, at midnight
 const scheduleString = '0 0 * * *';
@@ -344,9 +331,10 @@ module.exports = {
     attritionAlert,
     needsRetestAlert,
     maintenanceAlert,
-
+    attritionAlertLogic,
+    needsRetestAlertLogic,
+    maintenanceAlertLogic,
     missedAppointmentJob,
     needsRetestJob,
-    //needsRefillJob,
     maintenanceJob
 };

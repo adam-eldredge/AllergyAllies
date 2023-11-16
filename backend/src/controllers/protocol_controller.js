@@ -47,7 +47,6 @@ async function updateProtocol(surveyData) {
     }
 }
 
-
 const getProtocol = async (req, res) => {
     try {
         const practiceID = req.params.practiceID;

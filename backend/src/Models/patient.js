@@ -13,6 +13,10 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    practiceID: {
+        required: false,
+        type: String
+    },
     phone: {
         required: true,
         type: String
@@ -40,10 +44,6 @@ const dataSchema = new mongoose.Schema({
             nameOfBottle: String,
             maintenanceNumber: Number,
         }],
-    },
-    providerID: {
-        require: false,
-        type: String,
     },
     // DEFAULT, INACTIVE, MAINTENANCE, ATTRITION
     status: {

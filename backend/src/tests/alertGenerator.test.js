@@ -1,77 +1,94 @@
 const {app, server} = require('../index');
+const schedule = require('node-schedule');
 const mongoose = require('mongoose');
-const Patient = require('../Models/patient');
-const {attritionAlert, needsRetestAlert, maintenanceAlert} = require('../services/alertGenerator');
+const ProviderAlerts = require('../Models/alert');
+const { mockPatient, mockProtocol, mockTreatment} = require('./mockData/mockData');
+const {
+    attritionAlertLogic, 
+    needsRetestAlertLogic,
+    maintenanceAlertLogic,
+    missedAppointmentJob,
+    needsRetestJob,
+    maintenanceJob,
+} = require('../services/alertGenerator');
 
-const patient = {
-    "firstName": "Harry",
-    "lastName": "Potter",
-    "email": "harry.potter@example.com",
-    "phone": "1234567890",
-    "password": "harry123",
-    "DoB": "01-01-1980",
-    "treatments": ["treatmentId1", "treatmentId2"],
-    "treatmentStartDate": "2023-01-01",
-    "maintenanceBottleNumber": [
-      {
-        "nameOfBottle": "Bottle1",
-        "maintenanceNumber": 5
-      },
-      {
-        "nameOfBottle": "Bottle2",
-        "maintenanceNumber": 8
-      }
-    ],
-    "providerID": "providerId123",
-    "status": "DEFAULT",
-    "statusDate": "2023-11-16T00:00:00.000Z",
-    "tokens": 10,
-    "needsRetestData": {
-      "needsRetest": false,
-      "needsRetestSnooze": {
-        "active": null,
-        "dateOfSnooze": null,
-        "snoozeDuration": null
-      }
-    },
-    "allergyMedication": [
-      {
-        "name": "Medication1",
-        "dose": "10mg",
-        "frequency": "Twice daily"
-      },
-      {
-        "name": "Medication2",
-        "dose": "5mg",
-        "frequency": "Once daily"
-      }
-    ]
-}
-
-
-describe('attritionAlert()', () => {
+describe('attrition', () => {
     it('Should match output', async () => {
-        const alerts = await attritionAlert();
+        const array = [{
+            patient: mockPatient,
+            protocol: mockProtocol,
+            treatment: mockTreatment
+        }];
+        
+        const alerts = await attritionAlertLogic(array);
+        console.log(alerts);
+
+        expect(alerts[0].patientName).toBe("Harry Potter");
+        expect(alerts[0].alertType).toBe("AttritionAlert");
         expect(alerts).toBeDefined();
+
+        await ProviderAlerts.findByIdAndDelete(alerts[0]._id);
     });
 });
 
-/*
-describe('needsRetestAlert()', () => {
+describe('needsRetest()', () => {
     it('Should create alert', async () => {
-        const alerts = await needsRetestAlert();
+        for (const b of mockTreatment.bottles) {
+            b.currBottleNumber = "M";
+        }
+        
+        const array = [{
+            patient: mockPatient,
+            protocol: mockProtocol,
+            treatment: mockTreatment
+        }];
+        const alerts = await needsRetestAlertLogic(array);
+
         expect(alerts).toBeDefined();
+        console.log(alerts);
+
+        expect(alerts[0].patientName).toBe("Harry Potter");
+        expect(alerts[0].alertType).toBe("NeedsRetestAlert");
+
+        await ProviderAlerts.findByIdAndDelete(alerts[0]._id);
     });
 });
 
-describe('maintenanceAlert()', () => {
+describe('maintenanceAlert', () => {
     it('Should create alert', async () => {
-        const alerts = await maintenanceAlert();
+        // alter test patient
+        for (const b of mockTreatment.bottles) {
+            b.currBottleNumber = "M";
+            b.injVol = mockProtocol.nextDoseAdjustment.maxInjectionVol;
+        }
+        mockPatient.status = 'DEFAULT';
+    
+        const array = [{
+            patient: mockPatient,
+            protocol: mockProtocol,
+            treatment: mockTreatment
+        }];
+        const alerts = await maintenanceAlertLogic(array);
+
         expect(alerts).toBeDefined();
+        console.log(alerts);
+
+        expect(alerts[0].patientName).toBe("Harry Potter");
+        expect(alerts[0].alertType).toBe("MaintenanceAlert");
+
+        await ProviderAlerts.findByIdAndDelete(alerts[0]._id);
     });
 });
-*/
+
 afterAll(async () => {
+    // Close the Express server
+    await new Promise(resolve => server.close(resolve));
+  
+    // Close the Mongoose connection
     await mongoose.connection.close();
-    server.close();
+  
+    // Cancel scheduled jobs
+    schedule.cancelJob(needsRetestJob);
+    schedule.cancelJob(missedAppointmentJob);
+    schedule.cancelJob(maintenanceJob);
 });
