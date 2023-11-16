@@ -1,34 +1,19 @@
 const patient = require('../Models/patient');
-//const provider = require('../Models/provider');
 const protocol = require('../Models/protocols')
-// const practice = require('../Models/practice');
 const treatment = require('../Models/treatment');
 const { Report } = require('../Models/report');
-const { getAllPatientsHelper } = require('../controllers/patient_controller');
 const provider = require('../Models/provider');
 
-async function generateReport(providerID, reportType, data) {
-    // Report name formatting
-    const currentDate = new Date();
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); 
-    const day = currentDate.getDate().toString().padStart(2, '0');
-    const year = currentDate.getFullYear().toString().slice(-2); 
-    const formattedDate = `${month}_${day}_${year}`;
-    const reportName = `${reportType}_${formattedDate}`;
-    // Generate the report
-    try {
-        const report = new Report({
-            providerID,
-            reportType,
-            reportName,
-            data: data,
-        });
+const { getAllPatientsHelper } = require('../controllers/patient_controller');
+const { generateReport, findMatchingBottle } = require('../helpers/reportHelper');
 
-        const savedReport = await report.save();
-        return savedReport;
-    } catch (error) {
-       throw new Error(error.message); 
-    }
+async function getTreatment(providerID, patientID) {
+    const patientTreatment = await treatment.findOne({
+        providerID: providerID.toString(),
+        patientID: patientID.toString(),
+    }).sort({ date: -1});
+    
+    return patientTreatment;
 }
 
 exports.deleteReport = async (req, res) => {
@@ -47,10 +32,23 @@ exports.deleteReport = async (req, res) => {
     return res.status(200).json({message: "Report deleted"})
 }
 
+exports.deleteAllReports = async (req, res) => {
+    try {
+        const result = await Report.deleteMany({});
+        if (result.deletedCount > 0) {
+            return res.status(200).json({ message: "All reports deleted"});
+        } else {
+            return res.status(201).json({ message: "No reports found"});
+        }
+    } catch (error) {
+        return res.status(401).json(error.message);
+    }
+}
+
 exports.getAllReportNames = async (req, res) => {
     const providerID = req.params.providerID; 
     try {
-        const reports = await Report.find({ providerID: providerID}).select('-data -createdAt -updatedAt -__v');
+        const reports = await Report.find({ providerID: providerID}).select('-providerID -data -createdAt -updatedAt -__v');
         return res.status(200).json({ reports });
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -72,9 +70,11 @@ exports.getReportData = async (req, res) => {
     }
 }
 
+/*============== Generate Report Functions ====================*/
+
 exports.generateApproachingMaintenanceReport = async (req, res) => {
     const providerID = req.params.providerID;
-    reportType = "ApproachingMaintenance";
+    const reportType = "ApproachingMaintenance";
 
     const patientsList = await getAllPatientsHelper(providerID);
 
@@ -82,36 +82,53 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
 
     // Iterate over each patient, checking their bottles
     for (const p of patientsList) {
-        const patientTreatment = await treatment.findOne({
-            patientID: p._id.toString(),
-        });
+        if(p.status === "MAINTENANCE") {
+            continue;
+        }
+
+        // find treatment data
+        const patientTreatment = await getTreatment(providerID, p._id)
 
         if (!patientTreatment) {
             continue;
         }
 
-        const foundProtocol = await protocol.findOne({ providerID: p.providerID });
+        const vialInfo = [];
+        let treatmentStartDate = new Date();
+        let allBottlesAtMaintenance = true;
+        let atleastOneMaintenanceBottle = false;
+        
+        // iterate over patient treatment vials
+        for (const bottle of patientTreatment.bottles) {
+            // match bottle in patient model to bottle in treatment (b)
+            const matchingBottle = await findMatchingBottle(p, bottle);
 
-        if (!foundProtocol) {
-            continue;
-        }
+            let patientCurrentBottleNumber = bottle.currBottleNumber;
 
-        const maxInjectVol = foundProtocol.nextDoseAdjustment.maxInjectionVol;
-        const maintenanceBottles = [];
-        let treatmentStartDate;
+            // check if bottle meets approaching maint. def.
+            if (patientCurrentBottleNumber === 'M') {
+                atleastOneMaintenanceBottle = true;
+                patientCurrentBottleNumber = matchingBottle.maintenanceNumber;
 
-        for (const b of patientTreatment.bottles) {
-            if (b.currBottleNumber === 'M') {
-                maintenanceBottles.push(b.nameOfBottle);
-                treatmentStartDate = b.date;
+            } else {
+                allBottlesAtMaintenance = false;
+            } 
+
+            // eg: Pollen 3/7, Mold 7/7 (M)
+            vialInfo.push(`${bottle.nameOfBottle} ${patientCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
+
+            // get earliest treatment date
+            if(treatmentStartDate > bottle.date) {
+                treatmentStartDate = bottle.date;
             }
         }
 
-        if (maintenanceBottles.length > 0) {
+        if (vialInfo.length > 0 && !allBottlesAtMaintenance && atleastOneMaintenanceBottle) {
             approachingMaintenanceData.push({
                 patientName: p.firstName + " " + p.lastName,
-                maintenanceBottles: maintenanceBottles,
+                maintenanceBottles: vialInfo,
                 startDate: treatmentStartDate,
+                DOB: p.DoB,
                 phoneNumber: p.phone,
                 email: p.email,
             });
@@ -120,8 +137,13 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
 
     // Generate the report
     try {
-        const savedReport = await generateReport(providerID, reportType, approachingMaintenanceData);
-        return res.status(200).json(savedReport);
+        if (approachingMaintenanceData.length > 0) {
+            const manual = true;
+            const savedReport = await generateReport(providerID, reportType, manual, approachingMaintenanceData);
+            return res.status(200).json(savedReport);
+        } else {
+            return res.status(201).json({message: "No patients approaching maintenance"});
+        }
     } catch (error) {
         return res.status(400).json({ message: error.message });
     }
@@ -131,157 +153,136 @@ exports.generateAttritionReport = async (req, res) => {
     try {
         const providerID = req.params.providerID;  
         const reportType = "Attrition";
-        const patientsList = await getAllPatientsHelper(providerID); 
         const patientAttrition = [];
+        const today = new Date();
+
+        const patientsList = await getAllPatientsHelper(providerID); 
+        //const foundProvider = await provider.findById(providerID);
 
         for (const p of patientsList) {
-            if (p.status == "ATTRITION") {
-                patientAttrition.push({
-                    patientName: p.firstName + " " + p.lastName,
-                    //status: p.status,
-                    statusDate: p.statusDate,
-                    email: p.email,
-                    phone: p.phone
-                })
+
+            if (p.status !== "ATTRITION") {
+                continue;
+            }
+
+            const patientBottles = [];
+            const foundTreatment = await getTreatment(providerID, p._id);
+
+            if (!foundTreatment) {
+                console.log("treatment not found in attrition report");
+                continue;
+            }
+
+            for(const bottle of foundTreatment.bottles) {
+                // find protocol to find out max bottle number
+                const matchingBottle = await findMatchingBottle(p, bottle);
+    
+                let treatmentCurrentBottleNumber = bottle.currBottleNumber;
+                
+                if(treatmentCurrentBottleNumber === 'M') {
+                    treatmentCurrentBottleNumber = matchingBottle.maintenanceNumber;
+                } 
+                
+                // eg: Pollen 3/7, Mold 7/7 (M)
+                patientBottles.push(`${bottle.nameOfBottle} ${treatmentCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
+            }
+
+            const timeDiff= today - p.statusDate;
+            const daysSinceLastInjection = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+            patientAttrition.push({
+                patientName: p.firstName + " " + p.lastName,
+                bottlesInfo: patientBottles,
+                daysSinceLastInjection: daysSinceLastInjection,
+                statusDate: p.statusDate,
+                DOB: p.DoB,
+                phone: p.phone,
+                email: p.email,
+            });
+        }
+
+        if (patientAttrition.length > 0) {
+            const manual = true;
+            const savedReport = await generateReport(providerID, reportType, manual, patientAttrition);
+            return res.status(200).json(savedReport);
+        } else {
+            return res.status(201).json({message: "No patients at risk of attrition."})
+        }
+        
+    } catch (error) {
+        return res.status(400).json({ message:`Error in attrition ${error.message}` }); 
+    }
+}
+
+// not working - requires a vial size associated with vials 
+exports.generateRefillsReport = async (req, res) => {
+    const providerID = req.params.providerID;
+    const reportType = "Refills";
+    const patientRefillsData = [];
+
+    const patientsList = await getAllPatientsHelper(providerID);
+    const foundProvider = await provider.findById(providerID);
+
+    for (const p of patientsList) {
+        const patientTreatment = await treatment.findOne({
+            providerID: p.providerID.toString(),
+            patientID: p._id.toString(),
+        });
+
+        const foundProtocol = await protocol.findOne({ practiceID: foundProvider.practiceID });
+
+        if (!foundProtocol || !patientTreatment) {
+            continue;
+        }
+
+        // also need to check for expiration. Can have provider insert expiration date each time,
+        // or just include as survey question (After how many days do your vials expire?)
+
+        const bottleRefillsData = [];
+        const bottleExpirationData = [];
+        for (const b of patientTreatment.bottles) {
+            const currentDate = new Date();
+            // check if bottle will expire within two weeks
+            const expireSoonDate = b.expirationDate;
+            expireSoonDate.setDate(expireSoonDate.getDate() - 7);
+
+            const expiresSoon = currentDate >= expireSoonDate;
+
+            if(expiresSoon) {
+                bottleExpirationData.push({
+                    bottleName: b.nameOfBottle,
+                    expirationDate: b.expirationDate,
+                });
+            }
+            else if (b.needsRefill) {
+                const matchingBottle = foundProtocol.bottles.find(
+                    (protocolBottle) => protocolBottle.bottleName === b.nameOfBottle
+                );
+
+                bottleRefillsData.push({
+                    bottleName: b.nameOfBottle,
+                    volumeLeft: matchingBottle.bottleSize - b.injSumForBottleNumber,
+                });
             }
         }
 
-        const savedReport = await generateReport(providerID, reportType, patientAttrition);
-        return res.status(200).json(savedReport);
-    } catch (error) {
-        return res.status(400).json({ message:`Error in attrition error.message` }); 
-    }
-}
-
-// composite collection of all refill data for each patient
-exports.generateGeneralRefillsReport = async (req, res) => {
-    // can be done by using other refill functions to return arrays
-    // w/ specific data, then attaching to name
-}
-
-exports.generateAllergyDropsRefillsReport = async (req, res) => {
-    // find out bottle volume
-    // find out volume of each injection currently
-    // needs refill if patient will run out soon 
-    
-    const providerID = req.params.providerID; 
-    const reportType = "DropsRefills";
-    const patientsList = await getAllPatientsHelper(providerID); 
-    const patientRefills = [];
-
-    // get rate of expiration/injection based on treatment dosage
-    for (const p of patientsList) {
-        // using time would probably be better here
-        // calculate by what day the bottle should be close to empty, based on vol and dosageRate
-        const dropsBottleVolume = 40, dose = 1, frequency = 7, doseInMl = 0.05; 
-        const dateStartedTreatment = new Date('2023-10-20');
-
-        const daysUntilRefill = dropsBottleVolume / (dose * doseInMl * frequency);
-
-        const refillNeededDate = new Date(dateStartedTreatment.getDate() + daysUntilRefill);
-        const currentDate = new Date();
-
-        if (currentDate >= refillNeededDate) {
-            const patientData = {
-                patientName: p.firstName,
-                needsRefill: true,
-            };
-
-            patientRefills.push(patientData);
-        }
+        patientRefillsData.push({
+            patientName: p.firstName + " " + p.lastName,
+            refillData: bottleRefillsData,
+            expirationData: bottleExpirationData,
+            DOB: p.DoB,
+            phone: p.phone,
+            email: p.email,
+        });
     }
 
     try {
-        const savedReport = await generateReport(providerID, reportType, patientRefills);
-        return res.status(200).json(savedReport);
-    } catch (error) {
-        return res.status(400).json({ message: error.message }); 
-    }
-    
-}
-
-exports.generateAllergyShotsRefillsReport = async (req, res) => {
-    const providerID = req.params.providerID;  
-    const reportType = "ShotsRefills";
-    const patientsList = await getAllPatientsHelper(providerID); 
-    const patientRefills = [];
-
-    const practiceAntigens = "Pollen, Insects, Mold"; // <- input received
-    const Antigens = practiceAntigens.split(',').map(antigen => antigen.trim());
-    const numbAntigens = Antigens.length
-
-    const practiceArray = [];
-    for (let i = 0; i < numbAntigens; i++) {
-        practiceArray.push( { antigen: Antigens[i], bottleVol: 50});
-    }
-
-    // get rate of expiration/injection based on treatment dosage
-    for (const p of patientsList) {
-        const patientData = {
-            patientName: p.firstName,
-            refillData: [],
-        };
-
-        // calculates refill needed based on summing past dosage amounts and subtracting from volume
-        for (const a of practiceArray) {
-            const shotsTaken = 4;
-            const dosageAmounts = [0.1, 0.2, 0.3, 0.4]; // scan from treatment
-            const totalVolumeSpent = dosageAmounts.reduce((acc, amount) => acc + amount, 0);
-
-            const needsRefill = a.bottleVol - totalVolumeSpent < 3;
-
-            patientData.refillData.push({
-                antigen: a.antigen,
-                needsRefill: needsRefill,
-            });
-        }
-
-        patientRefills.push(patientData);
-    }
-
-    try {
-        const savedReport = await generateReport(providerID, reportType, patientRefills);
+        const savedReport = await generateReport(providerID, reportType, true, patientRefillsData);
         return res.status(200).json(savedReport);
     } catch (error) {
         return res.status(400).json({ message: error.message }); 
     }
 }
 
-// need method of having patient notify if they used it (checking expiration pointless then)
-exports.generateEpipenRefillsReport = async (req, res) => {
-    /*
-    Epi-pen Refill reminder
-    Date of expiration needs to be input
-    Reminder pops up 10 days prior to expiration date
-    Snooze vs Dismiss reminder function 
-    */
-    const providerID = req.params.providerID; 
-    const reportType = "EpipenRefill";
-
-    const patientsList = await getAllPatientsHelper(providerID);
-    const expirationDate = new Date();
-    const currentDate = new Date();
-
-    const epipenRefillsArray = []
-
-    for (p of patientsList) {
-        if (currentDate >= expirationDate) {
-            epipenRefillsArray.push({
-                patientName: p.firstName + " " + p.lastName,
-                needsEpipenRefill: true
-            });
-        }
-    }
-
-    try {
-        const savedReport = await generateReport(providerID, reportType, epipenRefillsArray);
-        return res.status(200).json(savedReport);
-    } catch (error) {
-        return res.status(400).json({ message: error.message }); 
-    }
-}
-
-// needs testing
 exports.generateNeedsRetestReport = async (req, res) => {
     const providerID = req.params.providerID; 
     const reportType = "NeedsRetest";
@@ -291,43 +292,118 @@ exports.generateNeedsRetestReport = async (req, res) => {
 
     // simplify - make function to check if patient status is maintenance
     for (p of patientsList) {
+        if(p.status !== "MAINTENANCE") {
+            continue;
+        }
+
+        // get newest treatment data
         const patientTreatment = await treatment.findOne({
+            providerID: p.providerID,
             patientID: p._id.toString(),
-        });
+        }).sort({ date: -1});
 
         if (!patientTreatment) {
             continue;
         }
 
-        const patientBottles = [];
+        let dateLastTested;
 
-        for (const b of patientTreatment.bottles) {
-            
-            if (b.needsRetest) {
-                patientBottles.push({
-                    bottleName: b.nameOfBottle,
-                    maintenanceDate: b.date
-                })
-            }
+        if (!patientTreatment.lastVialTests) {
+            dateLastTested = "N/A";
+        } else {
+            dateLastTested = patientTreatment.lastVialTests.date;
         }
 
-        if (patientBottles.length > 0) {
-            needsRetestOutput.push({
-                patientName: p.firstName + " " + p.lastName,
-                bottles: patientBottles,
-                phoneNumber: p.phone,
-                email: p.email,
-            })
-        }
+        needsRetestOutput.push({
+            patientName: p.firstName + " " + p.lastName,
+            treatmentStartDate: p.treatmentStartDate,
+            maintenanceDate: p.statusDate,
+            dateLastTested,
+            DOB: p.DoB,
+            phoneNumber: p.phone,
+            email: p.email,
+        });
     }
 
     try {
-        const savedReport = await generateReport(providerID, reportType, needsRetestOutput);
-        return res.status(200).json(savedReport);
+        if (needsRetestOutput.length > 0) {
+            const manual = true;
+            const savedReport = await generateReport(providerID, reportType, manual, needsRetestOutput);
+            return res.status(200).json(savedReport);
+        } else {
+            return res.status(201).json({message: "No patients need retest"});
+        }
     } catch (error) {
         return res.status(400).json({ message: error.message }); 
     }
 }
+
+// snoozes a patient showing up on needs retest report
+// needs test
+exports.needsRetestSnooze = async (req, res) => {
+    const providerID = req.params.providerID;
+    const patientFirstName = req.body.firstName;
+    const patientLastName = req.body.lastName;
+    const patientEmail = req.body.email;
+    const snoozeDuration = req.body.snoozeDuration;
+
+    try {
+        const foundPatient = await patient.findOne({ firstName: patientFirstName, lastName: patientLastName, email: patientEmail});
+
+        if (!foundPatient) {
+            return res.status(400).json({ message: "patient not found"});
+        }
+
+        const foundTreatment = await treatment.findOne({
+            providerID: p.providerID,
+            patientID: p._id.toString(),
+        }).sort({ date: -1});;
+
+        for (const b of foundTreatment.bottles) {
+            if (b.needsRetest) {
+                b.needsRetestSnooze.active = true;
+                b.needsRetestSnooze.dateOfSnooze = new Date();
+                b.snoozeDuration = snoozeDuration;
+                await b.save();
+            }
+        }
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+// needs test
+exports.patientRetested = async (req, res) => {
+    const providerID = req.params.providerID;
+    const patientFirstName = req.body.firstName;
+    const patientLastName = req.body.lastName;
+    const patientEmail = req.body.email;
+
+    try {
+        const foundPatient = await patient.findOne({ firstName: patientFirstName, lastName: patientLastName, email: patientEmail});
+
+        if (!foundPatient) {
+            return res.status(400).json({ message: "patient not found"});
+        }
+
+        const foundTreatment = await treatment.findOne({ providerID: providerID, patientID: foundPatient._id});
+
+        for (const b of foundTreatment.bottles) {
+            if (b.needsRetest) {
+                b.needsRetest = false;
+                await b.save();
+            }
+        }
+
+    } catch (error) {
+        return res.status(404).json({ message: error.message });
+    }
+}
+
+
+
+
+
 
 /* Get records and compile functions */
 
@@ -336,38 +412,3 @@ exports.generateNeedsRetestReport = async (req, res) => {
 // ie: Want all records of AllergyDropsRefillsReport associated with patient John
 // williams mentioned this in a prior meeting ^
 // note: These might be able to be worked in to the above ^
-
-/*
-exports.generatePatientApproachingMaintenanceReport = async (req, res) => {
-    // just search database for reports including "John Smith"
-    // compile into report
-}
-
-exports.generatePatientAttritionReport = async (req, res) => {
-
-}
-
-exports.generatePatientGeneralRefillsReport = async (req, res) => {
-
-}
-
-exports.generatePatientAllergyDropsRefillsReport = async (req, res) => {
-    
-}
-
-exports.generatePatientAllergyShotsRefillsReport = async (req, res) => {
-    
-}
-
-exports.generatePatientEpipenRefillsReport = async (req, res) => {
-    
-}
-
-exports.generatePatientNeedsRetestReport = async (req, res) => {
-    
-}
-
-exports.generatePatientTokensReport = async (req, res) => {
-
-}
-*/

@@ -1,43 +1,87 @@
 const treatment = require('../Models/treatment');
 const patient = require('../Models/patient');
 const protocol = require('../Models/protocols');
+const practice = require('../Models/practice');
 
 // Post method
 exports.addTreatment = async (req, res) => {
     try {
-        const { nameOfPractice, NPI, patientLastName, patientFirstName, patientID, 
-            date, attended 
+        //This stuff will be manually input by the practice when a first treatment is entered
+        /*
+            Needs to look like this 
+            [{
+                nameOfBottle: String,
+                injVol: Number,
+                injDilution: Number,
+                injLLR: Number,
+                currBottleNumber: String,
+                date: Date,
+                currentDoseAdvancement: Number
+            }],
+        */
+        const { patientLastName, patientFirstName, patientID, date, practiceID, //Need to find out how this information is sent to here
         } = req.body;
 
-        const findProtocol = await protocol.findOne({ NPI: NPI });
+        const findProtocol = await protocol.findOne({ practiceID: practiceID });
         if (!findProtocol) {
             res.status(404).json({ message: "Protocol not found" });
         }
 
+        const findPractice = await practice.findById(practiceID);
+
         const data = new treatment({
-            nameOfPractice, NPI, patientLastName, patientFirstName, patientID,
-            date, attended
+            nameOfPractice: findPractice.practiceName,  
+            patientLastName: patientLastName, 
+            patientFirstName: patientFirstName, 
+            patientID: patientID,
+            date: date, 
+            attended: true
         });
 
-        for(let i = 0; i < findProtocol.bottles.length(); i++){
-            data.bottles[i].nameOfBottle = findProtocol.bottles[i].bottleName;
-        }
-
-        //Should add patient treatment data to end of array
-        const patientToFind = await patient.findById({_id: req.body.patientID},
+        //Add patient treatment data to end of array
+        const patientToFind = await patient.findById({_id: patientID},
             { $push: {treatments: data.id}},
             function(error){
                 if(error){
                     console.log(error);
+                    res.status(404).json({ message: "Patient not found" });
                 }
                 else{
                     console.log(`Treatment added to ${patientLastName}, ${patientFirstName} for ${nameOfPractice}.`)
                 }
         });
 
-        //Need to add bottles of protocol if patient has no treatments
-
+        await patientToFind.save();
         const treatmentLength = patientToFind.treatments.length();
+        let newVialValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
+        
+        //Adds bottles to treatment with starting inj value and 0 for all other fields
+        /*
+            TODO need to fix for when we recieve data
+        */
+        if(treatmentLength == 1){
+            for(let i = 0; i < findProtocol.bottles.length(); i++){
+                data.bottles.push({
+                    nameOfBottle: findProtocol.bottles[i].bottleName,
+                    injVol: findProtocol.nextDoseAdjustment.startingInjectionVol,
+                    injDilution: 0,
+                    injLLR: 0,
+                    currBottleNumber: "0",
+                });
+                data.lastVialTests.set(findProtocol.bottles[i].bottleName, {name: findProtocol.bottles[i].bottleName, values: newVialValues});
+            }
+            const dataToSave = await data.save();
+            res.status(200).json(dataToSave); 
+        }
+        else{
+            /*
+                TODO
+            */
+            //Need to fill this area in
+            
+        }
+
+
         const patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
         const lastTreatment = await treatment.findById(patientLastTreatmentID);
 
@@ -53,7 +97,7 @@ exports.addTreatment = async (req, res) => {
 }
 
 
-// Get all method
+// Get ALL treatments across patients
 exports.getAllTreatments = async (req, res) => {
     try {
         const data = await treatment.find();
@@ -64,24 +108,19 @@ exports.getAllTreatments = async (req, res) => {
     }
 }
 
-// Get treatment by practice, provider, treatment date and patient first/last/ID
+// Get treatment by patient first/last/DoB and treatment date
 exports.getTreatment = async (req, res) => {
     try {
-        const nameOfPractice = req.body.nameOfPractice.toString();
-        const NPI = req.body.NPI.toString();
-        const patientFirstName = req.body.patientFirstName.toString();
-        const patientLastName = req.body.patientLastName.toString();
-        const patientID = req.body.patientID.toString();
-        const date = req.body.date.toString();
-        const data = await treatment.findOne({ nameOfPractice: nameOfPractice, NPI: NPI, 
-            patientLastName: patientLastName, patientFirstName: patientFirstName, 
-            patientID: patientID, date: date 
+        const { patientLastName, patientFirstName, DoB, date } = req.body;
+
+        const data = await treatment.findOne({ patientLastName: patientLastName, patientFirstName: patientFirstName, 
+            DoB: DoB, date: date 
         });
         if (data === null) {
-            res.sendStatus(200);
+            return res.sendStatus(404).json({ message: `${error}`});
         }
         else {
-            res.sendStatus(201);
+            return res.sendStatus(200).json({data});
         }
     }
     catch (error) {
@@ -89,19 +128,46 @@ exports.getTreatment = async (req, res) => {
     }
 }
 
-// Delete by ID method
+// Delete by patient first/last/DoB and treatment date
 exports.deleteTreatment = async (req, res) => {
     try {
-        const id = req.params.id;
-        const treatmentToDelete = await treatment.findById(id);
+        const { patientLastName, patientFirstName, DoB, date } = req.body;
+
+        const treatmentToDelete = await treatment.findOne({ patientLastName: patientLastName, patientFirstName: patientFirstName, 
+            DoB: DoB, date: date 
+        });
         if (!treatmentToDelete) {
             res.status(404).json({ message: "Treatment not found" });
         }
 
         await treatment.findByIdAndDelete(id);
-        res.status(200).json({ message: `Treatment has been deleted..` });
+        res.status(200).json({ message: `Treatment has been deleted.` });
     }
     catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
+
+/*
+    For this update to work the we need to index of the treatment
+*/
+exports.updateTreatment = async (req, res) => {
+    try {
+        const { patientID, date, bottleName, injVol, injDilution, injLLR, currBottleNumber } = req.body;
+        //const treatmentToUpdate = await treatment.findOneAndUpdate({patientID: patientID}, {...req.body} );
+        const treatmentToUpdate = await treatment.findOne(
+            { patientID: patientID, date: date}
+        );
+        const treatmentIndex = treatmentToUpdate.bottles.findIndex(bottleName == bottleName);
+        treatmentToUpdate.bottles[treatmentIndex].injVol = injVol;
+        treatmentToUpdate.bottles[treatmentIndex].injLLR = injLLR;
+        treatmentToUpdate.bottles[treatmentIndex].injDilution = injDilution;
+        treatmentToUpdate.bottles[treatmentIndex].currBottleNumber = currBottleNumber;
+        await treatmentToUpdate.save();
+        res.status(200).json({ message: 'Successful update'});
+        
+    } catch (error) {
         res.status(400).json({ message: error.message })
     }
 }
@@ -109,16 +175,18 @@ exports.deleteTreatment = async (req, res) => {
 //update treatment according to calculations
 exports.nextTreatment = async(req, res) => {
     try{
-        //Pass in patientID and NPI
-        const id = req.params.id;
-        const npi = req.body.NPI.toString();
+        const { patientID, practiceID } = req.body;
+
+        //Pass in patientID and practiceID
+        const id = req.body.patientID.toString();
+        const pracID = req.body.practiceID.toString();
 
         const patientToFind = await patient.findById(id);
         if (!patientToFind) {
             res.status(404).json({ message: "Patient not found" });
         }
 
-        const findProtocol = await protocol.findOne({ NPI: npi });
+        const findProtocol = await protocol.findOne({ practiceID: pracID });
         if (!findProtocol) {
             res.status(404).json({ message: "Protocol not found" });
         }
@@ -128,6 +196,10 @@ exports.nextTreatment = async(req, res) => {
         const treatmentLength = patientToFind.treatments.length();
         const patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
         const lastTreatment = await treatment.findById(patientLastTreatmentID);
+
+        if(lastTreatment.attended == false){
+            res.status(201).json({ message: "You cannot determine the next treatment without a previous successful injection." });
+        }
 
         //Returns current date in milliseconds
         const today = new Date();
@@ -175,7 +247,7 @@ exports.nextTreatment = async(req, res) => {
                 nameOfBottle: antigenName,
                 injVol: newInjVol,
                 injDilution: newDilAdjustment,
-                currBottleNumber: newBottleNumber,
+                currBottleNumber: (newBottleNumber).toString(),
             });
 
             data.nextVialTests.set(antigenName, newVialValues);
@@ -270,13 +342,13 @@ exports.nextTreatment = async(req, res) => {
 
             if(lastTreatmentBN == "M" && lastTreatmentLLR < findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment 
                 && lastTreatment.vialTest.whealSize < findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection
-                && dateDifference <= findProtocol.nextDoseAdjustment.injectionInterval)
+                && dateDifference <= findProtocol.missedDoseAdjustment1.doseAdjustMissedDays /*findProtocol.nextDoseAdjustment.injectionInterval*/)
             {
                 newTreatmentInjVol = findProtocol.nextDoseAdjustment.maxInjectionVol;
                 return newTreatmentInjVol;
             }
             else if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol && dateDifference < findProtocol.missedDoseAdjustment1.doseAdjustMissedDays
-                && lastTreatmentLLR < findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment)
+                && lastTreatmentLLR < findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment && lastTreatmentBN != "M" && parseInt(lastTreatmentBN) < ptMaintBottle)
             {
                     newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
                     return newTreatmentInjVol;
@@ -343,7 +415,7 @@ exports.nextTreatment = async(req, res) => {
                                 return newTreatmentInjVol;
                             }
                             else{
-                                if(parseInt(lastTreatmentBN) == ptMaintBottle){
+                                if(parseInt(lastTreatmentBN) >= ptMaintBottle){ /* == to >= */
                                     newTreatmentInjVol = findProtocol.nextDoseAdjustment.maxInjectionVol;
                                     return newTreatmentInjVol;
                                 }
@@ -636,19 +708,19 @@ exports.nextTreatment = async(req, res) => {
                             return newTreatmentBotNum;
                         }
                         else{
-                            newTreatmentBotNum = parseInt(lastTreatmentBN) + 1;
-                            return newTreatmentBotNum;
+                            if((parseInt(lastTreatmentBN) + 1) > ptMaintBottle){
+                                newTreatmentBotNum = 999;
+                                return newTreatmentBotNum;
+                            }
+                            else{
+                                newTreatmentBotNum = parseInt(lastTreatment) + 1;
+                                return newTreatmentBotNum;
+                            }
                         }
                     }
                     else{
-                        if(lastTreatmentBN == "M"){
-                            newTreatmentBotNum = 999;
-                            return newTreatmentBotNum;
-                        }
-                        else{
-                            newTreatmentBotNum = parseInt(lastTreatmentBN)
-                            return newTreatmentBotNum;
-                        }
+                        newTreatmentBotNum = parseInt(lastTreatmentBN);
+                        return newTreatmentBotNum;
                     }
                 }
             }
@@ -658,4 +730,3 @@ exports.nextTreatment = async(req, res) => {
         res.status(400).json({ message: err.message })
     }
 }
-
