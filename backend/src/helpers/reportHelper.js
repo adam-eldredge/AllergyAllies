@@ -1,6 +1,6 @@
 const { Report } = require('../Models/report');
 
-async function generateReport(providerID, reportType, manual, data) {
+async function generateReport(providerID, practiceID, reportType, manual, data) {
     // Report name formatting
     const currentDate = new Date();
     const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); 
@@ -12,6 +12,7 @@ async function generateReport(providerID, reportType, manual, data) {
     try {
         const report = new Report({
             providerID,
+            practiceID,
             reportType,
             reportName,
             formattedDate,
