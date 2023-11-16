@@ -3,9 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal } fr
 import { DataTable, IconButton } from 'react-native-paper';
 import axios from 'axios';
 import User from '../User';
+import AuthContext from '../AuthContext';
 
 export default function Reports({ navigation }) {
   const userInfo = User();
+  const { signOut } = useContext(AuthContext);
   const providerId = userInfo.providerId;
   const [reports, setReports] = useState([]);
   const [attritionError, setAttritionError] = useState(null);
