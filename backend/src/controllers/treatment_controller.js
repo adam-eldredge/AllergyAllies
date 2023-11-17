@@ -20,91 +20,67 @@ exports.firstTreatment = async (req, res) => {
 // Post method
 exports.addTreatment = async (req, res) => {
     try {
-        //This stuff will be manually input by the practice when a first treatment is entered
-        /*
-            Needs to look like this 
-            [{
-                nameOfBottle: String,
-                injVol: Number,
-                injDilution: Number,
-                injLLR: Number,
-                currBottleNumber: String,
-                date: Date,
-                currentDoseAdvancement: Number
-            }],
-        */
-        const { patientLastName, patientFirstName, patientID, date, practiceID, //Need to find out how this information is sent to here
+
+        //This method is called when a patient creates an account creating an empty treatment that needs to be updated
+        const { patientLastName, patientFirstName, patientID, date, practiceID,
         } = req.body;
 
-        console.log(practiceID)
         const findProtocol = await protocol.findOne({ practiceID: practiceID });
         if (!findProtocol) {
-            res.status(404).json({ message: "Protocol not found" });
-        }
-
-        const findPractice = await practice.findById(practiceID);
-
-        const data = new treatment({
-            nameOfPractice: findPractice.practiceName,  
-            patientLastName: patientLastName, 
-            patientFirstName: patientFirstName, 
-            patientID: patientID,
-            date: date, 
-            attended: true
-        });
-
-        //Add patient treatment data to end of array
-        const patientToFind = await patient.findById({_id: patientID},
-            { $push: {treatments: data.id}},
-            function(error){
-                if(error){
-                    console.log(error);
-                    res.status(404).json({ message: "Patient not found" });
-                }
-                else{
-                    console.log(`Treatment added to ${patientLastName}, ${patientFirstName} for ${nameOfPractice}.`)
-                }
-        });
-
-        await patientToFind.save();
-        const treatmentLength = patientToFind.treatments.length();
-        let newVialValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
-        
-        //Adds bottles to treatment with starting inj value and 0 for all other fields
-        /*
-            TODO need to fix for when we recieve data
-        */
-        if(treatmentLength == 1){
-            for(let i = 0; i < findProtocol.bottles.length(); i++){
-                data.bottles.push({
-                    nameOfBottle: findProtocol.bottles[i].bottleName,
-                    injVol: findProtocol.nextDoseAdjustment.startingInjectionVol,
-                    injDilution: 0,
-                    injLLR: 0,
-                    currBottleNumber: "0",
-                });
-                data.lastVialTests.set(findProtocol.bottles[i].bottleName, {name: findProtocol.bottles[i].bottleName, values: newVialValues});
-            }
-            const dataToSave = await data.save();
-            res.status(200).json(dataToSave); 
+            return res.status(404).json({ message: "Protocol not found" });
         }
         else{
-            /*
-                TODO
-            */
-            //Need to fill this area in
+
+            const findPractice = await practice.findById(practiceID);
+
+            const data = new treatment({
+                nameOfPractice: findPractice.practiceName,  
+                patientLastName: patientLastName, 
+                patientFirstName: patientFirstName, 
+                patientID: patientID,
+                date: date, 
+                attended: false
+            });
+            await data.save();
+
+            //Add patient treatment data to end of array
+            const patientToFind = await patient.findById(patientID);
+            patientToFind.treatments.push(data.id);
+            await patientToFind.save();
+
+            let treatmentLength = patientToFind.treatments.length;
+            let newVialValues = {dilution: 0, bottleNumber: "0", whealSize: 0};
             
+            /*
+                Working, but there is a delay for when there is finding a protocol, 
+                may need to load page when it's done getting info
+
+            */
+            let startingInjVol = JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol);
+            let newMap = new Map();
+
+            //Adds bottles to treatment with starting inj value and 0 for all other fields
+            if(treatmentLength == 1){
+                for(let i = 0; i < findProtocol.bottles.length; i++){
+                    data.bottles.push({
+                        nameOfBottle: findProtocol.bottles[i].bottleName,
+                        injVol: parseFloat(startingInjVol),
+                        injDilution: 0,
+                        injLLR: 0,
+                        currBottleNumber: "1",
+                    });
+                    newMap.set(findProtocol.bottles[i].bottleName, {name: findProtocol.bottles[i].bottleName, values: newVialValues});
+                }
+                data.lastVialTests = newMap;
+                const dataToSave = await data.save();
+                return res.status(200).json(dataToSave); 
+            }
+            else{
+
+                return res.status(201).json({message: 'Patient\'s last treatment needs to be updated'});
+                
+            }
         }
-
-
-        const patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
-        const lastTreatment = await treatment.findById(patientLastTreatmentID);
-
-        //Move the lastTreatments vial Test to new one
-        data.lastVialTests = lastTreatment.lastVialTests;
-
-        const dataToSave = await data.save();
-        res.status(200).json(dataToSave);
     }
     catch (error) {
         res.status(400).json({ message: error.message });
@@ -126,16 +102,16 @@ exports.getAllTreatments = async (req, res) => {
 // Get treatment by patient first/last/DoB and treatment date
 exports.getTreatment = async (req, res) => {
     try {
-        const { patientLastName, patientFirstName, DoB, date } = req.body;
+    const { patientLastName, patientFirstName, DoB, date } = req.body;
 
         const data = await treatment.findOne({ patientLastName: patientLastName, patientFirstName: patientFirstName, 
-            DoB: DoB, date: date 
+            DoB: DoB, date: date
         });
         if (data === null) {
             return res.sendStatus(404).json({ message: `${error}`});
         }
         else {
-            return res.sendStatus(200).json({data});
+            return res.sendStatus(200).json(data);
         }
     }
     catch (error) {
@@ -165,16 +141,15 @@ exports.deleteTreatment = async (req, res) => {
 
 
 /*
-    For this update to work the we need to index of the treatment
+    This update is for a single vial in the panel of bottles. For when there is an adverse reaction
 */
 exports.updateTreatment = async (req, res) => {
     try {
         const { patientID, date, bottleName, injVol, injDilution, injLLR, currBottleNumber } = req.body;
-        //const treatmentToUpdate = await treatment.findOneAndUpdate({patientID: patientID}, {...req.body} );
         const treatmentToUpdate = await treatment.findOne(
             { patientID: patientID, date: date}
         );
-        const treatmentIndex = treatmentToUpdate.bottles.findIndex(bottleName == bottleName);
+        const treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle === bottleName);
         treatmentToUpdate.bottles[treatmentIndex].injVol = injVol;
         treatmentToUpdate.bottles[treatmentIndex].injLLR = injLLR;
         treatmentToUpdate.bottles[treatmentIndex].injDilution = injDilution;
@@ -187,7 +162,47 @@ exports.updateTreatment = async (req, res) => {
     }
 }
 
-//update treatment according to calculations
+/*
+    This update is after a successful treatment given a patientID and the date of the treatment
+
+    TODO
+*/
+
+exports.updateSuccessfulTreatment = async (req, res) => {
+    try {
+        
+        const { patientID, date, arrayOfBottles } = req.body;
+        const treatmentToUpdate = await treatment.findOne(
+            { patientID: patientID, date: date}
+        );
+
+        let treatmentIndex = 0;
+        
+        for( let i = 0; i < arrayOfBottles.length; i++){
+            treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle === arrayOfBottles[i].bottleName);
+            treatmentToUpdate.bottles[treatmentIndex].injVol = arrayOfBottles[i].injVol;
+            treatmentToUpdate.bottles[treatmentIndex].injLLR = arrayOfBottles[i].injLLR;
+            treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
+            treatmentToUpdate.bottles[treatmentIndex].currBottleNumber = arrayOfBottles[i].currBottleNumber;
+            treatmentToUpdate.bottles[treatmentIndex].date = new Date();
+        }
+
+        treatmentToUpdate.attended = true;
+        // currentDoseAdvancement: Number,
+
+        // needsRetest: Boolean,
+        // injSumForBottleNumber: Number,
+        // needsRefill: Boolean,
+        // expirationDate: Date,
+        await treatmentToUpdate.save();
+        res.status(200).json({ message: 'Successful update'});
+        
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
+//update treatment according to calculations, this is called right before a calculation and 
 exports.nextTreatment = async(req, res) => {
     try{
         const { patientID, practiceID } = req.body;
@@ -213,13 +228,14 @@ exports.nextTreatment = async(req, res) => {
         const lastTreatment = await treatment.findById(patientLastTreatmentID);
 
         if(lastTreatment.attended == false){
-            res.status(201).json({ message: "You cannot determine the next treatment without a previous successful injection." });
+            return res.status(201).json({ message: "You cannot determine the next treatment without a previous successful injection. Please update last injection." });
         }
 
         //Returns current date in milliseconds
         const today = new Date();
         const lastTreatmentDate = new Date(lastTreatment.date);
         const dateDifference = (today.getTime() - lastTreatmentDate.getTime()) / (1000 * 3600 * 24);
+
 
         const data = new treatment({
             nameOfPractice: lastTreatment.nameOfPractice, 
@@ -277,8 +293,8 @@ exports.nextTreatment = async(req, res) => {
         */
         function NextVialTestDilution(values, lastTreatmentLLR, lastTreatmentInj, lastTreatmentDil){
 
-            if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol){
-                if((lastTreatmentDil <= 0) && (lastTreatmentLLR < findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection)){
+            if(lastTreatmentInj >= parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol))){
+                if((lastTreatmentDil <= 0) && (lastTreatmentLLR < parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.whealLevelForAdjustment)))){
                     values.dilution = 0;
                     return;
                 }
@@ -293,7 +309,7 @@ exports.nextTreatment = async(req, res) => {
                         }
                     }
                     else{
-                        if(lastTreatmentLLR >= findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection){
+                        if(lastTreatmentLLR >= parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.whealLevelForAdjustment))){
                             values.dilution = (lastTreatmentDil + 1);
                             return;
                         }
@@ -313,8 +329,8 @@ exports.nextTreatment = async(req, res) => {
         */
         function NextVialTestBottleNumber(values, lastTreatmentLLR, lastTreatmentInj, lastTreatmentDil, lastTreatmentBN, ptMaintBottle){
 
-            if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol){
-                if(lastTreatmentLLR >= findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection){
+            if(lastTreatmentInj >= parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol))){
+                if(lastTreatmentLLR >= parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.whealLevelForAdjustment))){
                     values.bottleNumber = lastTreatmentBN;
                     return;
                 }
@@ -355,94 +371,96 @@ exports.nextTreatment = async(req, res) => {
 
             let newTreatmentInjVol = 0;
 
-            if(lastTreatmentBN == "M" && lastTreatmentLLR < findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment 
-                && lastTreatment.vialTest.whealSize < findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection
-                && dateDifference <= findProtocol.missedDoseAdjustment1.doseAdjustMissedDays /*findProtocol.nextDoseAdjustment.injectionInterval*/)
+            if(lastTreatmentBN == "M" && lastTreatmentLLR < parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment)) 
+                && lastTreatment.vialTest.whealSize < parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.whealLevelForAdjustment))
+                && dateDifference <= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.days)) /*findProtocol.nextDoseAdjustment.injectionInterval*/)
             {
-                newTreatmentInjVol = findProtocol.nextDoseAdjustment.maxInjectionVol;
+                newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol));
                 return newTreatmentInjVol;
             }
-            else if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol && dateDifference < findProtocol.missedDoseAdjustment1.doseAdjustMissedDays
-                && lastTreatmentLLR < findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment && lastTreatmentBN != "M" && parseInt(lastTreatmentBN) < ptMaintBottle)
+            else if(lastTreatmentInj >= parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol)) 
+                && dateDifference < parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.days))
+                && lastTreatmentLLR < parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment)) 
+                && lastTreatmentBN != "M" && parseInt(lastTreatmentBN) < ptMaintBottle)
             {
-                    newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
+                    newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol));
                     return newTreatmentInjVol;
             }
-            else if(lastTreatmentLLR >= findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment){
-                if((lastTreatmentInj - findProtocol.largeReactionsDoseAdjustment.adjustInjectionVol) < findProtocol.nextDoseAdjustment.startingInjectionVol){
-                    newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
+            else if(lastTreatmentLLR >= parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment))){
+                if((lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.decreaseInjectionVol))) < parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol))){
+                    newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol));
                     return newTreatmentInjVol;
                 }else{
-                    newTreatmentInjVol = (lastTreatmentInj - findProtocol.largeReactionsDoseAdjustment.adjustInjectionVol);
+                    newTreatmentInjVol = (lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.decreaseInjectionVol)));
                     return newTreatmentInjVol;
                 }
             }
             else{
-                if(dateDifference >= findProtocol.missedDoseAdjustment4.doseAdjustMissedDays){
-                    if((lastTreatmentInj - findProtocol.missedDoseAdjustment4.adjustInjectionVolume) < findProtocol.nextDoseAdjustment.startingInjectionVol){
-                        newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
+                if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range4.days))){
+                    if((lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range4.injectionVolumeDecrease))) < parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol))){
+                        newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol));
                         return newTreatmentInjVol;
                     }
                     else{
-                        newTreatmentInjVol = (lastTreatmentInj - findProtocol.missedDoseAdjustment4.adjustInjectionVolume);
+                        newTreatmentInjVol = (lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range4.injectionVolumeDecrease)));
                         return newTreatmentInjVol;
                     }
                 }
-                else if(dateDifference >= findProtocol.missedDoseAdjustment3.doseAdjustMissedDays){
-                    if((lastTreatmentInj - findProtocol.missedDoseAdjustment3.adjustInjectionVolume) < findProtocol.nextDoseAdjustment.startingInjectionVol){
-                        newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
+                else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range3.days))){
+                    if((lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range3.injectionVolumeDecrease))) < parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol))){
+                        newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol));
                         return newTreatmentInjVol;
                     }
                     else{
-                        newTreatmentInjVol = (lastTreatmentInj - findProtocol.missedDoseAdjustment3.adjustInjectionVolume);
+                        newTreatmentInjVol = (lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range3.injectionVolumeDecrease)));
                         return newTreatmentInjVol;
                     }
                 }
-                else if(dateDifference >= findProtocol.missedDoseAdjustment2.doseAdjustMissedDays){
-                    if((lastTreatmentInj - findProtocol.missedDoseAdjustment2.adjustInjectionVolume) < findProtocol.nextDoseAdjustment.startingInjectionVol){
-                        newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
+                else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range2.days))){
+                    if((lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range2.injectionVolumeDecrease))) < parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol))){
+                        newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol));
                         return newTreatmentInjVol;
                     }
                     else{
-                        newTreatmentInjVol = (lastTreatmentInj - findProtocol.missedDoseAdjustment2.adjustInjectionVolume);
+                        newTreatmentInjVol = (lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range2.injectionVolumeDecrease)));
                         return newTreatmentInjVol;
                     }
                 }
-                else if(dateDifference >= findProtocol.missedDoseAdjustment1.doseAdjustMissedDays){
-                    if((lastTreatmentInj - findProtocol.missedDoseAdjustment1.adjustInjectionVolume) < findProtocol.nextDoseAdjustment.startingInjectionVol){
-                        newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
+                else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.days))){
+                    if((lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range1.injectionVolumeDecrease))) < parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol))){
+                        newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol));
                         return newTreatmentInjVol;
                     }
                     else{
-                        newTreatmentInjVol = (lastTreatmentInj - findProtocol.missedDoseAdjustment1.adjustInjectionVolume);
+                        newTreatmentInjVol = (lastTreatmentInj - parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range1.injectionVolumeDecrease)));
                         return newTreatmentInjVol;
                     }
                 }
                 else{
-                    if((lastTreatmentInj + findProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval) > findProtocol.nextDoseAdjustment.maxInjectionVol){
+                    if((lastTreatmentInj + parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval))) > parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol))){
                         if(lastTreatmentDil > 0){
-                            newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
+                            newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol));
                             return newTreatmentInjVol;
                         }
                         else{
                             if(lastTreatmentBN == "M"){
-                                newTreatmentInjVol = findProtocol.nextDoseAdjustment.maxInjectionVol;
+                                newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol));
                                 return newTreatmentInjVol;
                             }
                             else{
                                 if(parseInt(lastTreatmentBN) >= ptMaintBottle){ /* == to >= */
-                                    newTreatmentInjVol = findProtocol.nextDoseAdjustment.maxInjectionVol;
+                                    newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol));
                                     return newTreatmentInjVol;
                                 }
                                 else{
-                                    newTreatmentInjVol = findProtocol.nextDoseAdjustment.startingInjectionVol;
+                                    newTreatmentInjVol = parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol));
                                     return newTreatmentInjVol;
                                 }
                             }
                         }
                     }
                     else{
-                        newTreatmentInjVol = (lastTreatmentInj + findProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval);
+                        newTreatmentInjVol = (lastTreatmentInj + parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval)));
                         return newTreatmentInjVol;
                     }
                 }
@@ -457,9 +475,9 @@ exports.nextTreatment = async(req, res) => {
 
             let newTreatmentDilVol = 0;
 
-            if(lastTreatmentInj >= findProtocol.nextDoseAdjustment.maxInjectionVol){
-                if(lastTreatment.lastVialTests.get(vialTestKey).values.whealSize >= findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection){
-                    newTreatmentDilVol = (lastTreatmentDil + findProtocol.vialTestReactionAdjustment.adjustVialConcentration);
+            if(lastTreatmentInj >= parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol))){
+                if(lastTreatment.lastVialTests.get(vialTestKey).values.whealSize >= parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.whealLevelForAdjustment))){
+                    newTreatmentDilVol = (lastTreatmentDil + parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.adjustVialConcentration)));
                     return newTreatmentDilVol;
                 }
                 else{
@@ -468,12 +486,12 @@ exports.nextTreatment = async(req, res) => {
                         return newTreatmentDilVol;
                     }
                     else{  
-                        if((lastTreatmentDil - findProtocol.vialTestReactionAdjustment.adjustVialConcentration) <= 0){
+                        if((lastTreatmentDil - parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.adjustVialConcentration))) <= 0){
                             newTreatmentDilVol = 0;
                             return newTreatmentDilVol;
                         }
                         else{
-                            newTreatmentDilVol = (lastTreatmentDil - findProtocol.vialTestReactionAdjustment.adjustVialConcentration);
+                            newTreatmentDilVol = (lastTreatmentDil - parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.adjustVialConcentration)));
                             return newTreatmentDilVol;
                         }
                     }
@@ -481,78 +499,78 @@ exports.nextTreatment = async(req, res) => {
             }
             else{
     
-                if(lastTreatmentLLR >= findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment){
+                if(lastTreatmentLLR >= parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment))){
                     if(lastTreatmentDil == 0){
-                        newTreatmentDilVol = findProtocol.largeReactionsDoseAdjustment.adjustVialConcentration;
+                        newTreatmentDilVol = parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.adjustVialConcentration));
                         return newTreatmentDilVol;
                     }
                     else{
-                        newTreatmentDilVol = (lastTreatmentDil + findProtocol.largeReactionsDoseAdjustment.adjustVialConcentration);
+                        newTreatmentDilVol = (lastTreatmentDil + parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.adjustVialConcentration)));
                         return newTreatmentDilVol;
                     }
                 }
                 else{
-                    if(dateDifference >= findProtocol.missedDoseAdjustment4.doseAdjustMissedDays){
+                    if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range4.days))){
                         if(lastTreatmentDil == 0){
-                            if(findProtocol.missedDoseAdjustment4.adjustVialConcentration <= 0){
+                            if(parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range4.decreaseVialConcentration)) <= 0){
                                 newTreatmentDilVol = 0;
                                 return newTreatmentDilVol;
                             }
                             else{
-                                newTreatmentDilVol = findProtocol.missedDoseAdjustment4.adjustVialConcentration;
+                                newTreatmentDilVol = parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range4.decreaseVialConcentration));
                                 return newTreatmentDilVol;
                             }
                         }
                         else{
-                            newTreatmentDilVol = (lastTreatmentDil + findProtocol.missedDoseAdjustment4.adjustVialConcentration);
+                            newTreatmentDilVol = (lastTreatmentDil + parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range4.decreaseVialConcentration)));
                             return newTreatmentDilVol;
                         }
                     }
-                    else if(dateDifference >= findProtocol.missedDoseAdjustment3.doseAdjustMissedDays){
+                    else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range3.days))){
                         if(lastTreatmentDil == 0){
-                            if(findProtocol.missedDoseAdjustment3.adjustVialConcentration <= 0){
+                            if(parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range3.decreaseVialConcentration)) <= 0){
                                 newTreatmentDilVol = 0;
                                 return newTreatmentDilVol;
                             }
                             else{
-                                newTreatmentDilVol = findProtocol.missedDoseAdjustment3.adjustVialConcentration;
+                                newTreatmentDilVol = parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range3.decreaseVialConcentration));
                                 return newTreatmentDilVol;
                             }
                         }
                         else{
-                            newTreatmentDilVol = (lastTreatmentDil + findProtocol.missedDoseAdjustment3.adjustVialConcentration);
+                            newTreatmentDilVol = (lastTreatmentDil + parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range3.decreaseVialConcentration)));
                             return newTreatmentDilVol;
                         }
                     }
-                    else if(dateDifference >= findProtocol.missedDoseAdjustment2.doseAdjustMissedDays){
+                    else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range2.days))){
                         if(lastTreatmentDil == 0){
-                            if(findProtocol.missedDoseAdjustment2.adjustVialConcentration <= 0){
+                            if(parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range2.decreaseVialConcentration)) <= 0){
                                 newTreatmentDilVol = 0;
                                 return newTreatmentDilVol;
                             }
                             else{
-                                newTreatmentDilVol = findProtocol.missedDoseAdjustment1.adjustVialConcentration;
+                                newTreatmentDilVol = parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range2.decreaseVialConcentration));
                                 return newTreatmentDilVol;
                             }
                         }
                         else{
-                            newTreatmentDilVol = (lastTreatmentDil + findProtocol.missedDoseAdjustment2.adjustVialConcentration);
+                            newTreatmentDilVol = (lastTreatmentDil + parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range2.decreaseVialConcentration)));
                             return newTreatmentDilVol;
                         }
                     }
-                    else if(dateDifference >= findProtocol.missedDoseAdjustment1.doseAdjustMissedDays){
+                    else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.days))){
                         if(lastTreatmentDil == 0){
-                            if(findProtocol.missedDoseAdjustment1.adjustVialConcentration <= 0){
+                            if(parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range1.decreaseVialConcentration)) <= 0){
                                 newTreatmentDilVol = 0;
                                 return newTreatmentDilVol;
                             }
                             else{
-                                newTreatmentDilVol = findProtocol.missedDoseAdjustment1.adjustVialConcentration;
+                                newTreatmentDilVol = parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range1.decreaseVialConcentration));
                                 return newTreatmentDilVol;
                             }
                         }
                         else{
-                            newTreatmentDilVol = (lastTreatmentDil + findProtocol.missedDoseAdjustment1.adjustVialConcentration);
+                            newTreatmentDilVol = (lastTreatmentDil + parseFloat(JSON.stringify(findProtocol.missedDoseAdjustment.range1.decreaseVialConcentration)));
                             return newTreatmentDilVol;
                         }
                     }
@@ -572,116 +590,116 @@ exports.nextTreatment = async(req, res) => {
 
             let newTreatmentBotNum = 0;
 
-            if(lastTreatmentInj < findProtocol.nextDoseAdjustment.maxInjectionVol){
+            if(lastTreatmentInj < parseFloat(JSON.stringify(findProtocol.nextDoseAdjustment.maxInjectionVol))){
 
-                if(lastTreatmentLLR >= findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment){
+                if(lastTreatmentLLR >= parseFloat(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.whealLevelForAdjustment))){
                     if(lastTreatmentBN == "M"){
-                        if((ptMaintBottle - findProtocol.largeReactionsDoseAdjustment.adjustBottleNumber) < 1){
+                        if((ptMaintBottle - parseInt(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.adjustBottleNumber))) < 1){
                             newTreatmentBotNum = 1;
                             return newTreatmentBotNum;
                         }
                         else{
-                            newTreatmentBotNum = (ptMaintBottle - findProtocol.largeReactionsDoseAdjustment.adjustBottleNumber);
+                            newTreatmentBotNum = (ptMaintBottle - parseInt(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.adjustBottleNumber)));
                             return newTreatmentBotNum;
                         }
                     }
                     else{
-                        if((parseInt(lastTreatmentBN) - findProtocol.largeReactionsDoseAdjustment.adjustBottleNumber) < 1){
+                        if((parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.adjustBottleNumber))) < 1){
                             newTreatmentBotNum = 1;
                             return newTreatmentBotNum;
                         }
                         else{
-                            newTreatmentBotNum = (parseInt(lastTreatmentBN) - findProtocol.largeReactionsDoseAdjustment.adjustBottleNumber);
+                            newTreatmentBotNum = (parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.largeReactionsDoseAdjustment.adjustBottleNumber)));
                             return newTreatmentBotNum;
                         }
                     }
                 }
                 else{
     
-                    if(dateDifference >= findProtocol.missedDoseAdjustment4.doseAdjustMissedDays){
+                    if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range4.days))){
                         if(lastTreatmentBN == "M"){
-                            if((ptMaintBottle - findProtocol.missedDoseAdjustment4.adjustBottleNumber) < 1){
+                            if((ptMaintBottle - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range4.decreaseBottleNumber))) < 1){
                                 newTreatmentBotNum = 1;
                                 return newTreatmentBotNum;
                             }
                             else{
-                                newTreatmentBotNum = (ptMaintBottle - findProtocol.missedDoseAdjustment4.adjustBottleNumber);
+                                newTreatmentBotNum = (ptMaintBottle - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range4.decreaseBottleNumber)));
                                 return newTreatmentBotNum;
                             }
                         }
                         else{
-                            if((parseInt(lastTreatmentBN) - findProtocol.missedDoseAdjustment4.adjustBottleNumber) < 1){
+                            if((parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range4.decreaseBottleNumber))) < 1){
                                 newTreatmentBotNum = 1;
                                 return newTreatmentBotNum;
                             }
                             else{
-                                newTreatmentBotNum = (parseInt(lastTreatmentBN) - findProtocol.missedDoseAdjustment4.adjustBottleNumber);
+                                newTreatmentBotNum = (parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range4.decreaseBottleNumber)));
                                 return newTreatmentBotNum;
                             }
                         }
                     }
-                    else if(dateDifference >= findProtocol.missedDoseAdjustment3.doseAdjustMissedDays){
+                    else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range3.days))){
                         if(lastTreatmentBN == "M"){
-                            if((ptMaintBottle - findProtocol.missedDoseAdjustment3.adjustBottleNumber) < 1){
+                            if((ptMaintBottle - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range3.decreaseBottleNumber))) < 1){
                                 newTreatmentBotNum = 1;
                                 return newTreatmentBotNum;
                             }
                             else{
-                                newTreatmentBotNum = (ptMaintBottle - findProtocol.missedDoseAdjustment3.adjustBottleNumber);
+                                newTreatmentBotNum = (ptMaintBottle - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range3.decreaseBottleNumber)));
                                 return newTreatmentBotNum;
                             }
                         }
                         else{
-                            if((parseInt(lastTreatmentBN) - findProtocol.missedDoseAdjustment3.adjustBottleNumber) < 1){
+                            if((parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range3.decreaseBottleNumber))) < 1){
                                 newTreatmentBotNum = 1;
                                 return newTreatmentBotNum;
                             }
                             else{
-                                newTreatmentBotNum = (parseInt(lastTreatmentBN) - findProtocol.missedDoseAdjustment3.adjustBottleNumber);
+                                newTreatmentBotNum = (parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range3.decreaseBottleNumber)));
                                 return newTreatmentBotNum;
                             }
                         }
                     }
-                    else if(dateDifference >= findProtocol.missedDoseAdjustment2.doseAdjustMissedDays){
+                    else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range2.days))){
                         if(lastTreatmentBN == "M"){
-                            if((ptMaintBottle - findProtocol.missedDoseAdjustment2.adjustBottleNumber) < 1){
+                            if((ptMaintBottle - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range2.decreaseBottleNumber))) < 1){
                                 newTreatmentBotNum = 1;
                                 return newTreatmentBotNum;
                             }
                             else{
-                                newTreatmentBotNum = (ptMaintBottle - findProtocol.missedDoseAdjustment2.adjustBottleNumber);
+                                newTreatmentBotNum = (ptMaintBottle - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range2.decreaseBottleNumber)));
                                 return newTreatmentBotNum;
                             }
                         }
                         else{
-                            if((parseInt(lastTreatmentBN) - findProtocol.missedDoseAdjustment2.adjustBottleNumber) < 1){
+                            if((parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range2.decreaseBottleNumber))) < 1){
                                 newTreatmentBotNum = 1;
                                 return newTreatmentBotNum;
                             }
                             else{
-                                newTreatmentBotNum = (parseInt(lastTreatmentBN) - findProtocol.missedDoseAdjustment2.adjustBottleNumber);
+                                newTreatmentBotNum = (parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range2.decreaseBottleNumber)));
                                 return newTreatmentBotNum;
                             }
                         }
                     }
-                    else if(dateDifference >= findProtocol.missedDoseAdjustment1.doseAdjustMissedDays){
+                    else if(dateDifference >= parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.days))){
                         if(lastTreatmentBN == "M"){
-                            if((ptMaintBottle - findProtocol.missedDoseAdjustment1.adjustBottleNumber) < 1){
+                            if((ptMaintBottle - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.decreaseBottleNumber))) < 1){
                                 newTreatmentBotNum = 1;
                                 return newTreatmentBotNum;
                             }
                             else{
-                                newTreatmentBotNum = (ptMaintBottle - findProtocol.missedDoseAdjustment1.adjustBottleNumber);
+                                newTreatmentBotNum = (ptMaintBottle - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.decreaseBottleNumber)));
                                 return newTreatmentBotNum;
                             }
                         }
                         else{
-                            if((parseInt(lastTreatmentBN) - findProtocol.missedDoseAdjustment1.adjustBottleNumber) < 1){
+                            if((parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.decreaseBottleNumber))) < 1){
                                 newTreatmentBotNum = 1;
                                 return newTreatmentBotNum;
                             }
                             else{
-                                newTreatmentBotNum = (parseInt(lastTreatmentBN) - findProtocol.missedDoseAdjustment1.adjustBottleNumber);
+                                newTreatmentBotNum = (parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.decreaseBottleNumber)));
                                 return newTreatmentBotNum;
                             }
                         }
@@ -694,24 +712,24 @@ exports.nextTreatment = async(req, res) => {
             }
             else{
     
-                if(lastTreatment.lastVialTests.get(vialTestKey).values.whealSize >= findProtocol.vialTestReactionAdjustment.whealLimitToProceedWithInjection){
+                if(lastTreatment.lastVialTests.get(vialTestKey).values.whealSize >= parseFloat(JSON.stringify(findProtocol.vialTestReactionAdjustment.whealLevelForAdjustment))){
                     if(lastTreatmentBN == "M"){
-                        if((ptMaintBottle - findProtocol.vialTestReactionAdjustment.adjustBottleNumber) < 1){
+                        if((ptMaintBottle - parseInt(JSON.stringify(findProtocol.vialTestReactionAdjustment.adjustBottleNumber))) < 1){
                             newTreatmentBotNum = 1;
                             return newTreatmentBotNum;
                         }
                         else{
-                            newTreatmentBotNum = (ptMaintBottle - findProtocol.vialTestReactionAdjustment.adjustBottleNumber);
+                            newTreatmentBotNum = (ptMaintBottle - parseInt(JSON.stringify(findProtocol.vialTestReactionAdjustment.adjustBottleNumber)));
                             return newTreatmentBotNum;
                         }
                     }
                     else{
-                        if((parseInt(lastTreatmentBN) - findProtocol.vialTestReactionAdjustment.adjustBottleNumber) < 1){
+                        if((parseInt(lastTreatmentBN) - parseInt(JSON.stringify(findProtocol.vialTestReactionAdjustment.adjustBottleNumber))) < 1){
                             newTreatmentBotNum = 1;
                             return newTreatmentBotNum;
                         }
                         else{
-                            newTreatmentBotNum = (parseInt(lastTreatmentBN)- findProtocol.vialTestReactionAdjustment.adjustBottleNumber);
+                            newTreatmentBotNum = (parseInt(lastTreatmentBN)- parseInt(JSON.stringify(findProtocol.vialTestReactionAdjustment.adjustBottleNumber)));
                             return newTreatmentBotNum;
                         }
                     }
