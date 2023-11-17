@@ -29,6 +29,14 @@ const dataSchema = new mongoose.Schema({
         required: false,
         type: String
     },
+    height: {
+        required: false,
+        type: String
+    },
+    weight: {
+        required: false,
+        type: String
+    },
     treatments: {
         required: false,
         type: [ String ], /*mongoose.Schema.Types.ObjectId*/
