@@ -67,12 +67,6 @@ export default function PatientDetails({ route, navigation }) {
         <Text style={styles.prompt2}>Name: </Text>
         <Text style={{ ...styles.data2, alignSelf: 'center', }}>{practice.practiceName}</Text>
       </View>
-
-      {/* PRACTICE ADDRESS */}
-      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-        <Text style={styles.prompt2}>Phone Number: </Text>
-        <Text style={{ ...styles.data2, alignSelf: 'center', }}>{practice.practiceName}</Text>
-      </View>
     </View>
   )
 
@@ -83,42 +77,39 @@ export default function PatientDetails({ route, navigation }) {
         <View>
           <View style={styles.section}>
             <IconButton
-              icon="account-circle"
-              iconColor="gray"
-              size={150}
-              style={{ alignSelf: 'center', marginBottom: -10, marginTop: -5 }}
+            icon="account-circle"
+            iconColor="green"
+            size={150}
+            style={{alignSelf: 'center', marginBottom: -10, marginTop: -5}}
             />
             <Text style={styles.prompt}>{patient.firstName} {patient.lastName}</Text>
-            <Text style={{ fontSize: 12, alignSelf: 'center', }}>{patient.email}</Text>
-            <TouchableOpacity style={{ marginLeft: 10, alignSelf: 'center', flex: 1, flexDirection: 'row', marginTop: 5 }}>
-              <Text style={{ fontSize: 12, marginBottom: 10, color: 'green', }}>edit patient info</Text>
-              <IconButton icon="pencil" iconColor="green" size={10} style={{ marginTop: -4, marginLeft: -5 }} />
-            </TouchableOpacity>
+            <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.email}</Text>
+            <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.phone}</Text>
           </View>
 
         <PracticeSection/>
 
           <View style={styles.section}>
-            <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-              <Text style={styles.prompt2}>Date of Birth: </Text>
-              <Text style={{ ...styles.data2, alignSelf: 'center', }}>{patient.DoB}</Text>
-            </View>
-            <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-              <Text style={styles.prompt2}>Height: </Text>
-              <Text style={{ ...styles.data2, alignSelf: 'center', }}>x'xx</Text>
-            </View>
-            <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-              <Text style={styles.prompt2}>Weight: </Text>
-              <Text style={{ ...styles.data2, alignSelf: 'center', }}>xx lb</Text>
-            </View>
-            <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-              <Text style={styles.prompt2}>Practice: </Text>
-              <Text style={{ ...styles.data2, alignSelf: 'center', }}>ENT Specialists of Nashville     </Text>
-            </View>
-            <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-              <Text style={styles.prompt2}>Status: </Text>
-              <Text style={{ ...styles.data2, alignSelf: 'center', }}>{patient.status}</Text>
-            </View>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt2}>Date of Birth: </Text>
+            <Text style={styles.data}>07/09/2001     </Text>
+          </View>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt2}>Height: </Text>
+            <Text style={styles.data}>{patient.height} in</Text>
+          </View>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt2}>Weight: </Text>
+            <Text style={styles.data}>{patient.weight} lb</Text>
+          </View>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt2}>Practice: </Text>
+            <Text style={styles.data}>{patient.practice}</Text>
+          </View>
+          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
+            <Text style={styles.prompt2}>Status: </Text>
+            <Text style={styles.data}>{patient.status}</Text>
+          </View>
           </View>
         </View>
         <View>
@@ -145,29 +136,6 @@ export default function PatientDetails({ route, navigation }) {
           </View>
        </View>
        <View>
-       <View style={styles.section}>
-            <Text style={styles.prompt2}>Vial 1: </Text>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Maintenance Bottle: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>% to Maintenance: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Last Injection: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Dosage: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Bottle: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-          </View>
           </View>
         </View>
         <Vials />

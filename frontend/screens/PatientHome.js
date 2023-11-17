@@ -8,6 +8,7 @@ import PatientProfile from '../screens/PatientProfile.js';
 import PatientProgress from '../screens/PatientProgress.js';
 import Alerts from '../screens/Alerts.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import ReportReaction from '../screens/ReportReaction.js';
 
 const Tab = createBottomTabNavigator();
 
@@ -25,8 +26,8 @@ export default function PatientHome(){
               else if (route.name === 'Progress') {
                 iconName = focused ? 'analytics' : 'analytics-outline';
               }
-              else if (route.name === 'Alerts') {
-                iconName = focused ? 'notifications' : 'notifications-outline';
+              else if (route.name === 'Report Reaction') {
+                iconName = focused ? 'warning' : 'warning-outline';
               }
   
               // You can return any component that you like here!
@@ -39,7 +40,7 @@ export default function PatientHome(){
         >
         <Tab.Screen name="Home" component={PatientAppointments} />
         <Tab.Screen name="Progress" component={PatientProgress} />
-        <Tab.Screen name="Alerts" component={Alerts} />
+        <Tab.Screen name="Report Reaction" component={ReportReaction} />
         <Tab.Screen name="Profile" component={PatientProfile} />
         </Tab.Navigator>
       )

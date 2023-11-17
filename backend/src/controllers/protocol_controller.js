@@ -1,6 +1,6 @@
 const protocol = require('../Models/protocols');
 
-exports.addProtocol = async (req, res) => {
+const addProtocol = async (req, res) => {
     try {
 
         const {
@@ -24,26 +24,11 @@ exports.addProtocol = async (req, res) => {
         res.status(200).json(dataToSave);
     }
     catch (error) {
-        return res.status(400).json({ message: `Issue adding protocol: ${error.message}` });
+        
     }
 }
 
-exports.getProtocol = async (req, res) => {
-    try {
-        const practiceID = req.params.practiceID;
-        const foundProtocol = await protocol.findOne({ practiceID: practiceID }).exec();
-
-        if (!foundProtocol) {
-            return res.status(201).json({ message: "Protocol not found"});
-        }
-
-        return res.status(200).json({ protocol: foundProtocol });
-    } catch (err) {
-        return res.status(400).json({ message: err.message });
-    }
-}
-
-exports.updateProtocol = async (req, res) => {
+const updateProtocol = async (req, res) => {
     try {
         const practiceID = req.params.practiceID
 
@@ -58,4 +43,26 @@ exports.updateProtocol = async (req, res) => {
     } catch (err) {
         return res.status(400).json({ message: err.message });
     }
+}
+
+
+const getProtocol = async (req, res) => {
+    try {
+        const practiceID = req.params.practiceID;
+        const foundProtocol = await protocol.findOne({ practiceID: practiceID }).exec();
+
+        if (!foundProtocol) {
+            return res.status(201).json({ message: "Protocol not found"});
+        }
+
+        return res.status(200).json({ protocol: foundProtocol });
+    } catch (err) {
+        return res.status(400).json({ message: err.message });
+    }
+}
+
+module.exports = {
+    addProtocol,
+    updateProtocol,
+    getProtocol,
 }

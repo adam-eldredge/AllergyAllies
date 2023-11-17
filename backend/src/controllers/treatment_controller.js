@@ -20,8 +20,8 @@ exports.firstTreatment = async (req, res) => {
 // Post method
 exports.addTreatment = async (req, res) => {
     try {
-        //This method is called when a patient creates an account creating an empty treatment that needs to be updated
 
+        //This method is called when a patient creates an account creating an empty treatment that needs to be updated
         const { patientLastName, patientFirstName, patientID, date, practiceID,
         } = req.body;
 
@@ -763,4 +763,3 @@ exports.nextTreatment = async(req, res) => {
         res.status(400).json({ message: err.message })
     }
 }
-
