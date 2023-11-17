@@ -46,12 +46,35 @@ export default function PatientDetails({ route, navigation }) {
     <div>
       {protocol.bottles.map((bottle, index) =>
         <View style={styles.section}>
+          {/* VIAL NAME */}
           <Text style={styles.prompt2}>{bottle.bottleName}</Text>
-          <Text style={styles.data3}>Maintenance Bottle: x</Text>
-          <Text style={styles.data3}>x% to maintenance</Text>
-          <Text style={styles.prompt2}>Last injection:</Text>
-          <Text style={styles.data3}>Dosage: x ml</Text>
-          <Text style={styles.data3}>Bottle: x</Text>
+
+          {/* MAINTENANCE BOTTLE NUMBER */}
+          <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+            <Text style={styles.prompt3}>Maintenance Botttle: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>x</Text>
+          </View>
+
+          {/* PROGRESS */}
+          <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+            <Text style={styles.prompt3}>Progress: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}> [insert calc here]</Text>
+          </View>
+
+          {/* LAST INJECTION */}
+          <Text style={{ ...styles.prompt2, paddingTop: 14 }}>Last Injection</Text>
+
+          {/* DOSAGE */}
+          <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+            <Text style={styles.prompt3}>Dosage: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}> [INSERT HERE] </Text>
+          </View>
+
+          {/* BOTTLE NUMBER */}
+          <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+            <Text style={styles.prompt3}>Bottle: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}> [INSERT HERE]</Text>
+          </View>
         </View>
       )}
     </div>
@@ -64,9 +87,95 @@ export default function PatientDetails({ route, navigation }) {
 
       {/* PRACTICE NAME */}
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-        <Text style={styles.prompt2}>Name: </Text>
+        <Text style={styles.prompt3}>Name: </Text>
         <Text style={{ ...styles.data2, alignSelf: 'center', }}>{practice.practiceName}</Text>
       </View>
+    </View>
+  )
+
+  const IconSection = () => (
+    <View style={styles.section}>
+      <IconButton
+        icon="account-circle"
+        iconColor="green"
+        size={150}
+        style={{ alignSelf: 'center', marginBottom: -10, marginTop: -5 }}
+      />
+      <Text style={styles.prompt}>{patient.firstName} {patient.lastName}</Text>
+      <Text style={{ fontSize: 12, alignSelf: 'center', }}>{patient.email}</Text>
+      <Text style={{ fontSize: 12, alignSelf: 'center', }}>{patient.phone}</Text>
+    </View>
+  )
+
+  const PersonalInfo = () => (
+    <View style={styles.section}>
+      {/* TITLE */}
+      <Text style={styles.prompt2}>Personal Info</Text>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Date of Birth: </Text>
+        <Text style={styles.data}>{patient.DoB}     </Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Height: </Text>
+        <Text style={styles.data}>{patient.height} in</Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Weight: </Text>
+        <Text style={styles.data}>{patient.weight} lb</Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Practice: </Text>
+        <Text style={styles.data}>{patient.practice}</Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Status: </Text>
+        <Text style={styles.data}>{patient.status}</Text>
+      </View>
+
+    </View>
+  )
+
+  const TreatmentInfo = () => (
+    <View style={styles.section}>
+      {/* TITLE */}
+      <Text style={{ ...styles.prompt2, paddingTop: 10 }}>Treatment Information: </Text>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Treatment start date: </Text>
+        <Text style={styles.data3}>11/01/2023</Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Tracking start date: </Text>
+        <Text style={styles.data3}>11/05/2023</Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Frequency of injections: </Text>
+        <Text style={styles.data3}>2x/week</Text>
+      </View>
+    </View>
+  )
+
+  const Buttons = () => (
+    <View style={{ flex: 1, flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', padding: '7' }}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate('Maintenance', { patient })}>
+        <Text style={styles.buttonText}>Set Maintenance Bottle Numbers</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate('Injections', { patient })}>
+        <Text style={styles.buttonText}>Add an Injection</Text>
+      </TouchableOpacity>
     </View>
   )
 
@@ -74,85 +183,23 @@ export default function PatientDetails({ route, navigation }) {
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, flexDirection: 'row', }}>
+        {/* ROW 1*/}
         <View>
-          <View style={styles.section}>
-            <IconButton
-            icon="account-circle"
-            iconColor="green"
-            size={150}
-            style={{alignSelf: 'center', marginBottom: -10, marginTop: -5}}
-            />
-            <Text style={styles.prompt}>{patient.firstName} {patient.lastName}</Text>
-            <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.email}</Text>
-            <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.phone}</Text>
-          </View>
-
-        <PracticeSection/>
-
-          <View style={styles.section}>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Date of Birth: </Text>
-            <Text style={styles.data}>07/09/2001     </Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Height: </Text>
-            <Text style={styles.data}>{patient.height} in</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Weight: </Text>
-            <Text style={styles.data}>{patient.weight} lb</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Practice: </Text>
-            <Text style={styles.data}>{patient.practice}</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Status: </Text>
-            <Text style={styles.data}>{patient.status}</Text>
-          </View>
-          </View>
+          <IconSection />
+          <PersonalInfo />
         </View>
+
+        {/* ROW 2*/}
         <View>
-        <View>
-          <View style={styles.section}>
-            <Text style={styles.prompt2}>Current Allergy Medications: </Text>
-            <Text style={{...styles.data2, marginLeft: 10}}>xxx</Text>
-            <Text style={{...styles.data2, marginLeft: 10}}>xxx</Text>
-          </View>
-          <View style={styles.section}>
-          <Text style={{...styles.prompt2, paddingTop: 10}}>Treatment Information: </Text>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt3}>Treatment start date: </Text>
-            <Text style = {styles.data3}>11/01/2023</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt3}>Tracking start date: </Text>
-            <Text style = {styles.data3}>11/05/2023</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt3}>Frequency of injections: </Text>
-            <Text style = {styles.data3}>2x/week</Text>
-          </View>
-          </View>
-       </View>
-       <View>
-          </View>
+          <PracticeSection />
+          <TreatmentInfo />
         </View>
+
+        {/* ROW 3*/}
         <Vials />
-        <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate('Maintenance', { patient })}>
-            <Text style={styles.buttonText}>Set Maintenance Bottle Numbers</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate('Injections', { patient })}>
-            <Text style={styles.buttonText}>Add an Injection</Text>
-          </TouchableOpacity>
-        </View>
+
+        {/* ROW 4*/}
+        <Buttons />
       </View>
     </View>
   );
@@ -162,9 +209,11 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     alignSelf: 'center',
-    width: 800,
+    minWidth: 800,
+    flexDirection: 'column',
+    justifyContent: 'center'
   },
-    header: {
+  header: {
     fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 20,
@@ -215,7 +264,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1059d5',
     padding: 10,
     margin: 10,
-    height: 40,
+    height: 50,
     width: 150,
     justifyContent: 'center',
     borderRadius: 8,
