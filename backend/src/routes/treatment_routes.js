@@ -20,4 +20,7 @@ router.post('/nextTreatment', treatmentController.nextTreatment);
 // PATCH to change values depending on doctor
 router.patch('/updateTreatment', treatmentController.updateTreatment);
 
+// GET to find first treatment
+router.get('/getFirstTreatment/:id', treatmentController.firstTreatment)
+
 module.exports = router;

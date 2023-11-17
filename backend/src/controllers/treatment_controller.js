@@ -3,6 +3,20 @@ const patient = require('../Models/patient');
 const protocol = require('../Models/protocols');
 const practice = require('../Models/practice');
 
+
+exports.firstTreatment = async (req, res) => {
+    try {
+        
+        const patientID = req.params.id
+        const earliest = await treatment.find({patientID: patientID}).sort({date: 1}).limit(1)
+
+        return res.status(200).json(earliest)
+    }
+    catch (err) {
+        return res.status(400).json({message: err})
+    }
+}
+
 // Post method
 exports.addTreatment = async (req, res) => {
     try {
@@ -22,6 +36,7 @@ exports.addTreatment = async (req, res) => {
         const { patientLastName, patientFirstName, patientID, date, practiceID, //Need to find out how this information is sent to here
         } = req.body;
 
+        console.log(practiceID)
         const findProtocol = await protocol.findOne({ practiceID: practiceID });
         if (!findProtocol) {
             res.status(404).json({ message: "Protocol not found" });

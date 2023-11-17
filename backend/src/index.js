@@ -28,7 +28,7 @@ const export_routes = require('./routes/export_routes');
 const practice_routes = require('./routes/practice_routes');
 const protocol_routes = require('./routes/protocol_routes');
 const auth_routes = require('./routes/auth_routes');
-const treatment_routes = require('./routes/treatment_routes');
+const treatment_routes = require('./routes/treatment_routes')
 
 // Use statements
 app.use('/api', patient_routes);
