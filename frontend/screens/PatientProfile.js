@@ -3,19 +3,27 @@ import { View, Text, Image,  Button, ScrollView, TouchableOpacity, TextInput, St
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 import AuthContext from '../AuthContext';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons/faPenToSquare'
 import User from '../User';
 import { DataTable } from 'react-native-paper'; 
    
 
 
-export default function PatientProfile(){
+export default function PatientProfile({navigation}){
 
     const { signOut } = useContext(AuthContext);
     const userInfo = User();
     const firstName = userInfo.firstName;
     const lastName = userInfo.lastName;
     const email = userInfo.email;
+
+
+    const editCurrentMeds = () => {
+   
+      navigation.navigate('EditCurrentMedications')
+  
+  };
 
       return (
       <ScrollView style={styles.container}>
@@ -29,7 +37,11 @@ export default function PatientProfile(){
       </View>
       <View style={styles.textBoxContainer}>
         <View style={styles.textBoxDivider}> 
-        <Text style={styles.textBoxTitle}>Current Allergy Medications                                                                                                               </Text>
+        <Text style={styles.textBoxTitle}>Current Allergy Medications</Text>
+        <TouchableOpacity onPress={editCurrentMeds} style={{marginRight: 8}}>
+        <FontAwesomeIcon style={{alignContent: 'flex-end', marginLeft: 85}} icon={faPenToSquare} color={'#0d3375'} size={20}/>
+        </TouchableOpacity>
+       
         </View>
         <Text style={styles.textBoxContent}>Nasal Steroid Spray </Text> 
         <Text style={styles.textBoxContent}>Nasal Antihistamine Spray </Text>
@@ -118,6 +130,8 @@ export default function PatientProfile(){
       textBoxDivider: {
         borderBottomWidth: 1,
         borderBottomColor: '#e3e3e3',
+        flexDirection: 'row',
+        alignItems: 'center'
       },
       textBoxContent: {
         fontSize: 16,
