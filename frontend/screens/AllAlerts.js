@@ -1,20 +1,11 @@
-import React, { Component } from 'react'
+import React, { useContext } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
+import axios from 'axios';
+import AuthContext from '../AuthContext';
 
 export default function AllAlerts({navigation}){
-   useEffect(() => {
-      const getPatients = async () => {
-          const patients = await axios.get(`http://localhost:5000/api/getPatientsByPractice/${practiceID}`)
-          if (patients.status == 200) {
-              setPatientsArray(patients.data)
-              setRenderData(patients.data)
-          }
-          setQueriedPatients(true);
-      }
-
-      if (!queriedPatients) { getPatients() }
-   })
+   const { signOut } = useContext(AuthContext);
    return (
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#fcfcfc'}}>
       <ScrollView style={{ backgroundColor: '#fcfcfc'}}>
