@@ -49,8 +49,8 @@ const dataSchema = new mongoose.Schema({
             maintenanceNumber: Number,
         }],
     },
-    providerID: {
-        require: false,
+    practiceID: {
+        require: true,
         type: String,
     },
     // DEFAULT, INACTIVE, MAINTENANCE, ATTRITION

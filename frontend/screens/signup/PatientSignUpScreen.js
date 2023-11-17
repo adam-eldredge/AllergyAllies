@@ -116,9 +116,9 @@ export default function PatientSignUpScreen() {
 
 
       setDisplay('Account successfully created! Returning to sign in screen...');
-      // setTimeout(() => {
-      //   navigation.navigate('SignIn');
-      // }, 1000);
+      setTimeout(() => {
+        navigation.navigate('SignIn');
+      }, 1000);
     }
   }
 

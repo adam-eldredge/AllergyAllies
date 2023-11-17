@@ -66,8 +66,9 @@ export default function Maintenance({route, navigation}){
                            name: 'bottleNum' + index,
                            title: 'Maintenance Bottle Number:',
                            type: 'text',
-                           inputType: 'number',
+                           inputType: 'numeric',
                            defaultValue: 0,
+                           minValue: 0,
                            isRequired: true
                         }
                      ]
@@ -103,8 +104,7 @@ const updateMaintenanceBottles = async (data, bottles, patient) => {
       bottleNums.push(bottleData)
    })
 
-   console.log(patient.patient)
    const update = await axios.patch(`http://localhost:5000/api/${patient.patient.email}/updateMaintenanceBottleNums`, bottleNums)
-   console.log(update)
+   location.reload();
 }
 

@@ -44,15 +44,15 @@ export default function PatientDetails({ route, navigation }) {
   // Create a section for each vial
   const Vials = () => (
     <div>
-      {protocol.bottles.map((bottle, index) =>
+      {patient.maintenanceBottleNumber.map((bottle, index) =>
         <View style={styles.section}>
           {/* VIAL NAME */}
-          <Text style={styles.prompt2}>{bottle.bottleName}</Text>
+          <Text style={styles.prompt2}>{bottle.nameOfBottle}</Text>
 
           {/* MAINTENANCE BOTTLE NUMBER */}
           <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-            <Text style={styles.prompt3}>Maintenance Botttle: </Text>
-            <Text style={{ ...styles.data2, alignSelf: 'center', }}>x</Text>
+            <Text style={styles.prompt3}>Maintenance Bottle: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{bottle.maintenanceNumber}</Text>
           </View>
 
           {/* PROGRESS */}
@@ -128,11 +128,6 @@ export default function PatientDetails({ route, navigation }) {
       </View>
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-        <Text style={styles.prompt3}>Practice: </Text>
-        <Text style={styles.data}>{patient.practice}</Text>
-      </View>
-
-      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
         <Text style={styles.prompt3}>Status: </Text>
         <Text style={styles.data}>{patient.status}</Text>
       </View>
@@ -147,17 +142,12 @@ export default function PatientDetails({ route, navigation }) {
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
         <Text style={styles.prompt3}>Treatment start date: </Text>
-        <Text style={styles.data3}>11/01/2023</Text>
-      </View>
-
-      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-        <Text style={styles.prompt3}>Tracking start date: </Text>
-        <Text style={styles.data3}>11/05/2023</Text>
+        <Text style={styles.data3}> [QUERY PATIENTS FIRST TREATMENT]</Text>
       </View>
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
         <Text style={styles.prompt3}>Frequency of injections: </Text>
-        <Text style={styles.data3}>2x/week</Text>
+        <Text style={styles.data3}> [FREQUENCY FROM PROTOCOL]</Text>
       </View>
     </View>
   )
