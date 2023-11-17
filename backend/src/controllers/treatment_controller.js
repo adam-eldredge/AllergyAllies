@@ -30,7 +30,6 @@ exports.addTreatment = async (req, res) => {
                 injLLR: Number,
                 currBottleNumber: String,
                 date: Date,
-                needsRetest: Boolean,
                 currentDoseAdvancement: Number
             }],
         */
@@ -746,4 +745,3 @@ exports.nextTreatment = async(req, res) => {
         res.status(400).json({ message: err.message })
     }
 }
-

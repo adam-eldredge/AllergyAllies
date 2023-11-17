@@ -68,22 +68,12 @@ export default function Injections({route, navigation}){
                      type: 'panel',
                      elements: [
                         {
-                           name: 'b' + index,
-                           title: 'Edit?',
-                           titleLocation: 'left',
-                           type: 'boolean',
-                           defaultValue: false,
-                           valueTrue: 'Edit',
-                           valueFalse: 'Lock'
-                        },
-                        {
                            name: 'volume' + index,
                            title: 'Injection Volume:',
                            description: 'Calculated next dose volume',
                            type: 'text',
                            inputType: 'numeric',
                            defaultValue: calculatedVolume,
-                           startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -94,6 +84,7 @@ export default function Injections({route, navigation}){
                            type: 'text',
                            inputType: 'numeric',
                            defaultValue: calculatedBottleNum,
+                           startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -120,8 +111,19 @@ export default function Injections({route, navigation}){
                               'Left Lower'
                            ],
                            defaultValue: 'Right Upper',
+                           startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
+                        },
+                        {
+                           name: 'b' + index,
+                           title: 'Accept?',
+                           titleLocation: 'left',
+                           type: 'boolean',
+                           defaultValue: true,
+                           valueTrue: 'Lock',
+                           valueFalse: 'Edit',
+                           renderAs: 'checkbox'
                         },
                      ]
                   }
