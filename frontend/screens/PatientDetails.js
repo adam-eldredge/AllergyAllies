@@ -8,10 +8,72 @@ import axios from 'axios';
 
 export default function PatientDetails({ route, navigation }) {
   const { patient } = route.params;
-  
+
+  const [protocol, setProtocol] = useState();
+  const [practice, setPractice] = useState();
+  const [queriedProtocol, setQueriedProtocol] = useState(false);
+
+  // Get the current bottles for this patient's practice
+  useEffect(() => {
+    const findProtocol = async () => {
+      try {
+        const protocol = await axios.get(`http://localhost:5000/api/getProtocol/${patient.practiceID}`)
+        const practice = await axios.get(`http://localhost:5000/api/practice/${patient.practiceID}`)
+
+        if (protocol.status == 200) {
+          setProtocol(protocol.data.protocol);
+        }
+        if (practice.status == 200) {
+          setPractice(practice.data);
+          console.log(practice);
+        }
+
+        setQueriedProtocol(true);
+      }
+      catch (err) {
+        setQueriedProtocol(true);
+        return ('Something went wrong');
+      }
+    }
+
+    if (!queriedProtocol) { findProtocol(); }
+  })
+  if (!protocol) return ('Something went wrong');
+
+
+  // Create a section for each vial
+  const Vials = () => (
+    <div>
+      {protocol.bottles.map((bottle, index) =>
+        <View style={styles.section}>
+          <Text style={styles.prompt2}>{bottle.bottleName}</Text>
+          <Text style={styles.data3}>Maintenance Bottle: x</Text>
+          <Text style={styles.data3}>x% to maintenance</Text>
+          <Text style={styles.prompt2}>Last injection:</Text>
+          <Text style={styles.data3}>Dosage: x ml</Text>
+          <Text style={styles.data3}>Bottle: x</Text>
+        </View>
+      )}
+    </div>
+  );
+
+  const PracticeSection = () => (
+    <View style={styles.section}>
+      {/* TITLE */}
+      <Text style={styles.prompt2}>Practice Info</Text>
+
+      {/* PRACTICE NAME */}
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt2}>Name: </Text>
+        <Text style={{ ...styles.data2, alignSelf: 'center', }}>{practice.practiceName}</Text>
+      </View>
+    </View>
+  )
+
+
   return (
     <View style={styles.container}>
-      <View style={{flex: 1, flexDirection: 'row',}}>
+      <View style={{ flex: 1, flexDirection: 'row', }}>
         <View>
           <View style={styles.section}>
             <IconButton
@@ -24,7 +86,9 @@ export default function PatientDetails({ route, navigation }) {
             <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.email}</Text>
             <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.phone}</Text>
           </View>
-          
+
+        <PracticeSection/>
+
           <View style={styles.section}>
           <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
             <Text style={styles.prompt2}>Date of Birth: </Text>
@@ -72,78 +136,22 @@ export default function PatientDetails({ route, navigation }) {
           </View>
        </View>
        <View>
-       <View style={styles.section}>
-            <Text style={styles.prompt2}>Vial 1: </Text>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Maintenance Bottle: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>% to Maintenance: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Last Injection: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Dosage: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Bottle: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-          </View>
           </View>
         </View>
-        <View>
-        <View style={styles.section}>
-            <Text style={styles.prompt2}>Vial 2: </Text>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Maintenance Bottle: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>% to Maintenance: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Last Injection: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Dosage: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Bottle: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-          </View>
-        <View style={styles.section}>
-            <Text style={styles.prompt2}>Vial 3: </Text>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Maintenance Bottle: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>% to Maintenance: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Last Injection: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Dosage: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-            <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-              <Text style={styles.prompt3}>Bottle: </Text>
-              <Text style = {styles.data3}>x</Text>
-            </View>
-          </View>
+        <Vials />
+        <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('Maintenance', { patient })}>
+            <Text style={styles.buttonText}>Set Maintenance Bottle Numbers</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() =>
+              navigation.navigate('Injections', { patient })}>
+            <Text style={styles.buttonText}>Add an Injection</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -151,11 +159,11 @@ export default function PatientDetails({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        marginTop: 30,
-        alignSelf: 'center',
-        width: 800,
-    },
+  container: {
+    marginTop: 40,
+    alignSelf: 'center',
+    width: 800,
+  },
     header: {
     fontSize: 30,
     fontWeight: 'bold',
@@ -199,7 +207,22 @@ const styles = StyleSheet.create({
     padding: 7,
     backgroundColor: 'white',
     margin: 10,
+    minWidth: 300,
     paddingBottom: 10,
     boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.1)',
+  },
+  button: {
+    backgroundColor: '#1059d5',
+    padding: 10,
+    margin: 10,
+    height: 40,
+    width: 150,
+    justifyContent: 'center',
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 15,
   },
 });

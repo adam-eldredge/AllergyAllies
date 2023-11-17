@@ -28,22 +28,20 @@ const addProtocol = async (req, res) => {
     }
 }
 
-async function updateProtocol(surveyData) {
-    try { 
-        const { 
-            providerID, appointmentSchedule, nextDoseAdjustment, missedDoseAdjustment1, missedDoseAdjustment2, 
-            missedDoseAdjustment3, missedDoseAdjustment4, bottles, vialTestReactionAdjustment, 
-        } = req.body;
+const updateProtocol = async (req, res) => {
+    try {
+        const practiceID = req.params.practiceID
 
-        const data = new protocol({
-            providerID, appointmentSchedule, nextDoseAdjustment, missedDoseAdjustment1, missedDoseAdjustment2, 
-            missedDoseAdjustment3, missedDoseAdjustment4, bottles, vialTestReactionAdjustment, 
-        });
-    
-        await data.save();
-    }
-    catch (error) {
-        
+        const query = { practiceID : practiceID }
+        let foundProtocol = await protocol.updateOne(query, req.body)
+
+        if (!foundProtocol) {
+            return res.status(400).json({ message: "Protocol not found"});
+        }
+
+        return res.status(200).json({ protocol: foundProtocol });
+    } catch (err) {
+        return res.status(400).json({ message: err.message });
     }
 }
 

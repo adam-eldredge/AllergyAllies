@@ -12,7 +12,7 @@ const dataSchema = new mongoose.Schema({
         type: String
     },
     NPI: {
-        required: true,
+        required: false,
         type: Number
     },
     patientLastName: {

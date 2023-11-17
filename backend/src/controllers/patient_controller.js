@@ -94,6 +94,22 @@ const getPatient = async (req, res) => {
     }
 }
 
+// Get patient by id
+const findPatient = async (req, res) => {
+    try {
+        const email = req.params.email;
+        const foundPatient = await patient.findOne({email: email});
+        if (foundPatient) {
+            return res.status(200).json(foundPatient);
+        } else {
+            return res.status(404).json({ message: `Patient not found: ${email}` });
+        }
+    }
+    catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+}
+
 // Get patient by email
 const checkEmail = async (req, res) => {
     try {
@@ -214,9 +230,25 @@ const findPercentMaintenance = async (req, res) => {
             return res.status(404).json({ message: `Not enough patient data`});
         }
 
-        const patientNextTreatmentID = foundPatient.treatments[treatmentLength - 1];
-        const patientLastTreatmentID = foundPatient.treatments[treatmentLength - 2];
-        const patientSecondToLastTreatmentID = foundPatient.treatments[treatmentLength - 3];
+        let patientNextTreatmentID = null;
+        let patientLastTreatmentID = null;
+        let patientSecondToLastTreatmentID = null;
+
+
+        /*
+            Needs to catch out of bounds errors
+        */
+        try {
+            patientNextTreatmentID = foundPatient.treatments[treatmentLength - 1];
+            patientLastTreatmentID = foundPatient.treatments[treatmentLength - 2];
+            patientSecondToLastTreatmentID = foundPatient.treatments[treatmentLength - 3];
+        } catch (error) {
+            if (error instanceof RangeError){
+                return res.status(201).json({ message: 'Treatments not added correctly.'})
+            }
+        }
+        
+
         const nextTreatment = await treatment.findById(patientNextTreatmentID);
         const lastTreatment = await treatment.findById(patientLastTreatmentID);
         const secondToLastTreatment = await treatment.findById(patientSecondToLastTreatmentID);
@@ -281,7 +313,11 @@ const findPercentMaintenance = async (req, res) => {
             }
         }
         else{
-            return res.status(404).json({message: `Next Treatment not calculated or past treatments are not valid`});
+
+            for( let i = 0; i < lastTreatment.bottles.length; i ++){
+                array.push(0);
+            }
+            return res.status(201).json({array, message: 'Array of 0\'s sent'});
         }
 
         //Sending over array of percent maintenance for each vial in the same order as stored in treatment
@@ -352,6 +388,24 @@ const updateLLR = async (req, res) => {
     }
 }
 
+const updateMaintenanceBottleNums = async (req, res) => {
+    try{
+        const email = req.params.email;
+        const query = {email : email}
+        const update = {maintenanceBottleNumber: req.body}
+
+        let p = await patient.findOne(query);
+        console.log(email);
+        console.log(p);
+        let updated = await patient.updateOne(query, update)
+        
+        return res.status(200).json({patient: updated})
+    }
+    catch(error){
+        return res.status(400).json({ message: error.message})
+    }
+}
+
 // required for const functions
 module.exports = {
     addPatient,
@@ -367,5 +421,7 @@ module.exports = {
     addAllergyMedication,
     findPercentMaintenance,
     getAllergyMedication,
-    updateLLR
+    updateMaintenanceBottleNums,
+    updateLLR,
+    findPatient
 }

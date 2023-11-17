@@ -1,5 +1,20 @@
 const mongoose = require('mongoose');
 
+const reportSchema = new mongoose.Schema({
+    type: {
+        required: true,
+        type: String
+    },
+    dateGenerated: {
+        required: true,
+        type: Date
+    },
+    data: {
+        required: true,
+        type: mongoose.Schema.Types.Mixed
+    }
+});
+
 const dataSchema = new mongoose.Schema({
     firstName: {
         required: true,
@@ -28,7 +43,8 @@ const dataSchema = new mongoose.Schema({
     providerCode: {
         required: false,
         type: String
-    }
+    },
+    reports: [reportSchema]
 }, { collection: 'Providers' })
 
 module.exports = mongoose.model('provider', dataSchema)
