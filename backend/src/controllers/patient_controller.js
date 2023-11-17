@@ -231,9 +231,9 @@ const findPercentMaintenance = async (req, res) => {
             return res.status(404).json({ message: `Not enough patient data`});
         }
 
-        const patientNextTreatmentID = null;
-        const patientLastTreatmentID = null;
-        const patientSecondToLastTreatmentID = null;
+        let patientNextTreatmentID = null;
+        let patientLastTreatmentID = null;
+        let patientSecondToLastTreatmentID = null;
 
 
         /*

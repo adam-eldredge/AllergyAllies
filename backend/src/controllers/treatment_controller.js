@@ -176,7 +176,7 @@ exports.updateSuccessfulTreatment = async (req, res) => {
             { patientID: patientID, date: date}
         );
 
-        const treatmentIndex = 0;
+        let treatmentIndex = 0;
         
         for( let i = 0; i < arrayOfBottles.length; i++){
             treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle === arrayOfBottles[i].bottleName);
