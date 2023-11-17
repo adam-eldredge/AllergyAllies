@@ -38,8 +38,7 @@ const dataSchema = new mongoose.Schema({
             date: Date,
             currentDoseAdvancement: Number,
 
-            // updated outside treatment controller
-            needsRetest: Boolean,
+            // updated outside treatment controlle
             // needs implementation: every time inj applied/appt attended, 
             // add the volume to below. New bottle = var becomes 0.
             // (for refill data)
@@ -57,7 +56,9 @@ const dataSchema = new mongoose.Schema({
             values: {
                 dilution: Number, 
                 bottleNumber: String, 
-                whealSize: Number
+                whealSize: Number,
+                // needs implementation
+                date: Date,
             }
         })
     },

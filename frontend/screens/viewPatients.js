@@ -16,7 +16,7 @@ export default function ViewPatients({ navigation }) {
     const [queriedPatients, setQueriedPatients] = useState(false);
     const stylesList = [styles.tableRow2, styles.tableRow1];
     const [filter, setFilter] = useState('All');
-    const filterList = ['All', 'attrition', 'inactive', 'active', 'maintenance']
+    const filterList = ['All', 'ATTRITION', 'INACTIVE', 'ACTIVE', 'MAINTENANCE']
     const [patientName, setPatientName] = useState('');
 
     useEffect(() => {
@@ -43,7 +43,7 @@ export default function ViewPatients({ navigation }) {
                     <DataTable.Cell>{p.lastName}</DataTable.Cell>
                     <DataTable.Cell>{p.email}</DataTable.Cell>
                     <DataTable.Cell textStyle={{ marginLeft: 20 }}>{p.status}</DataTable.Cell>
-                    <DataTable.Cell>Patient Account</DataTable.Cell>
+                    <DataTable.Cell >Patient Account</DataTable.Cell>
                 </DataTable.Row>
             </TouchableOpacity>
             )}

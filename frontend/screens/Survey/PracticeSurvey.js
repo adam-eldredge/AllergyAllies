@@ -8,6 +8,8 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 import theme from './theme.js';
 import User from '../../User.js';
+
+// ***** SURVEY QUESTIONS ***** //
 import SurveyQuestions from './SurveyQuestions.js';
 
 export default function PracticeSurvey() {

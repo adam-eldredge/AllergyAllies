@@ -2,16 +2,15 @@ const patient = require('../Models/patient');
 const protocols = require('../Models/protocols');
 const provider = require('../Models/provider');
 const treatment = require('../Models/treatment');
-// const provider = require('../Models/provider');
 
 // Needs Testing
 const addPatient = async (req, res) => {
     // implement duplicate check
     try {
-        const { firstName, lastName, email, phone, password, DoB } = req.body;
+        const { firstName, lastName, email, phone, password, DoB, height, weight } = req.body;
 
         const data = new patient({
-            firstName, lastName, email, phone, password, DoB
+            firstName, lastName, email, phone, password, DoB, height, weight
         });
         data.status = "DEFAULT";
         data.tokens = 0;

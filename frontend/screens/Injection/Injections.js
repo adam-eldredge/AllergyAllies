@@ -62,45 +62,33 @@ export default function Injections({route, navigation}){
             {
                name: "main page",
                elements: protocol.bottles.map((vial, index) => {
-                  return {
+                  return index % 2 == 0 ? {
                      name: String(index),
                      title: vial.bottleName,
                      type: 'panel',
                      elements: [
                         {
-                           name: 'b' + index,
-                           title: 'Edit?',
-                           titleLocation: 'left',
-                           type: 'boolean',
-                           defaultValue: false,
-                           valueTrue: 'Edit',
-                           valueFalse: 'Lock'
-                        },
-                        {
                            name: 'volume' + index,
                            title: 'Injection Volume:',
-                           description: 'Calculated next dose volume',
                            type: 'text',
                            inputType: 'numeric',
                            defaultValue: calculatedVolume,
-                           startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
                         {
                            name: 'bottleNum' + index,
                            title: 'Bottle Number:',
-                           description: "Patient's current bottle number for this vial.",
                            type: 'text',
                            inputType: 'numeric',
                            defaultValue: calculatedBottleNum,
+                           startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
                         {
                            name: 'dilution' + index,
                            title: 'Injection Dilution:',
-                           description: "Dilution of patient's current bottle.",
                            type: 'text',
                            inputType: 'numeric',
                            defaultValue: calculatedDilution,
@@ -111,7 +99,6 @@ export default function Injections({route, navigation}){
                         {
                            name: 'location' + index,
                            title: 'Injection Location:',
-                           description: "Location of injection on patient's arm.",
                            type: 'dropdown',
                            choices: [
                               'Right Upper',
@@ -120,8 +107,81 @@ export default function Injections({route, navigation}){
                               'Left Lower'
                            ],
                            defaultValue: 'Right Upper',
+                           startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
+                        },
+                        {
+                           name: 'b' + index,
+                           title: 'Accept?',
+                           titleLocation: 'left',
+                           type: 'boolean',
+                           defaultValue: true,
+                           valueTrue: 'Lock',
+                           valueFalse: 'Edit',
+                           renderAs: 'checkbox'
+                        },
+                     ]
+                  } :
+                  {
+                     name: String(index),
+                     title: vial.bottleName,
+                     type: 'panel',
+                     startWithNewLine: 'false',
+                     elements: [
+                        {
+                           name: 'volume' + index,
+                           title: 'Injection Volume:',
+                           type: 'text',
+                           inputType: 'numeric',
+                           defaultValue: calculatedVolume,
+                           enableIf: `{b${index}} == "Edit"`,
+                           isRequired: true
+                        },
+                        {
+                           name: 'bottleNum' + index,
+                           title: 'Bottle Number:',
+                           type: 'text',
+                           inputType: 'numeric',
+                           defaultValue: calculatedBottleNum,
+                           startWithNewLine: false,
+                           enableIf: `{b${index}} == "Edit"`,
+                           isRequired: true
+                        },
+                        {
+                           name: 'dilution' + index,
+                           title: 'Injection Dilution:',
+                           type: 'text',
+                           inputType: 'numeric',
+                           defaultValue: calculatedDilution,
+                           startWithNewLine: false,
+                           enableIf: `{b${index}} == "Edit"`,
+                           isRequired: true
+                        },
+                        {
+                           name: 'location' + index,
+                           title: 'Injection Location:',
+                           type: 'dropdown',
+                           choices: [
+                              'Right Upper',
+                              'Right Lower',
+                              'Left Upper',
+                              'Left Lower'
+                           ],
+                           defaultValue: 'Right Upper',
+                           startWithNewLine: false,
+                           enableIf: `{b${index}} == "Edit"`,
+                           isRequired: true
+                        },
+                        {
+                           name: 'b' + index,
+                           title: 'Accept?',
+                           titleLocation: 'left',
+                           type: 'boolean',
+                           defaultValue: true,
+                           valueTrue: 'Lock',
+                           valueFalse: 'Edit',
+                           renderAs: 'checkbox'
                         },
                      ]
                   }
