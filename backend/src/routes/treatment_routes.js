@@ -17,7 +17,13 @@ router.delete('/deleteTreatment', treatmentController.deleteTreatment);
 // POST to add next treatment
 router.post('/nextTreatment', treatmentController.nextTreatment);
 
-// PATCH to change values depending on doctor
+// PATCH to change 1 vial
 router.patch('/updateTreatment', treatmentController.updateTreatment);
+
+// PATCH to update an entire treatment for all bottles
+router.patch('/updateSuccessfulTreatment', treatmentController.updateSuccessfulTreatment);
+
+// GET to find first treatment
+router.get('/getFirstTreatment/:id', treatmentController.firstTreatment)
 
 module.exports = router;

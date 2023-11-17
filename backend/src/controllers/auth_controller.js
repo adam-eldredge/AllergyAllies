@@ -64,7 +64,8 @@ exports.login = async(req, res) => {
                     "firstName": foundUser.firstName,
                     "lastName": foundUser.lastName,
                     "practiceID": foundUser.practiceID,
-                    "status": foundUser.status
+                    "status": foundUser.status,
+                    "email": foundUser.email
                 }
             },
             process.env.ACCESS_TOKEN_SECRET,
@@ -137,7 +138,8 @@ exports.refresh = async(req, res) => {
                             "firstName": foundUser.firstName,
                             "lastName": foundUser.lastName,
                             "practiceID": foundUser.practiceID,
-                            "status": foundUser.status
+                            "status": foundUser.status,
+                            "email": foundUser.email
                         }
                     },
                     process.env.ACCESS_TOKEN_SECRET,

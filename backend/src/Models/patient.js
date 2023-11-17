@@ -14,7 +14,7 @@ const dataSchema = new mongoose.Schema({
         type: String
     },
     phone: {
-        required: true,
+        required: false,
         type: String
     },
     password: {
