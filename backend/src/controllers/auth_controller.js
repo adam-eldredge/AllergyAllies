@@ -48,6 +48,7 @@ exports.login = async(req, res) => {
                     "role": role,
                     "firstName": foundUser.firstName,
                     "lastName": foundUser.lastName,
+                    "practiceID": foundUser.practiceID
                 }
             },
             process.env.ACCESS_TOKEN_SECRET,
@@ -62,6 +63,7 @@ exports.login = async(req, res) => {
                     "role": role,
                     "firstName": foundUser.firstName,
                     "lastName": foundUser.lastName,
+                    "practiceID": foundUser.practiceID,
                     "status": foundUser.status,
                     "email": foundUser.email
                 }
@@ -120,6 +122,7 @@ exports.refresh = async(req, res) => {
                             "role": role,
                             "firstName": foundUser.firstName,
                             "lastName": foundUser.lastName,
+                            "practiceID": foundUser.practiceID
                         }
                     },
                     process.env.ACCESS_TOKEN_SECRET,
@@ -134,6 +137,7 @@ exports.refresh = async(req, res) => {
                             "role": role,
                             "firstName": foundUser.firstName,
                             "lastName": foundUser.lastName,
+                            "practiceID": foundUser.practiceID
                             "status": foundUser.status,
                             "email": foundUser.email
                         }
