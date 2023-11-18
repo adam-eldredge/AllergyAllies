@@ -12,6 +12,14 @@ const alertSchema = new mongoose.Schema({
     },
     date: {
         type: Date
+    },
+    markedForDelete: {
+        type: Boolean,
+        default: false
+    },
+    deleteDate: {
+        type: Date,
+        default: null
     }
 }, { collection: 'ProviderAlerts'});
 

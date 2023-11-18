@@ -10,6 +10,7 @@ export default function AllAlerts({navigation}){
    const { signOut } = useContext(AuthContext);
    const userInfo = User();
    const [recentAlerts, setRecentAlerts] = useState([]);
+   const [deletedAlerts, setDeletedAlerts] = useState([]);
 
    useEffect(() => {
       const fetchAlerts = async () => {
@@ -22,22 +23,53 @@ export default function AllAlerts({navigation}){
 
    const removeAlert = async (alertToDelete) => {
       try {
-        // Optimistically update the local state
-        const updatedAlerts = recentAlerts.filter((alert) => alert._id !== alertToDelete._id);
-        setRecentAlerts(updatedAlerts);
+
+         setDeletedAlerts((prevDeletedAlerts) => [...prevDeletedAlerts, alertToDelete]);
+
+         // update the local state of alerts/cards
+         const updatedAlerts = recentAlerts.filter((alert) => alert._id !== alertToDelete._id);
+         setRecentAlerts(updatedAlerts);
     
-        // Make the API call to delete the alert
-        await axios.delete(`http://localhost:5000/api/deleteAlert/${alertToDelete._id}`);
+         // mark alert for deletion in API
+         await axios.delete(`http://localhost:5000/api/deleteAlert/${alertToDelete._id}`);
+
       } catch (error) {
-        console.error('Error deleting alert in DB', error);
-        setRecentAlerts(prevAlerts => [...prevAlerts, alertToDelete]);
+         console.error('Error deleting alert in DB', error);
+         setRecentAlerts(prevAlerts => [...prevAlerts, alertToDelete]);
       }
    };
+
+   const undoDelete = async () => {
+      try {
+         if (deletedAlerts.length > 0) {
+            const latestDeletedAlert = deletedAlerts.pop();
+            setDeletedAlerts([...deletedAlerts]);
+
+            const updatedAlerts = [...recentAlerts, latestDeletedAlert].sort(
+               (a, b) => new Date(b.date) - new Date(a.date)
+            );
+
+            setRecentAlerts(updatedAlerts);
+
+            // undo alert deletion
+            await axios.patch(`http://localhost:5000/api/undoDelete`);
+         }
+       } catch (error) {
+         console.error('Error deleting alert in DB', error);
+       }
+   }
 
    return (
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#fcfcfc'}}>
       <ScrollView style={{ backgroundColor: '#fcfcfc'}}>
          <Text style={styles.title}>Your Alerts</Text>
+
+         <View style={{ alignItems: 'flex-end', marginRight: 245 }}>
+            <TouchableOpacity onPress={undoDelete}>
+                  <Text style = {{ textDecorationLine: 'underline', color: '#1059d5', fontSize: 15, fontWeight: 'bold' }}>Undo</Text>
+            </TouchableOpacity>
+         </View>
+         
          {recentAlerts.length === 0 ? (
             <View style={{ marginLeft: 100, marginTop: 30, marginRight: 300}}>
             <Text style={{fontSize: 18}}>There are currently no alerts.</Text>
@@ -59,6 +91,7 @@ export default function AllAlerts({navigation}){
                </Card>
             ))
          )}
+         
          <View style={{height: 20, backgroundColor: '#fcfcfc'}}></View>
       </ScrollView>
       <View style={{backgroundColor: '#fcfcfc', flex: 1,}}>

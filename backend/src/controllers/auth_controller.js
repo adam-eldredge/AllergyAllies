@@ -137,7 +137,7 @@ exports.refresh = async(req, res) => {
                             "role": role,
                             "firstName": foundUser.firstName,
                             "lastName": foundUser.lastName,
-                            "practiceID": foundUser.practiceID
+                            "practiceID": foundUser.practiceID,
                             "status": foundUser.status,
                             "email": foundUser.email
                         }
