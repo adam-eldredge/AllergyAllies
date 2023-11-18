@@ -6,4 +6,6 @@ router.get('/getAlerts/:providerID', alertController.getAlerts);
 
 router.delete('/deleteAlert/:alertID', alertController.deleteAlert);
 
+router.patch('/undoDelete', alertController.undoDeleteAlert);
+
 module.exports = router;

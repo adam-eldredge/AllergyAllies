@@ -22,8 +22,10 @@ exports.getAlerts = async (req, res) => {
         }
 
         const alerts = await alert.find({
-            practiceID: provider.practiceID
-        });
+            practiceID: provider.practiceID,
+            markedForDelete: false
+        }).sort({date: -1});
+
         return res.status(200).json(alerts);
     } catch (error) {
         return res.status(404).json({ message: error.message });
@@ -39,12 +41,37 @@ exports.deleteAlert = async (req, res) => {
             return res.status(400).json({ message: "Alert not found"});
         }
         
-        await alert.findByIdAndDelete(id);
+        foundAlert.markedForDelete = true;
+        foundAlert.deleteDate = new Date();
+
+        await foundAlert.save();
+
         return res.status(200);
     } catch (error) {
         return res.status(401).json({ message: error.message });
     }
 
+}
+
+exports.undoDeleteAlert = async (req, res) => {
+    try {
+        const recentlyMarkedAlert = await alert.findOne({
+            deleteDate: {$ne: null}
+        }).sort({ deleteDate: -1 });
+
+        if (!recentlyMarkedAlert) {
+            return res.status(201).json({ message: "No deletions to undo." });
+        }
+
+        recentlyMarkedAlert.markedForDelete = false;
+        recentlyMarkedAlert.deleteDate = null;
+
+        await recentlyMarkedAlert.save();
+
+        return res.status(200);
+    } catch (error) {
+        return res.status(402).json({ message: error.message });
+    }
 }
 
 // reaction alert creation

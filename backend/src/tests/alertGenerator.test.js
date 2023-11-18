@@ -13,6 +13,8 @@ const {
     maintenanceJob,
 } = require('../services/alertGenerator');
 
+/* Fails if alerts already exist */
+
 describe('attrition', () => {
     it('Should match output', async () => {
         const array = [{

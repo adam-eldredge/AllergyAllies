@@ -26,7 +26,8 @@ async function checkIfRecentAlertExists(patient, alertType) {
     const oldAlert = await providerAlerts.findOne({
         providerID: patient.providerID,
         patientName: patient.firstName + " " + patient.lastName,
-        alertType: alertType
+        alertType: alertType,
+        markedForDelete: false
     }).sort({ date: -1});
 
     if (!oldAlert) { return true; }
@@ -239,7 +240,7 @@ async function needsRefillAlert() {
     const Refills = [];
 
     for (const p of patientsList) {
-        const patientTreatment = await treatment.find({
+        const patientTreatment = await Treatment.find({
             providerID: p.providerID.toString(),
             patientID: p._id.toString(),
         });
