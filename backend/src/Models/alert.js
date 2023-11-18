@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const alertSchema = new mongoose.Schema({
-    providerID: {
+    practiceID: {
         type: String
     },
     patientName: {

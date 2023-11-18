@@ -13,12 +13,15 @@ const { getAllPatientsHelper } = require('../controllers/patient_controller');
 
 /* TODO:
     reaction alert creation
-    check if injections(bottle) need to be mixed ( patient is almost done with current bottle number)
-    ^ "max injection volume is soon to be reached" ^
-    check if injections(bottle) is expiring, make alert
-        *mixed and expired require storing bottleSize; 
-*/
+    injection needs mixed alert
+    injection expiration alert
+    perform vial test alert
 
+    Any time the last Injection Volume reaches the Max IV set by the Practice, 
+    there should be an alert to perform a Vial Test before the next injection 
+    record can be entered UNLESS the Bottle number is “M” (e.g., the patient is 
+    at his/her maintenance dose).  
+*/
 async function checkIfRecentAlertExists(patient, alertType) {
     const oldAlert = await providerAlerts.findOne({
         providerID: patient.providerID,
@@ -49,7 +52,7 @@ async function createAlert(patient, alertType) {
 
     const today = new Date();
     const alert = new providerAlerts({
-        providerID: patient.providerID,
+        practiceID: patient.practiceID,
         patientName: patient.firstName + " " + patient.lastName,
         alertType: alertType,
         date: today
