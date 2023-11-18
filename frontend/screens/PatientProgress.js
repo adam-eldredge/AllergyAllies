@@ -1,238 +1,281 @@
-import React, { Component, useState } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
-import { useRoute } from '@react-navigation/native';
-import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
+
+import React, {useState, useEffect } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Alerts from './Alerts.js';
-import InjectionInfo from './InjectionInfo.js';
-import ViewAllAppointments from './ViewAllAppointments.js';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Carousel from 'react-native-reanimated-carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
 import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
 import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
+import User from '../User';
+import axios from 'axios';
 
 const Tab = createBottomTabNavigator();
 
 export default function PatientProgress({navigation}){
 
-    //get from backend: from practice survey
-    const numVials = 3;
+    const userInfo = User();
+    const email = userInfo.email;
 
-    //create arrays for progress percentage, last injection dosage, and last injection date for each vial
-    const progress = Array(numVials).fill(null);
-    const dosages = Array(numVials).fill(null);
-    const dates = Array(numVials).fill(null);
-    const bottleNums = Array(numVials).fill(null);
-    const maintenanceNums = Array(numVials).fill(null);
+    const [patient, setPatient] = useState();
+    const [treatments, setTreatments] = useState();
+    const [loading, setLoading] = useState(true);
+    const [activeSlide, setActiveSlide] = useState(0);
 
-    //dummy values right now, get from backend
-    for (let i = 0; i <= numVials; i++) {
-        dosages[i] = (i+1)*.25;
-        dates[i] = ('10/9/23')
-        progress[i] = (i+1)*10;
-        maintenanceNums[i] = i+4;
-        bottleNums[i] = i+2;
+
+    //function that takes in a date from MongoDB and converts it into readable format
+    function formatDate(mongoDate){
+
+      //convert into javascript Date object
+      const javascriptDate = new Date(mongoDate);
+      //standardize timezone
+      const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
+      return utcDate.toLocaleDateString('en-US', {
+          year: '2-digit',
+          month: '2-digit',
+          day: '2-digit',
+        });
+
+    }
+
+    //includes day of week
+    function formatDateWithDay(mongoDate){
+
+      const javascriptDate = new Date(mongoDate);
+      const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
+  
+      return utcDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          });
+  
       }
 
-    const data = Array.from({ length: numVials }, (_, index) => ({
-        id: index + 1,
-        title: `Vial ${index + 1}`,
-        progress: progress[index], 
-        lastInjDate: dates[index],
-        maintenanceNum: maintenanceNums[index],
-        bottleNum: bottleNums[index],
-        lastInjDosage: dosages[index]
-      }));
+  //get the list of treatments associated with patient
+  useEffect(() => {
+
+    const findPatient = async () => {
+      if (email){
+        const patientObj = await axios.get(`http://10.75.154.12:5000/api/findPatient/${email}`)
+        setPatient(patientObj.data)
+      }
+    }
+    if (!patient) { findPatient(); }
+
+    const findTreatments = async () => {
+      const treatmentsObj = await axios.get(`http://10.75.154.12:5000/api/getAllTreatmentsByID/${patient._id}`)
+      setTreatments(treatmentsObj.data)
+    }
+    if (!treatments && patient) { findTreatments(); }
+
+    if (patient && treatments) { setLoading(false) }
+
+  })
+
+  if (loading) {
+    return <Text>Loading...</Text>
+   }
+
+  //get most recent injection data for carousel  
+  let data = []
+  if (patient && patient.maintenanceBottleNumber) {
+          if (treatments[0]) {
+              if (treatments[0].bottles){
+              //list of bottles for most recent injection
+              const bottles = treatments[0].bottles;
+        
+              //matching maintenance numbers in treatment data to patient data by comparing name of bottle
+              data = bottles.map((bottle, index) => {
+                const maintenanceObj = patient.maintenanceBottleNumber.find(
+                  (maintenanceBottle) => maintenanceBottle.nameOfBottle === bottle.nameOfBottle
+                );
+            
+                return {
+                  id: index + 1,
+                  title: `Vial ${index + 1}: ${bottle.nameOfBottle}`,
+                  progress: 50, // hardcoded, replace later
+                  lastInjDate: formatDate(treatments[0].date),
+                  maintenanceNum: maintenanceObj ? maintenanceObj.maintenanceNumber : 'N/A',
+                  bottleNum: bottle.currBottleNumber,
+                  lastInjDosage: bottle.injVol
+                };
+              });
+
+              } else {
+                 throw new Error("Invalid or missing data for bottles in treatments[0]");
+              }
+
+            } else {
+              data = [{ id: 1, message: 'No recorded injections yet!' }];
+                  //there are no inputted treatments yet, leave data empty
+            }
+
+    } else {
+      throw new Error("Invalid or missing data for patient or patient maintenance bottle numbers");
+    }
+
+    //keeps track of carousel slide
+    const onIndexChanged = (index) => {
+        setActiveSlide(index);
+    };
 
 
-      const renderDot = (index) => (
+    //create dots for carousel
+    const renderDot = (index) => (
         <View
           key={index}
           style={[
             styles.dot,
-            { opacity: index === activeSlide ? 0.6 : 0.2 }, // Adjust the opacity based on activeIndex
+            { opacity: index === activeSlide ? 0.6 : 0.2 }, // adjust the opacity based on activeSlide
           ]}
         />
       );
 
-      const onIndexChanged = (index) => {
-        setActiveSlide(index);
-      };
-
-
-    const [activeSlide, setActiveSlide] = useState(0);
-
-    const renderItem = ({ item }) => (
-        <View>
-        <Text style={styles.title}>{item.title}</Text>  
-        <Text style={styles.maintenance}>Maintenance Bottle: {item.maintenanceNum}</Text> 
+    //create cards for carousel
+    const renderCarouselCard = ({ item }) => (
+       <View>
+             <Text style={styles.title}>{item.title}</Text>  
+             <Text style={styles.maintenanceSubtitle}>Maintenance Bottle: {item.maintenanceNum}</Text> 
+     
         <View style={styles.card}>
-        <View style={{flexDirection: 'row', }}>
-        <AnimatedCircularProgress
-            size={150}
-            width={12}
-            rotation={0}
-            lineCap="round"
-            fill={item.progress}
-            tintColor="#1059d5"
-            backgroundColor="#d1d1d1">
-            {
-                (fill) => (
-                    <View>
-                    <Text style = {styles.progressCircleText}>
-                    { item.progress }%
-                </Text>
-                <Text style = {styles.progressCircleSubText}>
-                    to maintenance
-                </Text>
-                    </View>
-      
-      
-                )
-            }
-        </AnimatedCircularProgress>
+           <View style={{flexDirection: 'row', }}>
+             <AnimatedCircularProgress
+                 size={150}
+                 width={12}
+                 rotation={0}
+                 lineCap="round"
+                 fill={item.progress}
+                 tintColor="#1059d5"
+                 backgroundColor="#d1d1d1">
+                 {
+                     (fill) => (
+                         <View>
+                         <Text style = {styles.progressCircleText}>
+                         { item.progress }%
+                         </Text>
+                         <Text style = {styles.progressCircleSubText}>
+                         to maintenance
+                         </Text>
+                         </View>
+                     )
+                 }
+               </AnimatedCircularProgress>
+     
+         <View>
+     
+            <Text style={styles.lastInj}>Last injection:</Text>  
+     
+           <View>
+     
+           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+             <View style={styles.icon}>
+               <FontAwesomeIcon icon={faCalendar} color={'#737373'} size={20}/> 
+             </View>
+             <View>
+               <Text style={styles.cardSubData}>Date</Text>    
+               <Text style={styles.cardData}>{item.lastInjDate}</Text>    
+             </View> 
+           </View>
+     
+           <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+             <View style={styles.icon}>
+               <FontAwesomeIcon icon={faSyringe} color={'#737373'} size={20}/>
+             </View>
+             <View>
+               <Text style={styles.cardSubData}>Dosage</Text>    
+               <Text style={styles.cardData}>{item.lastInjDosage} ml</Text>    
+             </View> 
+           </View>
+     
+           <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+             <View style={styles.icon}>
+               <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/> 
+             </View>
+             <View>
+               <Text style={styles.cardSubData}>Bottle</Text>    
+               <Text style={styles.cardData}>{item.bottleNum}</Text>    
+             </View> 
+           </View>
+     
+           </View>
+     
+          </View>
+         </View>  
+        </View>     
+       </View>
+     );
+
+  
+
+     //create Past Injection blocks for list at bottom of screen
+     //date is from backend but Attended on Time flag is still hardcoded
+       const PastInjectionBlock = ({ date }) => (
+         <TouchableOpacity
+           onPress={() => navigation.navigate('InjectionInfo')}
+           style={styles.pastAppointment}>
+             <Text style={styles.pastAppointmentText}>{formatDateWithDay(date)}</Text>
+             <View style={styles.flags}>
+                 <View style={styles.onTime}>
+                 <Text style={{color: 'white'}}> Attended on Time </Text>
+                 </View>
+             </View>
+         </TouchableOpacity>
+       );
 
 
-        <View>
-        <Text style={styles.lastInj}>Last injection:</Text>  
 
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <View style={styles.icon}>
-      <FontAwesomeIcon icon={faCalendar} color={'#737373'} size={20}/> 
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Date</Text>    
-        <Text style={styles.cardData}>{item.lastInjDate}</Text>    
-      </View> 
-    </View>
-
-
-    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
-         <FontAwesomeIcon icon={faSyringe} color={'#737373'} size={20}/>
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Dosage</Text>    
-        <Text style={styles.cardData}>{item.lastInjDosage} ml</Text>    
-      </View> 
-    </View>
-
-    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
-        <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/> 
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Bottle</Text>    
-        <Text style={styles.cardData}>{item.bottleNum}</Text>    
-      </View> 
-    </View>
-
-</View>
-
- </View>
-
- 
-       {/* <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.iconMaintenance}>
-      <FontAwesomeIcon icon={faDroplet} color={'#737373'} size={20}/>
-      </View>
-      <View>
-        <Text style={styles.maintenanceSub}>Maintenance Bottle #</Text>    
-        <Text style={styles.maintenanceNum}>{item.maintenanceNum}</Text>    
-      </View> 
-        </View> */} 
-
-
+    return (
+    <View>
     
-</View>
-       
-</View>
-      );
-
- return (
-       
-<ScrollView>
-<View style = {styles.progressCircle}>
-     <Carousel
-        data={data}
-        loop={false}
-        onIndexChanged={onIndexChanged}
-        renderItem={renderItem}
-        width={350}
-        height = {300}
-        onSnapToItem={(index) => setActiveSlide(index)}
-      />
-
-<View style={styles.dotsContainer}>
-        {data.map((_, index) => renderDot(index))}
+      <ScrollView>
+      <View style = {styles.carousel}>
+          <Carousel
+             data={data}
+             loop={false}
+             onIndexChanged={onIndexChanged}
+             renderItem={renderCarouselCard}
+             width={350}
+             height = {300}
+             onSnapToItem={(index) => setActiveSlide(index)}
+           />
+     
+          <View style={styles.dotsContainer}>
+             {data.map((_, index) => renderDot(index))}
+          </View>
       </View>
-</View>
+     
+     
+     <Text style={styles.container}></Text>
+     <Text style = {styles.title2}>Past Injections </Text>
 
+     {data[0]?.message ? (
+      //if data has a message, no recorded injections yet
+         <Text style = {styles.noInjections}>No recorded injections yet!</Text>
+      ) : (
+      //recorded injections in database
+      <>
+         {treatments.map((treatment, index) => (
+          <PastInjectionBlock key={index} date={treatment.date} />
+         ))}
+      <TouchableOpacity
+       onPress={() => navigation.navigate('ViewAllAppointments') }>
+        <Text style = {styles.viewAllAppointments}>View All</Text>
+      </TouchableOpacity>
+      </>
+     )}
+     
+    </ScrollView>
 
-<Text style={styles.container}></Text>
-<Text style = {styles.title2}>Past Injections </Text>
-<TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-    <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
-    <View style={styles.flags}>
-        <View style={styles.onTime}>
-        <Text style={{color: 'white'}}> Attended on Time </Text>
-        </View>
-    </View>
-</TouchableOpacity>
-<TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-    <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-    <View style={styles.flags}>
-    <View style={styles.attendedLate}>
-        <Text style={{color: 'white'}}> 12 Days Late - Dose Adjustment </Text>
-    </View>
-    </View>
-</TouchableOpacity>
-<TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-    <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-    <View style={styles.flags}>
-        <View style={styles.onTime}>
-        <Text style={{color: 'white'}}> Attended on Time </Text>
-        </View>
-        <View style={styles.adverseReaction}>
-        <Text style={{color: 'white'}}> Adverse Reaction </Text>
-        </View>
-    </View>
-</TouchableOpacity>
-<TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-    <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-    <View style={styles.flags}>
-    <View style={styles.flags}>
-        <View style={styles.onTime}>
-        <Text style={{color: 'white'}}> Attended on Time </Text>
-        </View>
-    </View>
-    </View>
-</TouchableOpacity>
-<TouchableOpacity
-               onPress={() =>
-               navigation.navigate('ViewAllAppointments') }>
-               <Text style = {styles.viewAllAppointments}>View All</Text>
-            </TouchableOpacity>
-</ScrollView>
-      )
-   }
+   </View>
+           )
+        }
 
 const styles = StyleSheet.create({
-   container: {
+    container: {
       paddingTop: 30
-   },
-    title1 :{
-    paddingTop: 10,
-    marginBottom: -5,
-    textAlign: 'center',
-    fontSize: 22,
-    fontWeight: '600',
     },
     title2 :{
         fontSize: 20,
@@ -241,42 +284,7 @@ const styles = StyleSheet.create({
         marginLeft: 28,
         marginBottom: 4
     },
-    compliance: {
-        paddingTop: 10,
-        marginBottom: -5,
-        height: 200,
-        width: 200,
-        textAlign: 'center',
-        borderWidth: 1,
-        borderColor: 'purple',
-        borderRadius: 60,
-    },
-    subtitle :{
-        paddingBottom: 15,
-        textAlign: 'center',
-        fontSize: 16,
-        color: '#8b8b8b',
-        fontStyle: 'italic',
-    },
-    appointment: {
-        width: Dimensions.get('window').width - 30,
-        marginLeft: 15,
-        marginBottom: 8,
-        height: 60,
-        borderRadius: 8,
-        backgroundColor: '#84aef8',
-        justifyContent: 'center',
-        paddingHorizontal: 20,
-        textstyle:{fontsize: 60}
-    },
-    appointmentText: {
-        fontSize: 18,
-        marginVertical: 4,
-        fontWeight: '500',
-        color: 'white',
-        textAlign: 'center'
-    },
-    progressCircle:{
+    carousel:{
         alignItems: 'center',
         margin: 20,
     },
@@ -312,19 +320,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 2,
     },
-    maintenanceNum: {
-        fontWeight: '500',
-        fontSize: 15,
-        marginBottom: 10,
-        marginLeft: 12,
-        color: "#2b2b2b"
-    },
-    maintenanceSub: {
-        fontWeight: '400',
-        fontSize: 12,
-        marginLeft: 12,
-        color: '#878787',
-    },
     flags: {
         flex: 1,
         flexDirection: 'row',
@@ -356,10 +351,6 @@ const styles = StyleSheet.create({
         marginRight: 6,
         marginBottom: 6
     },
-    flagText: {
-        backgroundColor: 'red',
-        color: 'white',
-    },
     viewAllAppointments: {
       margin: 18,
       color: '#1059d5',
@@ -375,14 +366,12 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
         margin: 4,
         alignItems: 'center',
-        //elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 3,
       },
     cardData: {
-        //alignSelf: 'left',
         fontWeight: '500',
         fontSize: 15,
         marginBottom: 10,
@@ -390,7 +379,6 @@ const styles = StyleSheet.create({
         color: "#2b2b2b"
     }, 
     cardSubData: {
-        //alignSelf: 'left',
         fontWeight: '400',
         fontSize: 12,
         color: '#878787',
@@ -398,15 +386,13 @@ const styles = StyleSheet.create({
         marginTop: 8
     }, 
     lastInj: {
-        //alignSelf: 'left',
         fontWeight: '500',
         fontSize: 15,
         marginBottom: 2,
         marginLeft: 20,
         color: "#2b2b2b"
     }, 
-    maintenance: {
-        //alignSelf: 'left',
+    maintenanceSubtitle: {
         fontWeight: '500',
         fontSize: 14,
         marginBottom: 4,
@@ -418,36 +404,32 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: -12
-        //marginTop: -14
-      },
-      dot: {
+    },
+    dot: {
         width: 8,
         height: 8,
         borderRadius: 5,
         backgroundColor: 'black',
         marginHorizontal: 5,
-      },
+    },
     icon: {
         marginLeft: 40,
         alignSelf: 'center',
         verticalAlign: 'center',
     },
-    iconMaintenance: {
-        alignSelf: 'center',
-        verticalAlign: 'center',
-        marginLeft: -130
-    },
-      title: {
+    title: {
         fontSize: 20,
         fontWeight: 'bold',
         color: '#424242',
         marginLeft: 10
-      },
-      description: {
-        fontSize: 14,
-        marginTop: 5,
-      },
+    },
+    noInjections: {
+      textAlign: 'center',
+      fontSize: 14,
+      marginTop: 30
+    }
 })
+
 
 
 

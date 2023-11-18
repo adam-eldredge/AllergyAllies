@@ -5,7 +5,7 @@ import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } fro
 export default function ViewAllAppointments({navigation}){
    return (
     <ScrollView style = {styles.container}>
-    <Text style = {styles.title2}>Past Appointments Attended</Text>
+    <Text style = {styles.title2}>Past Injections</Text>
     <TouchableOpacity  onPress={() =>
                navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
         <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
