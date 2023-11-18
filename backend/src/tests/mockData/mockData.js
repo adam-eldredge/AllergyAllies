@@ -23,7 +23,7 @@ const mockPatient = {
         "maintenanceNumber": 5
       }
     ],
-    "status": "ATTRITION",
+    "status": "DEFAULT",
     "statusDate": "10-23-2021",
     "tokens": 10,
     "needsRetestData": {

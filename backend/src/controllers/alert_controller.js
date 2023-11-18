@@ -1,5 +1,5 @@
 const alert = require('../Models/alert');
-
+const Provider = require('../Models/provider');
 /*
 Any time the last Injection Volume reaches the Max IV set by the Practice, 
 there should be an alert to perform a Vial Test before the next injection 
@@ -15,8 +15,15 @@ but should be ALERTED to perform one under the conditions mentioned above.
 exports.getAlerts = async (req, res) => {
     try {
         const providerID = req.params.providerID;
-        const alerts = await alert.find(providerID);
+        
+        const provider = await Provider.findById(providerID);
+        if (!provider) {
+            return res.status(401).json({ message: "Provider not found"});
+        }
 
+        const alerts = await alert.find({
+            practiceID: provider.practiceID
+        });
         return res.status(200).json(alerts);
     } catch (error) {
         return res.status(404).json({ message: error.message });
@@ -25,17 +32,17 @@ exports.getAlerts = async (req, res) => {
 
 exports.deleteAlert = async (req, res) => {
     try {
-        const id = req.params.id;
+        const id = req.params.alertID;
         const foundAlert = await alert.findById(id);
 
         if (!foundAlert) {
             return res.status(400).json({ message: "Alert not found"});
         }
-
+        
         await alert.findByIdAndDelete(id);
         return res.status(200);
     } catch (error) {
-        return res.status(404).json({ message: error.message });
+        return res.status(401).json({ message: error.message });
     }
 
 }
