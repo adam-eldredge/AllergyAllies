@@ -78,8 +78,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 32,
     padding: 16,
-      paddingTop: 4,
-      flex: 1
+    paddingTop: 4,
   },
   checkbox: {
     margin: 8,
