@@ -32,6 +32,7 @@ import jwt_decode from 'jwt-decode';
 import PatientAppointments from './screens/PatientAppointments.js';
 import InitialMobileScreen from './screens/InitialMobileScreen.js'
 import InjectionInfo from './screens/InjectionInfo.js';
+import EditCurrentMedications from './screens/EditCurrentMedications.js';
 //import AppointmentInfo from './screens/AppointmentInfo';
 
 // Secure store doesn't work on web, only iOS and android ^
@@ -162,8 +163,9 @@ const SignedInMobileStack = (
       <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
       <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
       <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
-      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false, animationTypeForReplace: 'push'}} />
-      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'Injection Info'}} />
+      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
+      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
+      <Stack.Screen name="EditCurrentMedications" component={EditCurrentMedications} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
      
   </>
 );
