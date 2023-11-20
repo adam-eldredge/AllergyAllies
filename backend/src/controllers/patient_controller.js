@@ -46,9 +46,9 @@ const addPatientToProvider = async (req, res) => {
     }
 }
 
-const getAllPatientsHelper = async (providerID) => {
+const getAllPatientsHelper = async (practiceID) => {
     try {
-        const patientsList = await patient.find({providerID: providerID});
+        const patientsList = await patient.find({practiceID: practiceID});
         return patientsList;
     } catch (error) {
         console.error('Error retrieving list of patients: ', error);

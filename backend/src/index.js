@@ -28,7 +28,8 @@ const export_routes = require('./routes/export_routes');
 const practice_routes = require('./routes/practice_routes');
 const protocol_routes = require('./routes/protocol_routes');
 const auth_routes = require('./routes/auth_routes');
-const treatment_routes = require('./routes/treatment_routes')
+const treatment_routes = require('./routes/treatment_routes');
+const alert_routes = require('./routes/alert_routes');
 
 // Use statements
 app.use('/api', patient_routes);
@@ -39,6 +40,7 @@ app.use('/api', report_routes);
 app.use('/api', export_routes);
 app.use('/api', protocol_routes);
 app.use('/api', treatment_routes);
+app.use('/api', alert_routes);
 
 app.use('/auth', auth_routes);
 

@@ -142,6 +142,14 @@ export default {
                                 name: 'j1',
                                 title: 'Vial Name',
                                 type: 'text',
+                            },
+                            {
+                                name: 'j2',
+                                title: 'Shelf Life (months)',
+                                type: 'text',
+                                inputType: 'numeric',
+                                defaultValue: '6',
+                                minValue: '0'
                             }
                             ]
                         }

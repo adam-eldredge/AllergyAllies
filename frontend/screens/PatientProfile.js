@@ -3,7 +3,8 @@ import { View, Text, Image, Button, ScrollView, TouchableOpacity, TextInput, Sty
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 import AuthContext from '../AuthContext';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons/faPenToSquare'
 import User from '../User';
 import { DataTable } from 'react-native-paper';
 import axios from 'axios';

@@ -4,6 +4,9 @@ const dataSchema = new mongoose.Schema({
     providerID: {
         type: String
     },
+    practiceID: {
+        type: String
+    },
     reportType: {
         type: String
     },

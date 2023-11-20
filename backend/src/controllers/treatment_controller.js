@@ -137,7 +137,21 @@ exports.getAllTreatments = async (req, res) => {
     }
 }
 
+
+// Get ALL treatments across patients
+exports.getAllTreatmentsByID = async (req, res) => {
+    try {
+        const patientID = req.params.patientID;
+        const data = await treatment.find({patientID: patientID});
+        res.json(data)
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message })
+    }
+}
+
 // Get treatment by patientID and treatment date
+
 exports.getTreatment = async (req, res) => {
     try {
     const { patientID, date } = req.body;

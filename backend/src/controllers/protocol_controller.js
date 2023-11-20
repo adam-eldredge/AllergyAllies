@@ -45,7 +45,6 @@ const updateProtocol = async (req, res) => {
     }
 }
 
-
 const getProtocol = async (req, res) => {
     try {
         const practiceID = req.params.practiceID;
