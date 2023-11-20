@@ -15,7 +15,11 @@ import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
 
 const Tab = createBottomTabNavigator();
 
-export default function InjectionInfo({navigation}){
+export default function InjectionInfo({route, navigation}){
+
+
+        const bottles = route.params?.bottlesParam || [];
+        const injectionDate = route.params?.dateParam || [];
 
         //get from backend: from practice survey
         const numVials = 3;
@@ -37,8 +41,26 @@ export default function InjectionInfo({navigation}){
             bottleNums[i] = i+2;
             reactions[i] = true;
           }
+
+        let data = []
+        if (bottles) {
+        
+              //get data for each bottle
+              data = bottles.map((bottle, index) => {
+  
+                return {
+                  id: index + 1,
+                  title: `Vial ${index + 1}: ${bottle.nameOfBottle}`,
+                  bottleNum: bottle.currBottleNumber,
+                  dosage: bottle.injVol
+                };
+              });
+
+            } else {
+              throw new Error("Invalid or missing data for bottles for treatment");
+            }
     
-        const data = Array.from({ length: numVials }, (_, index) => ({
+        /* const dat1a = Array.from({ length: numVials }, (_, index) => ({
             id: index + 1,
             title: `Vial ${index + 1}`,
             progress: progress[index], 
@@ -47,7 +69,7 @@ export default function InjectionInfo({navigation}){
             bottleNum: bottleNums[index],
             lastInjDosage: dosages[index],
             reaction: reactions[index]
-          }));
+          })); */
     
     
           const renderDot = (index) => (
@@ -67,51 +89,44 @@ export default function InjectionInfo({navigation}){
     
         const [activeSlide, setActiveSlide] = useState(0);
     
-        const renderItem = ({ item }) => (
+        const renderCarouselCard = ({ item }) => (
+        <View>
+          <View style = {styles.pastAppointment}>
+            <View style = {styles.divider}>
+                <Text style={styles.pastAppointmentText}>{item.title}</Text>
+            </View>           
+          
+          
+          <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+              <View style={styles.icon}>
+               <FontAwesomeIcon icon={faSyringe} color={'#424242'} size={20}/>
+            </View>
             <View>
-
-
-<View style = {styles.pastAppointment}>
-
-     <View style = {styles.divider}>
-     <Text style={styles.pastAppointmentText}>{item.title}</Text>
-    </View>           
-   
-
-    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
-         <FontAwesomeIcon icon={faSyringe} color={'#424242'} size={20}/>
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Dosage</Text>    
-        <Text style={styles.cardData}>{item.maintenanceNum} ml</Text>    
-      </View> 
-    </View>
-
-    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
-        <FontAwesomeIcon icon={faDroplet} color={'#424242'} size={20}/> 
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Bottle</Text>    
-        <Text style={styles.cardData}>3</Text>    
-      </View> 
-    </View>
-
-    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
-        <FontAwesomeIcon icon={faLocationCrosshairs} color={'#424242'} size={20}/> 
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Location</Text>    
-        <Text style={styles.cardData}>Left Arm</Text>    
-      </View> 
-    </View>
-
-
-
-    
-</View>
+              <Text style={styles.cardSubData}>Dosage</Text>    
+              <Text style={styles.cardData}>{item.dosage} ml</Text>    
+            </View> 
+          </View>
+              
+          <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+              <View style={styles.icon}>
+              <FontAwesomeIcon icon={faDroplet} color={'#424242'} size={20}/> 
+            </View>
+            <View>
+              <Text style={styles.cardSubData}>Bottle</Text>    
+              <Text style={styles.cardData}>{item.bottleNum}</Text>    
+            </View> 
+          </View>
+              
+          <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+              <View style={styles.icon}>
+              <FontAwesomeIcon icon={faLocationCrosshairs} color={'#424242'} size={20}/> 
+            </View>
+            <View>
+              <Text style={styles.cardSubData}>Location</Text>    
+              <Text style={styles.cardData}>Upper Left Arm</Text>    
+            </View> 
+          </View> 
+        </View>
 
 
 
@@ -144,12 +159,12 @@ export default function InjectionInfo({navigation}){
 
 <View style = {styles.carouselItem}>
 
-<Text style={styles.dateTitle}>Thursday 10/25/2023</Text>  
+<Text style={styles.dateTitle}>{injectionDate}</Text>  
      <Carousel
         data={data}
         loop={false}
         onIndexChanged={onIndexChanged}
-        renderItem={renderItem}
+        renderItem={renderCarouselCard}
         width={350}
         height = {370}
         onSnapToItem={(index) => setActiveSlide(index)}
@@ -415,8 +430,7 @@ const styles = StyleSheet.create({
       dateTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#424242',
-        marginLeft: 22,
+        color: '#424242'
       },
 })
 

@@ -59,14 +59,14 @@ export default function PatientProgress({navigation}){
 
     const findPatient = async () => {
       if (email){
-        const patientObj = await axios.get(`http://10.75.154.12:5000/api/findPatient/${email}`)
+        const patientObj = await axios.get(`http://192.168.12.124:5000/api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
     }
     if (!patient) { findPatient(); }
 
     const findTreatments = async () => {
-      const treatmentsObj = await axios.get(`http://10.75.154.12:5000/api/getAllTreatmentsByID/${patient._id}`)
+      const treatmentsObj = await axios.get(`http://192.168.12.124:5000/api/getAllTreatmentsByID/${patient._id}`)
       setTreatments(treatmentsObj.data)
     }
     if (!treatments && patient) { findTreatments(); }
@@ -212,14 +212,14 @@ export default function PatientProgress({navigation}){
 
      //create Past Injection blocks for list at bottom of screen
      //date is from backend but Attended on Time flag is still hardcoded
-       const PastInjectionBlock = ({ date }) => (
+       const PastInjectionBlock = ({ treatment }) => (
          <TouchableOpacity
-           onPress={() => navigation.navigate('InjectionInfo')}
+           onPress={() => navigation.navigate('InjectionInfo', {bottlesParam: treatment.bottles, dateParam: formatDateWithDay(treatment.date)})}
            style={styles.pastAppointment}>
-             <Text style={styles.pastAppointmentText}>{formatDateWithDay(date)}</Text>
+             <Text style={styles.pastAppointmentText}>{formatDateWithDay(treatment.date)}</Text>
              <View style={styles.flags}>
                  <View style={styles.onTime}>
-                 <Text style={{color: 'white'}}> Attended on Time </Text>
+                 <Text style={{color: 'white'}}> Attended on Time</Text>
                  </View>
              </View>
          </TouchableOpacity>
@@ -258,7 +258,7 @@ export default function PatientProgress({navigation}){
       //recorded injections in database
       <>
          {treatments.map((treatment, index) => (
-          <PastInjectionBlock key={index} date={treatment.date} />
+          <PastInjectionBlock key={index} treatment={treatment}/>
          ))}
       <TouchableOpacity
        onPress={() => navigation.navigate('ViewAllAppointments') }>

@@ -188,6 +188,8 @@ const SignedInDesktopStack = (
       <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
       <Stack.Screen name="Maintenance" component={Maintenance} options={{title: 'Maintenance'}} />
       <Stack.Screen name="PatientDetails" component={PatientDetails} options={{title: 'Patient Details'}} />
+      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'ViewAllAppointments', headerBackTitleVisible: false}} />
+      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'InjectionInfo', headerBackTitleVisible: false}} />
   </>
 );
 
