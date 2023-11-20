@@ -1,16 +1,16 @@
-const patient = require('../Models/patient');
+const Patient = require('../Models/patient');
 const protocol = require('../Models/protocols')
 const treatment = require('../Models/treatment');
 const { Report } = require('../Models/report');
-const provider = require('../Models/provider');
+const Provider = require('../Models/provider');
 
 const { getAllPatientsHelper } = require('../controllers/patient_controller');
 const { generateReport, findMatchingBottle } = require('../helpers/reportHelper');
 
-async function getTreatment(providerID, patientID) {
+async function getTreatment(patientID) {
     const patientTreatment = await treatment.findOne({
-        providerID: providerID.toString(),
         patientID: patientID.toString(),
+        attended: true,
     }).sort({ date: -1});
     
     return patientTreatment;
@@ -24,7 +24,7 @@ exports.deleteReport = async (req, res) => {
     }
 
     try{
-        await patient.findByIdAndDelete(id);
+        await Report.findByIdAndDelete(reportID);
     } catch (error) { 
         return res.status(404).json({ message: error.message })
     };
@@ -48,7 +48,12 @@ exports.deleteAllReports = async (req, res) => {
 exports.getAllReportNames = async (req, res) => {
     const providerID = req.params.providerID; 
     try {
-        const reports = await Report.find({ providerID: providerID}).select('-providerID -data -createdAt -updatedAt -__v');
+        const provider = await Provider.findById(providerID);
+        if (!provider) {
+            return res.status(401).json({message: "Provider not found"});
+        }
+
+        const reports = await Report.find({ practiceID: provider.practiceID}).select('-providerID -practiceID -data -createdAt -updatedAt -__v');
         return res.status(200).json({ reports });
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -75,20 +80,24 @@ exports.getReportData = async (req, res) => {
 exports.generateApproachingMaintenanceReport = async (req, res) => {
     const providerID = req.params.providerID;
     const reportType = "ApproachingMaintenance";
+    const provider = await Provider.findById(providerID);
 
-    const patientsList = await getAllPatientsHelper(providerID);
+    if (!provider) {
+        return res.status(401).json({ message: "Provider not found" });
+    }
 
+    const patientsList = await getAllPatientsHelper(provider.practiceID);
     const approachingMaintenanceData = [];
 
     // Iterate over each patient, checking their bottles
-    for (const p of patientsList) {
-        if(p.status === "MAINTENANCE") {
+    for (const patient of patientsList) {
+        if(patient.status === "MAINTENANCE") {
             continue;
         }
 
         // find treatment data
-        const patientTreatment = await getTreatment(providerID, p._id)
-
+        const patientTreatment = await getTreatment(patient._id)
+        
         if (!patientTreatment) {
             continue;
         }
@@ -100,8 +109,9 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
         
         // iterate over patient treatment vials
         for (const bottle of patientTreatment.bottles) {
+            
             // match bottle in patient model to bottle in treatment (b)
-            const matchingBottle = await findMatchingBottle(p, bottle);
+            const matchingBottle = await findMatchingBottle(patient, bottle);
 
             let patientCurrentBottleNumber = bottle.currBottleNumber;
 
@@ -125,12 +135,12 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
 
         if (vialInfo.length > 0 && !allBottlesAtMaintenance && atleastOneMaintenanceBottle) {
             approachingMaintenanceData.push({
-                patientName: p.firstName + " " + p.lastName,
+                patientName: patient.firstName + " " + patient.lastName,
                 maintenanceBottles: vialInfo,
                 startDate: treatmentStartDate,
-                DOB: p.DoB,
-                phoneNumber: p.phone,
-                email: p.email,
+                DOB: patient.DoB,
+                phoneNumber: patient.phone,
+                email: patient.email,
             });
         }
     }
@@ -139,7 +149,7 @@ exports.generateApproachingMaintenanceReport = async (req, res) => {
     try {
         if (approachingMaintenanceData.length > 0) {
             const manual = true;
-            const savedReport = await generateReport(providerID, reportType, manual, approachingMaintenanceData);
+            const savedReport = await generateReport(providerID, provider.practiceID, reportType, manual, approachingMaintenanceData);
             return res.status(200).json(savedReport);
         } else {
             return res.status(201).json({message: "No patients approaching maintenance"});
@@ -153,29 +163,35 @@ exports.generateAttritionReport = async (req, res) => {
     try {
         const providerID = req.params.providerID;  
         const reportType = "Attrition";
-        const patientAttrition = [];
+        const provider = await Provider.findById(providerID);
+        if (!provider) {
+            return res.status(401).json({ message: "Provider not found"});
+        }
+        const patientsList = await getAllPatientsHelper(provider.practiceID); 
+
         const today = new Date();
-
-        const patientsList = await getAllPatientsHelper(providerID); 
-        //const foundProvider = await provider.findById(providerID);
-
-        for (const p of patientsList) {
-
-            if (p.status !== "ATTRITION") {
+        const patientAttrition = [];
+        for (const patient of patientsList) {
+            if (patient.status !== "ATTRITION") {
                 continue;
             }
 
             const patientBottles = [];
-            const foundTreatment = await getTreatment(providerID, p._id);
+
+            // get last not attended treatment
+            const foundTreatment = await treatment.findOne({
+                patientID: patient._id,
+                attended: false,
+            }).sort({ date: -1});;
 
             if (!foundTreatment) {
                 console.log("treatment not found in attrition report");
                 continue;
             }
-
+  
             for(const bottle of foundTreatment.bottles) {
                 // find protocol to find out max bottle number
-                const matchingBottle = await findMatchingBottle(p, bottle);
+                const matchingBottle = await findMatchingBottle(patient, bottle);
     
                 let treatmentCurrentBottleNumber = bottle.currBottleNumber;
                 
@@ -187,22 +203,22 @@ exports.generateAttritionReport = async (req, res) => {
                 patientBottles.push(`${bottle.nameOfBottle} ${treatmentCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
             }
 
-            const timeDiff= today - p.statusDate;
+            const timeDiff= today - patient.statusDate;
             const daysSinceLastInjection = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
             patientAttrition.push({
-                patientName: p.firstName + " " + p.lastName,
+                patientName: patient.firstName + " " + patient.lastName,
                 bottlesInfo: patientBottles,
                 daysSinceLastInjection: daysSinceLastInjection,
-                statusDate: p.statusDate,
-                DOB: p.DoB,
-                phone: p.phone,
-                email: p.email,
+                statusDate: patient.statusDate,
+                DOB: patient.DoB,
+                phone: patient.phone,
+                email: patient.email,
             });
         }
 
         if (patientAttrition.length > 0) {
             const manual = true;
-            const savedReport = await generateReport(providerID, reportType, manual, patientAttrition);
+            const savedReport = await generateReport(providerID, provider.practiceID, reportType, manual, patientAttrition);
             return res.status(200).json(savedReport);
         } else {
             return res.status(201).json({message: "No patients at risk of attrition."})
@@ -220,7 +236,7 @@ exports.generateRefillsReport = async (req, res) => {
     const patientRefillsData = [];
 
     const patientsList = await getAllPatientsHelper(providerID);
-    const foundProvider = await provider.findById(providerID);
+    const foundProvider = await Provider.findById(providerID);
 
     for (const p of patientsList) {
         const patientTreatment = await treatment.findOne({
@@ -276,7 +292,7 @@ exports.generateRefillsReport = async (req, res) => {
     }
 
     try {
-        const savedReport = await generateReport(providerID, reportType, true, patientRefillsData);
+        const savedReport = await generateReport(providerID, practiceID, reportType, true, patientRefillsData);
         return res.status(200).json(savedReport);
     } catch (error) {
         return res.status(400).json({ message: error.message }); 
@@ -286,21 +302,22 @@ exports.generateRefillsReport = async (req, res) => {
 exports.generateNeedsRetestReport = async (req, res) => {
     const providerID = req.params.providerID; 
     const reportType = "NeedsRetest";
-    // get list of all patients (can probably skip this step due to below comment)
-    const patientsList = await getAllPatientsHelper(providerID); 
+    const provider = await Provider.findById(providerID);
+
+    if(!provider) {
+        return res.status(401).json({ message: "Provider not found"});
+    }
+
+    const patientsList = await getAllPatientsHelper(provider.practiceID); 
     const needsRetestOutput = [];
 
-    // simplify - make function to check if patient status is maintenance
-    for (p of patientsList) {
-        if(p.status !== "MAINTENANCE") {
+    for (const patient of patientsList) {
+        if(patient.status !== "MAINTENANCE") {
             continue;
         }
 
         // get newest treatment data
-        const patientTreatment = await treatment.findOne({
-            providerID: p.providerID,
-            patientID: p._id.toString(),
-        }).sort({ date: -1});
+        const patientTreatment = await getTreatment(patient._id);
 
         if (!patientTreatment) {
             continue;
@@ -315,20 +332,20 @@ exports.generateNeedsRetestReport = async (req, res) => {
         }
 
         needsRetestOutput.push({
-            patientName: p.firstName + " " + p.lastName,
-            treatmentStartDate: p.treatmentStartDate,
-            maintenanceDate: p.statusDate,
+            patientName: patient.firstName + " " + patient.lastName,
+            treatmentStartDate: patient.treatmentStartDate,
+            maintenanceDate: patient.statusDate,
             dateLastTested,
-            DOB: p.DoB,
-            phoneNumber: p.phone,
-            email: p.email,
+            DOB: patient.DoB,
+            phoneNumber: patient.phone,
+            email: patient.email,
         });
     }
 
     try {
         if (needsRetestOutput.length > 0) {
             const manual = true;
-            const savedReport = await generateReport(providerID, reportType, manual, needsRetestOutput);
+            const savedReport = await generateReport(providerID, provider.practiceID, reportType, manual, needsRetestOutput);
             return res.status(200).json(savedReport);
         } else {
             return res.status(201).json({message: "No patients need retest"});
@@ -339,61 +356,51 @@ exports.generateNeedsRetestReport = async (req, res) => {
 }
 
 // snoozes a patient showing up on needs retest report
-// needs test
 exports.needsRetestSnooze = async (req, res) => {
-    const providerID = req.params.providerID;
-    const patientFirstName = req.body.firstName;
-    const patientLastName = req.body.lastName;
     const patientEmail = req.body.email;
     const snoozeDuration = req.body.snoozeDuration;
 
     try {
-        const foundPatient = await patient.findOne({ firstName: patientFirstName, lastName: patientLastName, email: patientEmail});
+        const patient = await Patient.findOne({ email: patientEmail});
 
-        if (!foundPatient) {
-            return res.status(400).json({ message: "patient not found"});
+        if (!patient) {
+            return res.status(401).json({ message: "patient not found"});
         }
 
-        const foundTreatment = await treatment.findOne({
-            providerID: p.providerID,
-            patientID: p._id.toString(),
-        }).sort({ date: -1});;
+        // needsRetest in needsRetestData assumed true if this function is called.
 
-        for (const b of foundTreatment.bottles) {
-            if (b.needsRetest) {
-                b.needsRetestSnooze.active = true;
-                b.needsRetestSnooze.dateOfSnooze = new Date();
-                b.snoozeDuration = snoozeDuration;
-                await b.save();
-            }
-        }
+        const needsRetestSnooze = patient.needsRetestData.needsRetestSnooze;
+        needsRetestSnooze.active = true;
+        needsRetestSnooze.dateOfSnooze = new Date();
+        needsRetestSnooze.snoozeDuration = snoozeDuration;
+
+        await patient.save();
+        return res.status(200).json({ message: "Snooze Applied"});
     } catch (error) {
         return res.status(404).json({ message: error.message });
     }
 }
 
-// needs test
 exports.patientRetested = async (req, res) => {
-    const providerID = req.params.providerID;
-    const patientFirstName = req.body.firstName;
-    const patientLastName = req.body.lastName;
     const patientEmail = req.body.email;
 
     try {
-        const foundPatient = await patient.findOne({ firstName: patientFirstName, lastName: patientLastName, email: patientEmail});
+        const patient = await Patient.findOne({ email: patientEmail });
 
-        if (!foundPatient) {
+        if (!patient) {
             return res.status(400).json({ message: "patient not found"});
         }
 
-        const foundTreatment = await treatment.findOne({ providerID: providerID, patientID: foundPatient._id});
+        patient.needsRetestData.needsRetest = false;
 
-        for (const b of foundTreatment.bottles) {
-            if (b.needsRetest) {
-                b.needsRetest = false;
-                await b.save();
-            }
-        }
+        //apply snooze - needsRetest set false, but needsRetest criteria may still satisfied (until treatment info updated).
+        const needsRetestSnooze = patient.needsRetestData.needsRetestSnooze;
+        needsRetestSnooze.active = true;
+        needsRetestSnooze.dateOfSnooze = new Date();
+        needsRetestSnooze.snoozeDuration = 30;
+
+        await patient.save();
+        return res.status(200).json({ message: "Patient marked as retested"});
 
     } catch (error) {
         return res.status(404).json({ message: error.message });

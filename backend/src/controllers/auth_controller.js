@@ -147,7 +147,6 @@ exports.refresh = async(req, res) => {
                 )
             }
 
-            console.log(foundUser.practiceID)
             res.json({ accessToken })            
         }
     )

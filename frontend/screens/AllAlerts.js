@@ -1,111 +1,97 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
-import axios from 'axios';
 import AuthContext from '../AuthContext';
+import {formatDate, alertMessage, fetchRecentAlerts} from '../utils/alertUtils';
+import User from '../User';
+import axios from 'axios';
 
 export default function AllAlerts({navigation}){
    const { signOut } = useContext(AuthContext);
+   const userInfo = User();
+   const [recentAlerts, setRecentAlerts] = useState([]);
+   const [deletedAlerts, setDeletedAlerts] = useState([]);
+
+   useEffect(() => {
+      const fetchAlerts = async () => {
+         const alerts = await fetchRecentAlerts(userInfo.id);
+         setRecentAlerts(alerts);
+      }
+
+      fetchAlerts();
+   }, []);
+
+   const removeAlert = async (alertToDelete) => {
+      try {
+
+         setDeletedAlerts((prevDeletedAlerts) => [...prevDeletedAlerts, alertToDelete]);
+
+         // update the local state of alerts/cards
+         const updatedAlerts = recentAlerts.filter((alert) => alert._id !== alertToDelete._id);
+         setRecentAlerts(updatedAlerts);
+    
+         // mark alert for deletion in API
+         await axios.delete(`http://localhost:5000/api/deleteAlert/${alertToDelete._id}`);
+
+      } catch (error) {
+         console.error('Error deleting alert in DB', error);
+         setRecentAlerts(prevAlerts => [...prevAlerts, alertToDelete]);
+      }
+   };
+
+   const undoDelete = async () => {
+      try {
+         if (deletedAlerts.length > 0) {
+            const latestDeletedAlert = deletedAlerts.pop();
+            setDeletedAlerts([...deletedAlerts]);
+
+            const updatedAlerts = [...recentAlerts, latestDeletedAlert].sort(
+               (a, b) => new Date(b.date) - new Date(a.date)
+            );
+
+            setRecentAlerts(updatedAlerts);
+
+            // undo alert deletion
+            await axios.patch(`http://localhost:5000/api/undoDelete`);
+         }
+       } catch (error) {
+         console.error('Error deleting alert in DB', error);
+       }
+   }
+
    return (
       <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#fcfcfc'}}>
       <ScrollView style={{ backgroundColor: '#fcfcfc'}}>
          <Text style={styles.title}>Your Alerts</Text>
-         <Card style = {{...styles.alert, marginTop: 10}}>
-            <Card.Title titleStyle={{ fontWeight:"600" }}
-               title="Patient Bob is at risk for attrition."
-               subtitle="9/17/2023"
-               right={(props) => <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={showAlert}
-                />}
-            />
-         </Card>
-         <Card style = {styles.alert}>
-            <Card.Title titleStyle={{fontWeight:"600" }}
-               title="Patient Rob’s injections are expiring or will soon need to be mixed"
-               subtitle="9/17/2023"
-               right={(props) => <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={showAlert}
-                />}
-            />
-         </Card>
-         <Card style = {styles.alert}>
-            <Card.Title titleStyle={{fontWeight:"600" }}
-               title="Sample Alert 3"
-               subtitle="9/16/2023"
-               right={(props) => <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={showAlert}
-                />}
-            />
-         </Card>
-         <Card style = {styles.alert}>
-            <Card.Title titleStyle={{fontWeight:"600" }}
-               title="Sample Alert 4"
-               subtitle="9/15/2023"
-               right={(props) => <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={showAlert}
-                />}
-            />
-         </Card>
-         <Card style = {styles.alert}>
-            <Card.Title titleStyle={{fontWeight:"600" }}
-               title="Sample Alert 5"
-               subtitle="9/15/2023"
-               right={(props) => <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={showAlert}
-                />}
-            />
-         </Card>
-         <Card style = {styles.alert}>
-            <Card.Title titleStyle={{fontWeight:"600" }}
-               title="Sample Alert 6"
-               subtitle="9/14/2023"
-               right={(props) => <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={showAlert}
-                />}
-            />
-         </Card>
-         <Card style = {styles.alert}>
-            <Card.Title titleStyle={{fontWeight:"600"}}
-               title="Sample Alert 7"
-               subtitle="9/12/2023"
-               right={(props) => <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={showAlert}
-                />}
-            />
-         </Card>
-         <Card style = {styles.alert}>
-            <Card.Title titleStyle={{fontWeight:"600"}}
-               title="Sample Alert 8"
-               subtitle="9/10/2023"
-               right={(props) => <IconButton
-                  icon="trash-can-outline"
-                  iconColor="#1059d5"
-                  size={20}
-                  onPress={showAlert}
-                />}
-            />
-         </Card>
+
+         <View style={{ alignItems: 'flex-end', marginRight: 245 }}>
+            <TouchableOpacity onPress={undoDelete}>
+                  <Text style = {{ textDecorationLine: 'underline', color: '#1059d5', fontSize: 15, fontWeight: 'bold' }}>Undo</Text>
+            </TouchableOpacity>
+         </View>
+         
+         {recentAlerts.length === 0 ? (
+            <View style={{ marginLeft: 100, marginTop: 30, marginRight: 300}}>
+            <Text style={{fontSize: 18}}>There are currently no alerts.</Text>
+            </View>
+         ) : (
+            recentAlerts.map((alert, index) => (
+               <Card key={index} style={styles.alert}>
+                  <Card.Title
+                     titleStyle={{ fontWeight: "600" }}
+                     title={`${alertMessage(alert.alertType, alert.patientName)}`}
+                     subtitle={formatDate(alert.date)}
+                     right={(props)=><IconButton
+                        icon="trash-can-outline"
+                        iconColor="#1059d5"
+                        size={20}
+                        onPress={() => removeAlert(alert)}
+                     />}
+                  ></Card.Title>
+               </Card>
+            ))
+         )}
+         
          <View style={{height: 20, backgroundColor: '#fcfcfc'}}></View>
       </ScrollView>
       <View style={{backgroundColor: '#fcfcfc', flex: 1,}}>
@@ -204,26 +190,3 @@ const styles = StyleSheet.create({
    },
 })
 
-const showAlert = () =>
-  Alert.alert(
-    'Delete this alert?',
-    'This action cannot be undone!',
-    [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-        //onPress: () => Alert.alert('add in delete functionality'),
-      },
-      {
-         text: 'Yes',
-         style: 'cancel',
-       },
-    ],
-    {
-      cancelable: true,
-      onDismiss: () =>
-        Alert.alert(
-          'This alert was dismissed by tapping outside of the alert dialog.',
-        ),
-    },
-  );

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const alertSchema = new mongoose.Schema({
-    providerID: {
+    practiceID: {
         type: String
     },
     patientName: {
@@ -12,6 +12,14 @@ const alertSchema = new mongoose.Schema({
     },
     date: {
         type: Date
+    },
+    markedForDelete: {
+        type: Boolean,
+        default: false
+    },
+    deleteDate: {
+        type: Date,
+        default: null
     }
 }, { collection: 'ProviderAlerts'});
 

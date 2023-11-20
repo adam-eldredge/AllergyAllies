@@ -1,10 +1,9 @@
-import React, { useContext, Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView } from 'react-native'
-import { useRoute } from '@react-navigation/native';
+import React, { useContext, Component, useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView } from 'react-native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import AuthContext from '../AuthContext';
-import jwt_decode from 'jwt-decode';
 import User from '../User';
+import { fetchRecentAlerts, alertMessage, formatDate } from '../utils/alertUtils';
 
 export default function Portal({navigation}){
 
@@ -12,6 +11,18 @@ export default function Portal({navigation}){
    const userInfo = User();
    const role = userInfo.role;
    const firstName = userInfo.firstName;
+
+   const [recentAlerts, setRecentAlerts] = useState([]);
+
+   useEffect(() => {
+      const fetchAlerts = async () => {
+         const alerts = await fetchRecentAlerts(userInfo.id);
+         setRecentAlerts(alerts);
+      }
+
+      fetchAlerts();
+   }, []);
+
 
    return role == 2 ? (
       // PATIENT PORTAL
@@ -85,29 +96,30 @@ export default function Portal({navigation}){
          <View style={{flex: 1, flexDirection: 'row', flexWrap: 'wrap',}}>
             <View style={{marginLeft: 100, marginRight: 170}}>
                <Text style={{fontSize: 18, marginBottom: 10, fontWeight: '500'}}>Your Alerts:</Text>
-               <Card style = {styles.alertCard}>
-                  <Card.Title titleStyle={styles.alertText}
-                     title="Patient Bob is at risk for attrition."
-                     subtitle="9/17/2023"
-                  />
-               </Card>
-               <Card style = {styles.alertCard}>
-                  <Card.Title titleStyle={styles.alertText}
-                     title="Patient Rob’s injections are expiring or will soon need to be mixed"
-                     subtitle="9/17/2023"
-                  />
-               </Card>
-               <Card style = {styles.alertCard}>
-                  <Card.Title titleStyle={styles.alertText}
-                     title="Patient Lisa’s injections are expiring or will soon need to be mixed"
-                     subtitle="9/16/2023"
-                  />
-               </Card>
-               <TouchableOpacity
-               onPress={() =>
-                  navigation.navigate('AllAlerts')}>
-                  <Text style = {{textDecorationLine: 'underline', color: '#1059d5', fontSize: 15, marginTop: 10, fontWeight: 'bold',}}>View All Alerts</Text>
-               </TouchableOpacity>
+               {recentAlerts.length === 0 ? (
+                  <View style={{ marginRight: 300}}>
+                     <Text>There are currently no alerts.</Text>
+                  </View>
+               ) : (
+                  recentAlerts.slice(0, 3).map((alert, index) => (
+                     <Card key={index} style={styles.alertCard}>
+                        <Card.Title
+                           titleStyle={styles.alertText}
+                           title= {`${alertMessage(alert.alertType, alert.patientName)}`}
+                           subtitle={formatDate(alert.date)}
+                        ></Card.Title>
+                     </Card>
+                  ))
+               )}
+               {recentAlerts.length === 0 ? (
+                  null
+               ) : (
+                  <TouchableOpacity
+                  onPress={() =>
+                     navigation.navigate('AllAlerts')}>
+                     <Text style = {{textDecorationLine: 'underline', color: '#1059d5', fontSize: 15, marginTop: 10, fontWeight: 'bold',}}>View All Alerts</Text>
+                  </TouchableOpacity>
+               )}
             </View>
             <View style = {{marginRight: 40}}>
                <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3'}}

@@ -13,6 +13,10 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    practiceID: {
+        required: false,
+        type: String
+    },
     phone: {
         required: false,
         type: String
@@ -49,10 +53,6 @@ const dataSchema = new mongoose.Schema({
             maintenanceNumber: Number,
         }],
     },
-    providerID: {
-        require: false,
-        type: String,
-    },
     // DEFAULT, INACTIVE, MAINTENANCE, ATTRITION
     status: {
         require: true,
@@ -67,15 +67,24 @@ const dataSchema = new mongoose.Schema({
         default: 0
     },
     needsRetestData: {
-        type: {
-            needsRetest: Boolean,
-            needsRetestSnooze: {
-                active: Boolean,
-                dateOfSnooze: Date,
-                snoozeDuration: Number,
-            },
+        needsRetest: {
+            type: Boolean,
+            default: false,
         },
-        required: false,
+        needsRetestSnooze: {
+            active: {
+                type: Boolean,
+                default: null,
+            },
+            dateOfSnooze: {
+                type: Date,
+                default: null,
+            },
+            snoozeDuration: {
+                type: Number,
+                default: null,
+            }
+        }
     },
     allergyMedication:{
         type: [{
