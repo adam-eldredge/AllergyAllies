@@ -67,17 +67,26 @@ export default function PatientProgress({navigation}){
 
     const findTreatments = async () => {
       const treatmentsObj = await axios.get(`http://192.168.12.124:5000/api/getAllTreatmentsByID/${patient._id}`)
-      setTreatments(treatmentsObj.data)
+      const sortedTreatments = treatmentsObj.data.slice().sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateB - dateA;
+      });
+      setTreatments(sortedTreatments)
     }
     if (!treatments && patient) { findTreatments(); }
 
     if (patient && treatments) { setLoading(false) }
+
+
+    
 
   })
 
   if (loading) {
     return <Text>Loading...</Text>
    }
+  
 
   //get most recent injection data for carousel  
   let data = []
@@ -257,11 +266,11 @@ export default function PatientProgress({navigation}){
       ) : (
       //recorded injections in database
       <>
-         {treatments.map((treatment, index) => (
+         {treatments.slice(0, 3).map((treatment, index) => (
           <PastInjectionBlock key={index} treatment={treatment}/>
          ))}
       <TouchableOpacity
-       onPress={() => navigation.navigate('ViewAllAppointments') }>
+       onPress={() => navigation.navigate('ViewAllAppointments')}>
         <Text style = {styles.viewAllAppointments}>View All</Text>
       </TouchableOpacity>
       </>

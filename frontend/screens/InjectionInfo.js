@@ -21,27 +21,6 @@ export default function InjectionInfo({route, navigation}){
         const bottles = route.params?.bottlesParam || [];
         const injectionDate = route.params?.dateParam || [];
 
-        //get from backend: from practice survey
-        const numVials = 3;
-
-        //create arrays for progress percentage, last injection dosage, and last injection date for each vial
-        const progress = Array(numVials).fill(null);
-        const dosages = Array(numVials).fill(null);
-        const dates = Array(numVials).fill(null);
-        const bottleNums = Array(numVials).fill(null);
-        const maintenanceNums = Array(numVials).fill(null);
-        const reactions = Array(numVials).fill(null);
-    
-        //dummy values right now, get from backend
-        for (let i = 0; i <= numVials; i++) {
-            dosages[i] = (i+1)*.25;
-            dates[i] = ('10/9/23')
-            progress[i] = (i+1)*10;
-            maintenanceNums[i] = i+4;
-            bottleNums[i] = i+2;
-            reactions[i] = true;
-          }
-
         let data = []
         if (bottles) {
         
@@ -60,18 +39,7 @@ export default function InjectionInfo({route, navigation}){
               throw new Error("Invalid or missing data for bottles for treatment");
             }
     
-        /* const dat1a = Array.from({ length: numVials }, (_, index) => ({
-            id: index + 1,
-            title: `Vial ${index + 1}`,
-            progress: progress[index], 
-            lastInjDate: dates[index],
-            maintenanceNum: maintenanceNums[index],
-            bottleNum: bottleNums[index],
-            lastInjDosage: dosages[index],
-            reaction: reactions[index]
-          })); */
-    
-    
+          //create dots for carousel  
           const renderDot = (index) => (
             <View
               key={index}
@@ -89,6 +57,7 @@ export default function InjectionInfo({route, navigation}){
     
         const [activeSlide, setActiveSlide] = useState(0);
     
+        //create cards for carousel  
         const renderCarouselCard = ({ item }) => (
         <View>
           <View style = {styles.pastAppointment}>
@@ -130,7 +99,7 @@ export default function InjectionInfo({route, navigation}){
 
 
 
- {/* Conditionally render adverseReaction view based on the value of item.reaction */}
+ {/* conditionally render adverse reaction 
  {item.reaction ? (
       <View>
         <View style={styles.adverseReaction}>
@@ -142,45 +111,33 @@ export default function InjectionInfo({route, navigation}){
           </View>
         </View>
       </View>
-    ) : null}       
-
-       
-
+    ) : null}       */} 
                 
-</View>
+          </View>
 
 
           );
 
  return (
        
-<ScrollView>
-
-
-<View style = {styles.carouselItem}>
-
-<Text style={styles.dateTitle}>{injectionDate}</Text>  
-     <Carousel
-        data={data}
-        loop={false}
-        onIndexChanged={onIndexChanged}
-        renderItem={renderCarouselCard}
-        width={350}
-        height = {370}
-        onSnapToItem={(index) => setActiveSlide(index)}
-      />
-
-<View style={styles.dotsContainer}>
-        {data.map((_, index) => renderDot(index))}
-      </View>
-</View>
-
- 
-
-
-    
-
-</ScrollView>
+       <ScrollView>
+       <View style = {styles.carouselItem}>
+       <Text style={styles.dateTitle}>{injectionDate}</Text>  
+            <Carousel
+               data={data}
+               loop={false}
+               onIndexChanged={onIndexChanged}
+               renderItem={renderCarouselCard}
+               width={350}
+               height = {370}
+               onSnapToItem={(index) => setActiveSlide(index)}
+             />
+       
+       <View style={styles.dotsContainer}>
+               {data.map((_, index) => renderDot(index))}
+             </View>
+       </View>
+       </ScrollView>
       )
    }
 

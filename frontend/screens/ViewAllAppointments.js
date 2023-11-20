@@ -1,104 +1,96 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
+import User from '../User';
+import axios from 'axios';
 
 export default function ViewAllAppointments({navigation}){
+
+
+    //repeated code from PatientProgress screen, could condense into one file used by both
+
+    const userInfo = User();
+    const email = userInfo.email;
+
+    const [patient, setPatient] = useState();
+    const [treatments, setTreatments] = useState();
+    const [loading, setLoading] = useState(true);
+
+    //function that takes in a date from MongoDB and converts it into readable format
+    function formatDateWithDay(mongoDate){
+
+      const javascriptDate = new Date(mongoDate);
+      const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
+  
+      return utcDate.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          });
+  
+      }
+
+   //get the list of treatments associated with patient
+   useEffect(() => {
+
+    const findPatient = async () => {
+      if (email){
+        const patientObj = await axios.get(`http://192.168.12.124:5000/api/findPatient/${email}`)
+        setPatient(patientObj.data)
+      }
+    }
+    if (!patient) { findPatient(); }
+
+    const findTreatments = async () => {
+      const treatmentsObj = await axios.get(`http://192.168.12.124:5000/api/getAllTreatmentsByID/${patient._id}`)
+      //sort treatments by date
+      const sortedTreatments = treatmentsObj.data.slice().sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateB - dateA;
+      });
+      setTreatments(sortedTreatments)
+    }
+    if (!treatments && patient) { findTreatments(); }
+
+    if (patient && treatments) { setLoading(false) }
+
+  })
+
+  if (loading) {
+    return <Text>Loading...</Text>
+   }
+
+
+     //create Past Injection blocks for list at bottom of screen
+     //date is from backend but Attended on Time flag is still hardcoded
+     const PastInjectionBlock = ({ treatment }) => (
+        <TouchableOpacity
+          onPress={() => navigation.navigate('InjectionInfo', {bottlesParam: treatment.bottles, dateParam: formatDateWithDay(treatment.date)})}
+          style={styles.pastAppointment}>
+            <Text style={styles.pastAppointmentText}>{formatDateWithDay(treatment.date)}</Text>
+            <View style={styles.flags}>
+                <View style={styles.onTime}>
+                <Text style={{color: 'white'}}> Attended on Time</Text>
+                </View>
+            </View>
+        </TouchableOpacity>
+      );
+
    return (
     <ScrollView style = {styles.container}>
-    <Text style = {styles.title2}>Past Injections</Text>
-    <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Monday 9/25/2023</Text>
-        <View style={styles.flags}>
-            <View style={styles.onTime}>
-            <Text style={{color: 'white'}}> Attended on Time </Text>
-            </View>
-        </View>
-    </TouchableOpacity>
-    <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-        <View style={styles.flags}>
-        <View style={styles.attendedLate}>
-            <Text style={{color: 'white'}}> 12 Days Late - Dose Adjustment </Text>
-        </View>
-        </View>
-    </TouchableOpacity>
-    <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-        <View style={styles.flags}>
-            <View style={styles.onTime}>
-            <Text style={{color: 'white'}}> Attended on Time </Text>
-            </View>
-            <View style={styles.adverseReaction}>
-            <Text style={{color: 'white'}}> Adverse Reaction </Text>
-            </View>
-        </View>
-    </TouchableOpacity>
-    <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-        <View style={styles.flags}>
-        <View style={styles.flags}>
-            <View style={styles.onTime}>
-            <Text style={{color: 'white'}}> Attended on Time </Text>
-            </View>
-        </View>
-        </View>
-    </TouchableOpacity>
-    <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-        <View style={styles.flags}>
-        <View style={styles.onTime}>
-        <Text style={{color: 'white'}}> Attended on Time </Text>
-        </View>
-        </View>
-    </TouchableOpacity>
-    <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-        <View style={styles.flags}>
-        <View style={styles.attendedLate}>
-            <Text style={{color: 'white'}}> 2 Days Late </Text>
-        </View>
-        <View style={styles.adverseReaction}>
-            <Text style={{color: 'white'}}> Adverse Reaction </Text>
-            </View>
-        </View>
-    </TouchableOpacity>
-    <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-        <View style={styles.flags}>
-        <View style={styles.onTime}>
-        <Text style={{color: 'white'}}> Attended on Time </Text>
-        </View>
-        </View>
-    </TouchableOpacity>
-    <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-        <View style={styles.flags}>
-        <View style={styles.onTime}>
-        <Text style={{color: 'white'}}> Attended on Time </Text>
-        </View>
-        </View>
-        </TouchableOpacity>
-        <TouchableOpacity  onPress={() =>
-               navigation.navigate('InjectionInfo') } style = {styles.pastAppointment}>
-        <Text style={styles.pastAppointmentText}>Thursday 9/14/2023</Text>
-        <View style={styles.flags}>
-        <View style={styles.onTime}>
-        <Text style={{color: 'white'}}> Attended on Time </Text>
-        </View>
-        </View>
-        </TouchableOpacity>
-    <Text>   </Text>
-    <Text>  </Text>
-    <Text>  </Text>
-    <Text>  </Text>
+
+             
+     <Text style = {styles.title2}>Past Injections </Text>
+
+    
+         {treatments.map((treatment, index) => (
+          <PastInjectionBlock key={index} treatment={treatment}/>
+         ))}
+      
+     
+ 
     </ScrollView>
    )
 }
