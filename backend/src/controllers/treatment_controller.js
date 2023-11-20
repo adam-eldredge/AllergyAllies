@@ -205,7 +205,7 @@ exports.deleteTreatment = async (req, res) => {
 
     Some of this information can be removed and changed
 */
-exports.updateTreatment = async (req, res) => {
+exports.updateAdverseTreatment = async (req, res) => {
     try {
         const { patientID, date, bottleName, injVol, injDilution, injLLR, currBottleNumber, expirationDate, needsRefill } = req.body;
         const treatmentToUpdate = await treatment.findOne( { patientID: patientID, date: date} );
@@ -332,9 +332,7 @@ exports.nextTreatment = async(req, res) => {
 
         //Determine how many antigens they are using
         const patientBottleCount = lastTreatment.bottles.length;
-        /*
-            TODO
-        */
+
         let newLastVialTestMap = new Map();
         let newNextVialTestMap = new Map();
 
@@ -352,11 +350,15 @@ exports.nextTreatment = async(req, res) => {
             //New Bottle Numbers for next treatment is 999, then maintenance
             let newBottleNumber = BottleNumberCalc(antigenCurrBottleNumber, antigenLLR, antigenInjVol, antigenDil, antigenMaintenanceBN, antigenName);
             let stringTemp = "";
+            let triggerVialTest = false;
             if(newBottleNumber == 999){
                 stringTemp = "M";
             }
             else{
                 stringTemp = parseInt(newBottleNumber);
+            }
+            if(newBottleNumber > parseInt(antigenCurrBottleNumber)){
+                triggerVialTest = true;
             }
 
             let lastVialTestValues = lastTreatment.lastVialTests.get(antigenName).values;
@@ -376,7 +378,7 @@ exports.nextTreatment = async(req, res) => {
                 currentDoseAdvancement: lastTreatment.bottles[i].currentDoseAdvancement,
                 adverseReaction: false,
                 locationOfInjection: "",
-                needsVialTest: false,
+                needsVialTest: triggerVialTest,
                 needsRefill: false,
                 expirationDate: lastTreatment.bottles[i].expirationDate
             });
