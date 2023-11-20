@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
-import User from '../User';
+import User from '../../User.js';
 import axios from 'axios';
 
 export default function ViewAllAppointments({navigation}){
@@ -36,6 +36,7 @@ export default function ViewAllAppointments({navigation}){
 
     const findPatient = async () => {
       if (email){
+        //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
         const patientObj = await axios.get(`http://192.168.12.124:5000/api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
@@ -43,6 +44,7 @@ export default function ViewAllAppointments({navigation}){
     if (!patient) { findPatient(); }
 
     const findTreatments = async () => {
+      //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
       const treatmentsObj = await axios.get(`http://192.168.12.124:5000/api/getAllTreatmentsByID/${patient._id}`)
       //sort treatments by date
       const sortedTreatments = treatmentsObj.data.slice().sort((a, b) => {

@@ -5,8 +5,7 @@ import { View, Text, TouchableOpacity, Image, TextInput, StyleSheet, Button, Hea
 import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Alerts from './Alerts.js';
-import User from '../User';
+import User from '../../User';
 
 const Tab = createBottomTabNavigator();
 
@@ -50,7 +49,7 @@ onPress={() =>
     <Text style={styles.appointmentText}>Monday 10/9/2023</Text>
 </TouchableOpacity>
 
-<Image style={{ width: "150%", height: "20%", marginTop: 150, marginLeft: -85}} source={require('./AdPlaceholder.png')} />
+<Image style={{ width: "150%", height: "20%", marginTop: 150, marginLeft: -85}} source={require('../AdPlaceholder.png')} />
 
     </ScrollView>
 

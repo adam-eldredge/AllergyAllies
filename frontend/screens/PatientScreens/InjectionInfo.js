@@ -1,16 +1,10 @@
 import React, { Component, useState } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
-import { useRoute } from '@react-navigation/native';
-import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Alerts from './Alerts.js';
-import ViewAllAppointments from './ViewAllAppointments.js';
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Carousel from 'react-native-reanimated-carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
 import { faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons/faLocationCrosshairs'
-import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
 import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
 
 const Tab = createBottomTabNavigator();
