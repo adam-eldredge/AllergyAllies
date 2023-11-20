@@ -2,10 +2,10 @@ import React, { useContext, Component, useState, useEffect } from 'react'
 import { View, Text, Image, Button, ScrollView, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert } from 'react-native'
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
-import AuthContext from '../AuthContext';
+import AuthContext from '../../AuthContext.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons/faPenToSquare'
-import User from '../User';
+import User from '../../User';
 import { DataTable } from 'react-native-paper';
 import axios from 'axios';
 
@@ -30,20 +30,20 @@ export default function PatientProfile() {
 
     const findPatient = async () => {
       if (email){
-        const patientObj = await axios.get(`http://localhost:5000/api/findPatient/${email}`)
+        const patientObj = await axios.get(`http://192.168.12.124:5000/api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
     }
     if (!patient) { findPatient(); }
 
     const findPractice = async () => {
-      const practiceObj = await axios.get(`http://localhost:5000/api/practice/${patient.practiceID}`)
+      const practiceObj = await axios.get(`http://192.168.12.124:5000/api/practice/${patient.practiceID}`)
       setPractice(practiceObj.data)
     }
     if (!practice && patient) { findPractice(); }
 
     const findProtocol = async () => {
-      const protocolObj = await axios.get(`http://localhost:5000/api/getProtocol/${patient.practiceID}`)
+      const protocolObj = await axios.get(`http://192.168.12.124:5000/api/getProtocol/${patient.practiceID}`)
       setProtocol(protocolObj.data.protocol)
     }
     if (!protocol && patient) { findProtocol(); }
@@ -59,13 +59,21 @@ export default function PatientProfile() {
   })
 
   if (loading) {
-    return <Text>Loading...</Text>
+   return <View>
+    <Text>Loading...</Text>
+     <TouchableOpacity
+      style={styles.signOutButton}
+      onPress={signOut}>
+      <Text style={styles.signOutButtonText}> Sign Out </Text>
+    </TouchableOpacity>
+    </View>
+   
   }
 
   const PatientInfoGeneral = () => (
     <View style={styles.profilePhotoContainer}>
       <Image
-        source={require('./profilepic.png')}
+        source={require('../profilepic.png')}
         style={styles.profilePhoto}
       />
       <Text style={styles.name}>{firstName} {lastName}</Text>
