@@ -24,6 +24,9 @@ router.patch('/updateTreatment', treatmentController.updateTreatment);
 router.patch('/updateSuccessfulTreatment', treatmentController.updateSuccessfulTreatment);
 
 // GET to find first treatment
-router.get('/getFirstTreatment/:id', treatmentController.firstTreatment)
+router.get('/getFirstTreatment/:id', treatmentController.firstTreatment);
+
+// GET to find days since treatment
+router.get('/getDaysSinceLastTreatment', treatmentController.getDaysSinceLastTreatment);
 
 module.exports = router;

@@ -37,6 +37,9 @@ const dataSchema = new mongoose.Schema({
             currBottleNumber: String,
             date: Date,
             currentDoseAdvancement: Number,
+            adverseReaction: Boolean,
+            locationOfInjection: String,
+            needsVialTest: Boolean,
 
             // updated outside treatment controlle
             // needs implementation: every time inj applied/appt attended, 
