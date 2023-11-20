@@ -37,15 +37,9 @@ const dataSchema = new mongoose.Schema({
             currBottleNumber: String,
             date: Date,
             currentDoseAdvancement: Number,
-
-            // updated outside treatment controlle
-            // needs implementation: every time inj applied/appt attended, 
-            // add the volume to below. New bottle = var becomes 0.
-            // (for refill data)
-            injSumForBottleNumber: Number,
             needsRefill: Boolean,
-            // needs working out: provider can insert exp date each time treatment updated
-            // or we get numb days till expirations occur in provider survey.
+            // DEFAULT, NEEDS_MIX, EXPIRING
+            bottleStatus: String,
             expirationDate: Date,
         }],
     },

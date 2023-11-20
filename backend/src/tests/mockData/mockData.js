@@ -118,10 +118,10 @@ const mockTreatment = {
     "bottles": [
       {
         "nameOfBottle": "Pollen",
-        "injVol": 0.5,
+        "injVol": 0.2,
         "injDilution": 0.1,
         "injLLR": 0.3,
-        "currBottleNumber": "M",
+        "currBottleNumber": "1",
         "date": {
           "$date": "2022-10-23T04:00:00.000Z"
         },
