@@ -37,6 +37,9 @@ const dataSchema = new mongoose.Schema({
             currBottleNumber: String,
             date: Date,
             currentDoseAdvancement: Number,
+            adverseReaction: Boolean,
+            locationOfInjection: String,
+            needsVialTest: Boolean,
             needsRefill: Boolean,
             // DEFAULT, NEEDS_MIX, EXPIRING
             bottleStatus: String,

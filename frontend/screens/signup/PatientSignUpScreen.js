@@ -107,7 +107,7 @@ export default function PatientSignUpScreen() {
         patientLastName: lastName,
         patientFirstName: firstName,
         patientID: pID,
-        date: new Date(),
+        date: new Date().setHours(0,0,0,0),
         practiceID: pracID
       }
 

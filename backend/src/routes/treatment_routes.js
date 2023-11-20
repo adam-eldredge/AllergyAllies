@@ -21,12 +21,15 @@ router.delete('/deleteTreatment', treatmentController.deleteTreatment);
 router.post('/nextTreatment', treatmentController.nextTreatment);
 
 // PATCH to change 1 vial
-router.patch('/updateTreatment', treatmentController.updateTreatment);
+router.patch('/updateAdverseTreatment', treatmentController.updateAdverseTreatment);
 
 // PATCH to update an entire treatment for all bottles
 router.patch('/updateSuccessfulTreatment', treatmentController.updateSuccessfulTreatment);
 
 // GET to find first treatment
-router.get('/getFirstTreatment/:id', treatmentController.firstTreatment)
+router.get('/getFirstTreatment/:id', treatmentController.firstTreatment);
+
+// GET to find days since treatment
+router.get('/getDaysSinceLastTreatment', treatmentController.getDaysSinceLastTreatment);
 
 module.exports = router;

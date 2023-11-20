@@ -1,55 +1,39 @@
 import React, { Component, useState } from 'react'
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
-import { useRoute } from '@react-navigation/native';
-import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Alerts from './Alerts.js';
-import ViewAllAppointments from './ViewAllAppointments.js';
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Carousel from 'react-native-reanimated-carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faSyringe } from '@fortawesome/free-solid-svg-icons/faSyringe'
 import { faLocationCrosshairs } from '@fortawesome/free-solid-svg-icons/faLocationCrosshairs'
-import { faCalendar } from '@fortawesome/free-regular-svg-icons/faCalendar'
 import { faDroplet } from '@fortawesome/free-solid-svg-icons/faDroplet'
 
 const Tab = createBottomTabNavigator();
 
-export default function InjectionInfo({navigation}){
+export default function InjectionInfo({route, navigation}){
 
-        //get from backend: from practice survey
-        const numVials = 3;
 
-        //create arrays for progress percentage, last injection dosage, and last injection date for each vial
-        const progress = Array(numVials).fill(null);
-        const dosages = Array(numVials).fill(null);
-        const dates = Array(numVials).fill(null);
-        const bottleNums = Array(numVials).fill(null);
-        const maintenanceNums = Array(numVials).fill(null);
-        const reactions = Array(numVials).fill(null);
+        const bottles = route.params?.bottlesParam || [];
+        const injectionDate = route.params?.dateParam || [];
+
+        let data = []
+        if (bottles) {
+        
+              //get data for each bottle
+              data = bottles.map((bottle, index) => {
+  
+                return {
+                  id: index + 1,
+                  title: `Vial ${index + 1}: ${bottle.nameOfBottle}`,
+                  bottleNum: bottle.currBottleNumber,
+                  dosage: bottle.injVol
+                };
+              });
+
+            } else {
+              throw new Error("Invalid or missing data for bottles for treatment");
+            }
     
-        //dummy values right now, get from backend
-        for (let i = 0; i <= numVials; i++) {
-            dosages[i] = (i+1)*.25;
-            dates[i] = ('10/9/23')
-            progress[i] = (i+1)*10;
-            maintenanceNums[i] = i+4;
-            bottleNums[i] = i+2;
-            reactions[i] = true;
-          }
-    
-        const data = Array.from({ length: numVials }, (_, index) => ({
-            id: index + 1,
-            title: `Vial ${index + 1}`,
-            progress: progress[index], 
-            lastInjDate: dates[index],
-            maintenanceNum: maintenanceNums[index],
-            bottleNum: bottleNums[index],
-            lastInjDosage: dosages[index],
-            reaction: reactions[index]
-          }));
-    
-    
+          //create dots for carousel  
           const renderDot = (index) => (
             <View
               key={index}
@@ -67,55 +51,49 @@ export default function InjectionInfo({navigation}){
     
         const [activeSlide, setActiveSlide] = useState(0);
     
-        const renderItem = ({ item }) => (
+        //create cards for carousel  
+        const renderCarouselCard = ({ item }) => (
+        <View>
+          <View style = {styles.pastAppointment}>
+            <View style = {styles.divider}>
+                <Text style={styles.pastAppointmentText}>{item.title}</Text>
+            </View>           
+          
+          
+          <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+              <View style={styles.icon}>
+               <FontAwesomeIcon icon={faSyringe} color={'#424242'} size={20}/>
+            </View>
             <View>
-
-
-<View style = {styles.pastAppointment}>
-
-     <View style = {styles.divider}>
-     <Text style={styles.pastAppointmentText}>{item.title}</Text>
-    </View>           
-   
-
-    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
-         <FontAwesomeIcon icon={faSyringe} color={'#424242'} size={20}/>
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Dosage</Text>    
-        <Text style={styles.cardData}>{item.maintenanceNum} ml</Text>    
-      </View> 
-    </View>
-
-    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
-        <FontAwesomeIcon icon={faDroplet} color={'#424242'} size={20}/> 
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Bottle</Text>    
-        <Text style={styles.cardData}>3</Text>    
-      </View> 
-    </View>
-
-    <View style={{ flexDirection: 'row', alignContent: 'center' }}>
-        <View style={styles.icon}>
-        <FontAwesomeIcon icon={faLocationCrosshairs} color={'#424242'} size={20}/> 
-      </View>
-      <View>
-        <Text style={styles.cardSubData}>Location</Text>    
-        <Text style={styles.cardData}>Left Arm</Text>    
-      </View> 
-    </View>
+              <Text style={styles.cardSubData}>Dosage</Text>    
+              <Text style={styles.cardData}>{item.dosage} ml</Text>    
+            </View> 
+          </View>
+              
+          <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+              <View style={styles.icon}>
+              <FontAwesomeIcon icon={faDroplet} color={'#424242'} size={20}/> 
+            </View>
+            <View>
+              <Text style={styles.cardSubData}>Bottle</Text>    
+              <Text style={styles.cardData}>{item.bottleNum}</Text>    
+            </View> 
+          </View>
+              
+          <View style={{ flexDirection: 'row', alignContent: 'center' }}>
+              <View style={styles.icon}>
+              <FontAwesomeIcon icon={faLocationCrosshairs} color={'#424242'} size={20}/> 
+            </View>
+            <View>
+              <Text style={styles.cardSubData}>Location</Text>    
+              <Text style={styles.cardData}>Upper Left Arm</Text>    
+            </View> 
+          </View> 
+        </View>
 
 
 
-    
-</View>
-
-
-
- {/* Conditionally render adverseReaction view based on the value of item.reaction */}
+ {/* conditionally render adverse reaction 
  {item.reaction ? (
       <View>
         <View style={styles.adverseReaction}>
@@ -127,45 +105,33 @@ export default function InjectionInfo({navigation}){
           </View>
         </View>
       </View>
-    ) : null}       
-
-       
-
+    ) : null}       */} 
                 
-</View>
+          </View>
 
 
           );
 
  return (
        
-<ScrollView>
-
-
-<View style = {styles.carouselItem}>
-
-<Text style={styles.dateTitle}>Thursday 10/25/2023</Text>  
-     <Carousel
-        data={data}
-        loop={false}
-        onIndexChanged={onIndexChanged}
-        renderItem={renderItem}
-        width={350}
-        height = {370}
-        onSnapToItem={(index) => setActiveSlide(index)}
-      />
-
-<View style={styles.dotsContainer}>
-        {data.map((_, index) => renderDot(index))}
-      </View>
-</View>
-
- 
-
-
-    
-
-</ScrollView>
+       <ScrollView>
+       <View style = {styles.carouselItem}>
+       <Text style={styles.dateTitle}>{injectionDate}</Text>  
+            <Carousel
+               data={data}
+               loop={false}
+               onIndexChanged={onIndexChanged}
+               renderItem={renderCarouselCard}
+               width={350}
+               height = {370}
+               onSnapToItem={(index) => setActiveSlide(index)}
+             />
+       
+       <View style={styles.dotsContainer}>
+               {data.map((_, index) => renderDot(index))}
+             </View>
+       </View>
+       </ScrollView>
       )
    }
 
@@ -415,8 +381,7 @@ const styles = StyleSheet.create({
       dateTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#424242',
-        marginLeft: 22,
+        color: '#424242'
       },
 })
 
