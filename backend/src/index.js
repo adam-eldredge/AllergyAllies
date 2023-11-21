@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv').config();
-const alertGenerator = require('./services/alertGenerator'); //leave this, does not need value read to work
+const scheduleService = require('./services/scheduleService'); //leave this, does not need value read to work
 
 const app = express();
 // To protect version information

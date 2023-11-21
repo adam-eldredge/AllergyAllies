@@ -31,18 +31,7 @@ async function needsRetestSnoozeCheck(patientTemp) {
     }
 }
 
-async function updateBottleStatus(bottle, needsRefill, bottleStatus) {
-    bottle.needsRefill = needsRefill;
-    bottle.bottleStatus = bottleStatus;
-    try {
-        await bottle.save();
-    } catch (error) {
-        console.error("Error saving bottle: ", error);
-    }
-}
-
 module.exports = {
     checkExpiration,
     needsRetestSnoozeCheck,
-    updateBottleStatus
 }

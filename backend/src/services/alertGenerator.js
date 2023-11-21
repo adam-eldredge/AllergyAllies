@@ -1,6 +1,6 @@
 const providerAlerts = require('../Models/alert');
 const Patient = require('../Models/patient');
-const { checkExpiration, needsRetestSnoozeCheck, updateBottleStatus} = require('../helpers/alerts_helper');
+const { checkExpiration, needsRetestSnoozeCheck} = require('../helpers/alerts_helper');
 
 /* This file generates alerts for the provider and updates patient status*/
 
@@ -123,8 +123,9 @@ async function needsRetestAlertLogic(bundleArray) {
             const maxInjectVol = bundle.protocol.nextDoseAdjustment.maxInjectionVol;
             let needsRetest = true;
 
-            const treatmentStartDate = formatDate(bundle.patient.treatmentStartDate);
+            if(!bundle.patient.treatmentStartDate) { continue; }
 
+            const treatmentStartDate = formatDate(bundle.patient.treatmentStartDate);
             // calculate 18 months from treatmentStartDate
             const oneYearLater = new Date(treatmentStartDate);
             oneYearLater.setMonth(oneYearLater.getMonth() + 18);
@@ -156,14 +157,18 @@ async function needsRetestAlertLogic(bundleArray) {
 }
 
 async function needsRefillAlertLogic(bundleArray) {
+    console.log("Needs refill job running");
+    
     const alertsArray = [];
     if (bundleArray.length === 0) { return alertsArray; }
+
+    let needsMix = false;
+    let expiresSoon = false;
 
     try {
         // patient, treatment, protocol
         for (const bundle of bundleArray) {
             const maxInjectionVol = bundle.protocol.nextDoseAdjustment.maxInjectionVol;
-            await setExpirationDate(bundle.treatment);
 
             for (const bottle of bundle.treatment.bottles) {
                 const currentInjectionVol = bottle.injVol;
@@ -171,17 +176,32 @@ async function needsRefillAlertLogic(bundleArray) {
 
                 if (injectionRatio >= 0.80 && bottle.currBottleNumber !== 'M') {
                     // patient vials need to be mixed 
-                    await updateBottleStatus(bottle, true, "NEEDS_MIX");
+                    needsMix = true;
+                    //await updateBottleStatus(bottle, true, "NEEDS_MIX");
+                    bottle.needsRefill = true;
+                    bottle.bottleStatus = "NEEDS_MIX";
                     continue;
                 } 
                 
-                const expiresSoon = checkExpiration(bottle);
+                expiresSoon = checkExpiration(bottle);
                 if (expiresSoon) { 
-                    await updateBottleStatus(bottle, true, "EXPIRATION");
+                    //await updateBottleStatus(bottle, true, "EXPIRATION");
+                    bottle.needsRefill = true;
+                    bottle.bottleStatus = "EXPIRATION";
                     continue;
                 }
 
-                await updateBottleStatus(bottle, false, "DEFAULT");
+                bottle.needsRefill = false;
+                bottle.bottleStatus = "DEFAULT";
+                //await updateBottleStatus(bottle, false, "DEFAULT");
+            }
+
+            await bundle.treatment.save();
+            
+            if (needsMix) {
+                createAlert(bundle.patient, "NeedsMixAlert");
+            } else if (expiresSoon) {
+                createAlert(bundle.patient, "ExpiresSoonAlert");
             }
         }
     } catch (error) {

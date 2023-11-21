@@ -24,11 +24,11 @@ const alertMessage = (alertType, patientName) => {
       case "ReactionAlert":
          message += " has reported a reaction";
          break;
-      case "MixedAlert":
-         message += "'s injections will soon need to be mixed "
+      case "NeedsMixAlert":
+         message += "'s injection(s) will soon need to be mixed";
          break;
-      case "VialTestAlert":
-         message = `Vial test for ${patientName} suggested`
+      case "ExpiresSoonAlert":
+         message += `'s injection(s) expiring soon`
          break;
     }
     return message;

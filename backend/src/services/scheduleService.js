@@ -1,4 +1,7 @@
 const schedule = require('node-schedule');
+const Patient = require('../Models/patient');
+const Treatment = require('../Models/treatment');
+const Protocol = require('../Models/protocols');
 const {
     attritionAlertLogic, 
     needsRetestAlertLogic, 
@@ -70,9 +73,9 @@ async function maintenanceAlert() {
 }
 
 const scheduleString = '0 0 * * *';
+const needsRefillJob = schedule.scheduleJob(scheduleString, needsRefillAlert);
 const missedAppointmentJob = schedule.scheduleJob(scheduleString, attritionAlert);
 const needsRetestJob = schedule.scheduleJob(scheduleString, needsRetestAlert);
-const needsRefillJob = schedule.scheduleJob(scheduleString, needsRefillAlert);
 const maintenanceJob = schedule.scheduleJob(scheduleString, maintenanceAlert);
 
 module.exports = {
