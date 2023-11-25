@@ -6,6 +6,7 @@ import axios from 'axios';
 
 export default function PatientSignUpScreen() {
   var success = true;
+  var pracID = "";
   const [display, setDisplay] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -13,10 +14,11 @@ export default function PatientSignUpScreen() {
   const [password, setPassword] = useState('');
   const [confirmPass, setConfirmPass] = useState('');
   const [practiceCode, setPracticeCode] = useState('');
-  const [pracID, setPracID] = useState('');
+  //const [pracID, setPracID] = useState('');
   const [height, setHeight] = useState('');
   const [weight, setWeight] = useState('');
   const [DoB, setDob] = useState('');
+  const [phone, setPhone] = useState('');
 
   const isNumeric = (value) => {
     return /^[0-9]+$/.test(value);
@@ -34,7 +36,8 @@ export default function PatientSignUpScreen() {
       const practice = await axios.get(`http://localhost:5000/api/practiceByCode/${practiceCode}`);
 
       const practiceID = practice.data._id;
-      setPracID(practiceID)
+      pracID = practiceID;
+      
       if (!practiceID) {
         setDisplay('Invalid Practice Code');
         success = false;
@@ -49,6 +52,7 @@ export default function PatientSignUpScreen() {
             email,
             password,
             practiceID,
+            phone,
             height,
             weight,
             DoB,
@@ -101,7 +105,8 @@ export default function PatientSignUpScreen() {
       const patient = await axios.get(`http://localhost:5000/api/findPatient/${email}`)
       const pID = patient.data._id
 
-      console.log(pID)
+      console.log(pID);
+      console.log(pracID);
 
       const toAdd = {
         patientLastName: lastName,
@@ -151,6 +156,14 @@ export default function PatientSignUpScreen() {
         value={email}
         autoCapitalize="none"
         onChangeText={setEmail} />
+
+      <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Phone Number"
+        placeholderTextColor="#7a7a7a"
+        value={phone}
+        autoCapitalize="none"
+        onChangeText={setPhone} />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"

@@ -7,10 +7,10 @@ const treatment = require('../Models/treatment');
 const addPatient = async (req, res) => {
     // implement duplicate check
     try {
-        const { firstName, lastName, email, phone, password, DoB, height, weight } = req.body;
+        const { firstName, lastName, email, phone, password, DoB, height, weight, practiceID } = req.body;
 
         const data = new patient({
-            firstName, lastName, email, phone, password, DoB, height, weight
+            firstName, lastName, email, phone, password, DoB, height, weight, practiceID
         });
         data.status = "DEFAULT";
         data.tokens = 0;
@@ -219,6 +219,7 @@ const findPercentMaintenance = async (req, res) => {
         }
 
         const foundProtocol = await protocols.findOne( {practiceID: foundPatient.practiceID} );
+        //console.log(JSON.stringify(foundPatient.practiceID));
         if (!foundProtocol) {
             return res.status(404).json({ message: `Protocol not found.`});
         }
@@ -230,7 +231,7 @@ const findPercentMaintenance = async (req, res) => {
             for( let i = 0; i < lastTreatment.bottles.length; i ++){
                 array.push(0);
             }
-            return res.status(201).json({array, message: 'Array of 0\'s sent'});
+            return res.status(201).json({array, message: 'Array of 0\'s sent. Not enough treatment data.'});
             //return res.status(404).json({ message: `Not enough patient data`});
         }
 
@@ -270,45 +271,37 @@ const findPercentMaintenance = async (req, res) => {
                 let ptMaintBottle = foundPatient.maintenanceBottleNumber[i].maintenanceNumber;
                 let injVolIncreaseInterval = foundProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval;
     
+                const totalInjCountForMaint = (foundProtocol.nextDoseAdjustment.maxInjectionVol / injVolIncreaseInterval) * ptMaintBottle;
     
-                let percentMaintenance = 0;
-                const totalInjCountForMaint = (foundProtocol.nextDoseAdjustment.maxInjectionVol / injVolIncreaseInterval) * ptMaintBottle
-    
-                if(lastInjVol >= (secLastInjVol + injVolIncreaseInterval)){
+                if(lastInjVol >= (Math.round((secLastInjVol + injVolIncreaseInterval)*100)/100)){
                     lastDoseAdvancement = secLastDoseAdvancement + 1;
-                    await lastTreatment.save();
-                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                    array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                 }
                 else{
                     if(lastInjVol == secLastInjVol){
                         lastDoseAdvancement = secLastDoseAdvancement;
-                        await lastTreatment.save();
-                        array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                        array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                     }
                     else{
                         if((parseInt(lastTreatmentBN) > secLastTreatmentBN) && (parseInt(lastTreatmentBN) < ptMaintBottle))
                         {
                             lastDoseAdvancement = secLastDoseAdvancement + 1;
-                            await lastTreatment.save();
-                            array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                            array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                         }
                         else{
                             if(lastTreatmentBN == "M"){
                                 lastDoseAdvancement = totalInjCountForMaint;
-                                await lastTreatment.save();
-                                array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                                array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                             }
                             else{
-                                if((lastDoseAdvancement - ((secLastInjVol - lastInjVol) / injVolIncreaseInterval)) < 1)
+                                if((lastDoseAdvancement - ((Math.round((secLastInjVol - lastInjVol)*100)/100) / injVolIncreaseInterval)) < 1)
                                 {
                                     lastDoseAdvancement = 1;
-                                    await lastTreatment.save();
-                                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                                    array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                                 }
                                 else{
-                                    lastDoseAdvancement = (lastDoseAdvancement - ((secLastInjVol - lastInjVol) / injVolIncreaseInterval));
-                                    await lastTreatment.save();
-                                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                                    lastDoseAdvancement = (lastDoseAdvancement - ((Math.round((secLastInjVol - lastInjVol)*100)/100) / injVolIncreaseInterval));
+                                    array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                                 }
                             }
                         }
@@ -321,7 +314,7 @@ const findPercentMaintenance = async (req, res) => {
             for( let i = 0; i < lastTreatment.bottles.length; i ++){
                 array.push(0);
             }
-            return res.status(201).json({array, message: 'Array of 0\'s sent'});
+            return res.status(201).json({array, message: 'Array of 0\'s sent. Next Treatment not calculated.'});
         }
 
         //Sending over array of percent maintenance for each vial in the same order as stored in treatment

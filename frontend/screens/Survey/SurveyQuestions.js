@@ -463,6 +463,12 @@ export default {
                                                                 startWithNewLine: 'false',
                                                                 elements: [
                                                                     {
+                                                                        name:'l3d11',
+                                                                        title: 'Restart patient treatment past this day?',
+                                                                        type: 'boolean',
+                                                                        defaultValue: 'true'
+                                                                    },
+                                                                    {
                                                                         name: 'l3d1',
                                                                         title: 'Start',
                                                                         type: 'text',
@@ -470,10 +476,44 @@ export default {
                                                                         defaultValueExpression: '{l3c2} + 1'
                                                                     },
                                                                     {
-                                                                        name:'l3d11',
-                                                                        title: 'Restart patient treatment past this day?',
-                                                                        type: 'boolean',
-                                                                        defaultValue: 'true'
+                                                                        name: 'l3d2',
+                                                                        title: 'End',
+                                                                        startWithNewLine: 'false',
+                                                                        type: 'text',
+                                                                        inputType: 'numeric',
+                                                                        defaultValueExpression: '{l3c2} + 7'
+                                                                    },
+                                                                    {
+                                                                        name: 'l3d3',
+                                                                        title: 'Action to Take',
+                                                                        type: 'radiogroup',
+                                                                        colCount: '3',
+                                                                        defaultValue: 'Decrease Injection Volume',
+                                                                        choices: ['Decrease Injection Volume', 'Dilute Vial', 'Reduce Bottle Number'],
+                                                                    },
+                                                                    {
+                                                                        name:'l3d31',
+                                                                        title: 'Decrease volume (ml)',
+                                                                        type: 'text',
+                                                                        inputType: 'numeric',
+                                                                        defaultValue: '0.2',
+                                                                        visibleIf: '{l3d3} == "Decrease Injection Volume"'
+                                                                    },
+                                                                    {
+                                                                        name:'l3d32',
+                                                                        title: 'How many times should the vial be diluted?',
+                                                                        type: 'text',
+                                                                        inputType: 'numeric',
+                                                                        defaultValue: '4',
+                                                                        visibleIf: '{l3d3} == "Dilute Vial"'
+                                                                    },
+                                                                    {
+                                                                        name:'l3d33',
+                                                                        title: 'Reduce bottle number by:',
+                                                                        type: 'text',
+                                                                        inputType: 'numeric',
+                                                                        defaultValue: '4',
+                                                                        visibleIf: '{l3d3} == "Reduce Bottle Number"'
                                                                     }
                                                                 ]
                                                             },

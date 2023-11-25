@@ -126,6 +126,11 @@ const createSurveyObj = (json, pID) => {
                     },
                     range4: {
                         start: json.l3d1,
+                        end: json.l3d2,
+                        event: json.l3d3,
+                        decreaseVolume: json.l3d31,
+                        timesDilution: json.l3d32,
+                        reduceBottleNum: json.l3d33,
                         restartTreatment: json.l3d11
                     },
                 },
@@ -186,8 +191,12 @@ const handleProtocol = async (survey, pID) => {
             decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range3.reduceBottleNum
         },
         range4: {
-            days: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.start,
-            restartTreatment: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.restartTreatment
+            days: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.end,
+            restartTreatment: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.restartTreatment,
+            event: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.event,
+            injectionVolumeDecrease: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.decreaseVolume,
+            decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.timesDilution,
+            decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.missedInjectionAdjustment.range4.reduceBottleNum
         }
     }
 
@@ -195,16 +204,16 @@ const handleProtocol = async (survey, pID) => {
         whealLevelForAdjustment: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.minWhealSize,
         event: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.event,
         decreaseInjectionVol: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.decreaseVolume,
-        decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.timesDilution,
-        decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.reduceBottleNum
+        adjustVialConcentration: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.timesDilution,
+        adjustBottleNumber: survey.doseAdjustments.generalAdjustmentRules.largeLocalReactionAdjustment.reduceBottleNum
     }
 
     const vialTestReactionAdjustment = {
         whealLevelForAdjustment: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.minWhealSize,
         event: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.event,
         decreaseInjectionVol: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.decreaseVolume,
-        decreaseVialConcentration: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.timesDilution,
-        decreaseBottleNumber: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.reduceBottleNum
+        adjustVialConcentration: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.timesDilution,
+        adjustBottleNumber: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.reduceBottleNum
     }
 
     let bottles = []
@@ -218,13 +227,13 @@ const handleProtocol = async (survey, pID) => {
 
     const protocol = {
         practiceID: pID,
-        nextDoseAdjustments: nextDoseAdjustments,
+        nextDoseAdjustment: nextDoseAdjustments,
         bottles: bottles,
         vialTestReactionAdjustment: vialTestReactionAdjustment,
         missedDoseAdjustment: missedDoseAdjustments,
         largeReactionsDoseAdjustment: largeReactionsDoseAdjustment
     }
-    console.log(protocol);
+    //console.log(protocol);
 
     // Here is where we post or patch the protocol to the database.
     let currPracticeProtocol = await axios.get(`http://localhost:5000/api/getProtocol/${pID}`)
@@ -237,7 +246,7 @@ const handleProtocol = async (survey, pID) => {
         let post = await axios.post(`http://localhost:5000/api/addProtocol`, protocol)
         console.log(post)
     }
-    console.log(currPracticeProtocol.status)
+    //console.log(currPracticeProtocol.status)
 
 
     return protocol;
