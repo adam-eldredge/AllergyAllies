@@ -9,6 +9,10 @@ const dataSchema = new mongoose.Schema({
         required: true,
         type: String
     },
+    address: {
+        required: true,
+        type: String
+    },
     phoneNumber: {
         required: true,
         type: String
