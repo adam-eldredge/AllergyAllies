@@ -8,6 +8,9 @@ router.post('/addTreatment', treatmentController.addTreatment);
 // GET localhost:5000/api/getAllTreatments
 router.get('/getAllTreatments', treatmentController.getAllTreatments);
 
+// GET localhost:5000/api/getAllTreatments/:patientID
+router.get('/getAllTreatmentsByID', treatmentController.getAllTreatmentsByID);
+
 // GET localhost:5000/api/getTreatment
 router.post('/getTreatment', treatmentController.getTreatment);
 

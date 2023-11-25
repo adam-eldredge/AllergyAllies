@@ -210,7 +210,8 @@ const handleProtocol = async (survey, pID) => {
     let bottles = []
     const vialNames = survey.treatments.vials.map((vial) => {
         const bottleSchema = {
-            bottleName: vial.j1
+            bottleName: vial.j1,
+            shelfLife: vial.j2
         }
         bottles.push(bottleSchema)
     })

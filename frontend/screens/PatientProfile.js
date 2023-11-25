@@ -47,12 +47,6 @@ export default function PatientProfile() {
     }
     if (!protocol && patient) { findProtocol(); }
 
-    // const getFirstTreatment = async () => {
-    //   const treatment = await axios.get(`http://localhost:5000/api/getFirstTreatment/${patient.practiceID}`)
-    //   setProtocol(protocolObj.data.protocol)
-    // }
-    // if (!protocol && patient) { findProtocol(); }
-
     if (practice && patient && protocol) { setLoading(false) }
 
   })

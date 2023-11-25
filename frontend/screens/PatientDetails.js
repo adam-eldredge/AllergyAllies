@@ -11,34 +11,47 @@ export default function PatientDetails({ route, navigation }) {
 
   const [protocol, setProtocol] = useState();
   const [practice, setPractice] = useState();
-  const [queriedProtocol, setQueriedProtocol] = useState(false);
+  const [percent, setPercent] = useState(0);
+  const [firstTreatment, setFirstTreatment] = useState();
+  const [loading, setLoading] = useState(true);
 
   // Get the current bottles for this patient's practice
   useEffect(() => {
     const findProtocol = async () => {
-      try {
-        const protocol = await axios.get(`http://localhost:5000/api/getProtocol/${patient.practiceID}`)
-        const practice = await axios.get(`http://localhost:5000/api/practice/${patient.practiceID}`)
+      const protocol = await axios.get(`http://localhost:5000/api/getProtocol/${patient.practiceID}`)
+      const practice = await axios.get(`http://localhost:5000/api/practice/${patient.practiceID}`)
 
-        if (protocol.status == 200) {
-          setProtocol(protocol.data.protocol);
-        }
-        if (practice.status == 200) {
-          setPractice(practice.data);
-          console.log(practice);
-        }
-
-        setQueriedProtocol(true);
+      if (protocol.status == 200) {
+        setProtocol(protocol.data.protocol);
       }
-      catch (err) {
-        setQueriedProtocol(true);
-        return ('Something went wrong');
+      if (practice.status == 200) {
+        setPractice(practice.data);
+      }
+
+      // Get patients percent maintenance
+      // try {
+      //   const percent = await axios.get(`http://localhost:5000/api/findPercentMaintenance/${patient._id}`)
+      // }
+      // catch (err) {
+
+      // }
+    }
+    if (!protocol || !practice) { findProtocol(); }
+
+    const getFirstTreatment = async () => {
+      const treatment = await axios.get(`http://localhost:5000/api/getFirstTreatment/${patient.practiceID}`)
+      if (treatment.data.length == 0) {
+        setFirstTreatment('[No Recorded Treatments]')
+      } 
+      else {
+        setFirstTreatment(treatment.data)
       }
     }
+    if (!firstTreatment && patient) { getFirstTreatment(); }
 
-    if (!queriedProtocol) { findProtocol(); }
+    if (practice && protocol && firstTreatment) {setLoading(false);}
   })
-  if (!protocol) return ('Something went wrong');
+  if (loading) return ('Loading...');
 
 
   // Create a section for each vial
@@ -142,7 +155,7 @@ export default function PatientDetails({ route, navigation }) {
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
         <Text style={styles.prompt3}>Treatment start date: </Text>
-        <Text style={styles.data3}> [QUERY PATIENTS FIRST TREATMENT]</Text>
+        <Text style={styles.data3}>{firstTreatment}</Text>
       </View>
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>

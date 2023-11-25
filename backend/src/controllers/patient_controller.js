@@ -12,9 +12,24 @@ const addPatient = async (req, res) => {
         const data = new patient({
             firstName, lastName, email, phone, password, DoB, height, weight, practiceID
         });
-        data.status = "DEFAULT";
+        data.status = "ACTIVE";
         data.tokens = 0;
         data.statusDate = new Date();
+
+        const protocol = await protocols.findOne({ practiceID: practiceID });
+
+        if (protocol) {
+            const bottles = protocol.bottles;
+            var b = []
+            bottles.map((bottle) => {
+                b.push({
+                    bottleName: bottle.bottleName,
+                    maintenanceNumber: 0
+                })
+            })
+
+            data.maintenanceBottleNumber = b
+        }
 
         const dataToSave = await data.save();
         return res.status(200).json(dataToSave);
@@ -45,9 +60,9 @@ const addPatientToProvider = async (req, res) => {
     }
 }
 
-const getAllPatientsHelper = async (providerID) => {
+const getAllPatientsHelper = async (practiceID) => {
     try {
-        const patientsList = await patient.find({providerID: providerID});
+        const patientsList = await patient.find({practiceID: practiceID});
         return patientsList;
     } catch (error) {
         console.error('Error retrieving list of patients: ', error);

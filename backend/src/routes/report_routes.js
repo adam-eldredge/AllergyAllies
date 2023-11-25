@@ -20,4 +20,8 @@ router.get('/refillsReport/:providerID', reportController.generateRefillsReport)
 
 router.get('/needsRetestReport/:providerID', reportController.generateNeedsRetestReport);
 
+router.patch('/needsRetestSnooze', reportController.needsRetestSnooze);
+
+router.patch('/patientRetested', reportController.patientRetested);
+
 module.exports = router;

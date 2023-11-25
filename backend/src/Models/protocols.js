@@ -164,6 +164,10 @@ const bottleSchema = new mongoose.Schema({
         require: true,
         type: String,
     },
+    shelfLife: {
+        require: true,
+        type: Number
+    },
     //missedDoseAdjustment: missedDoseAdjustments,
     largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
 })
