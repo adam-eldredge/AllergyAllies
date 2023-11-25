@@ -5,9 +5,9 @@ const path = require('path');
 
 exports.addPractice = async (req, res) => {
     try {
-        const { practiceName, providerNames, phoneNumber, email, officeHours, allergyShotHours } = req.body;
+        const { practiceName, providerNames, phoneNumber, email, officeHours, allergyShotHours, practiceCode } = req.body;
         const data = new practice({
-            practiceName, providerNames, phoneNumber, email, officeHours, allergyShotHours
+            practiceName, providerNames, phoneNumber, email, officeHours, allergyShotHours, practiceCode
         });
         // PREVENT DUPLICATES
         console.log(req.body);

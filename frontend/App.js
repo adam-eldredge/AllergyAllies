@@ -13,7 +13,7 @@ import LoadingScreen from './screens/LoadingScreen.js';
 import PatientSignUpScreen from './screens/signup/PatientSignUpScreen';
 import ProviderSignUpScreen from './screens/signup/ProviderSignUpScreen.js';
 import practiceEnrollment from './screens/signup/practiceEnrollment.js';
-import PatientHome from './screens/PatientHome.js';
+import PatientHome from './screens/PatientScreens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
 import UpcomingInfo from './screens/UpcomingInfo.js';
 import InitialScreen from './screens/InitialScreen.js';
@@ -21,7 +21,7 @@ import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
 import ViewPatients from './screens/ViewPatients.js';
 
-import ViewAllAppointments from './screens/ViewAllAppointments.js';
+import ViewAllAppointments from './screens/PatientScreens/ViewAllAppointments.js';
 import PatientDetails from './screens/PatientDetails.js';
 
 import { useMemo, useReducer, useEffect } from 'react';
@@ -29,9 +29,9 @@ import { useMemo, useReducer, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as SecureStore from 'expo-secure-store';
 import jwt_decode from 'jwt-decode';
-import PatientAppointments from './screens/PatientAppointments.js';
-import InitialMobileScreen from './screens/InitialMobileScreen.js'
-import InjectionInfo from './screens/InjectionInfo.js';
+import InitialMobileScreen from './screens/PatientScreens/InitialMobileScreen.js'
+import InjectionInfo from './screens/PatientScreens/InjectionInfo.js';
+import EditCurrentMedications from './screens/PatientScreens/EditCurrentMedications.js';
 //import AppointmentInfo from './screens/AppointmentInfo';
 
 // Secure store doesn't work on web, only iOS and android ^
@@ -162,8 +162,9 @@ const SignedInMobileStack = (
       <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
       <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
       <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
-      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false, animationTypeForReplace: 'push'}} />
-      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'Injection Info'}} />
+      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
+      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
+      <Stack.Screen name="EditCurrentMedications" component={EditCurrentMedications} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
      
   </>
 );
@@ -186,6 +187,8 @@ const SignedInDesktopStack = (
       <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
       <Stack.Screen name="Maintenance" component={Maintenance} options={{title: 'Maintenance'}} />
       <Stack.Screen name="PatientDetails" component={PatientDetails} options={{title: 'Patient Details'}} />
+      <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'ViewAllAppointments', headerBackTitleVisible: false}} />
+      <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'InjectionInfo', headerBackTitleVisible: false}} />
   </>
 );
 

@@ -226,22 +226,27 @@ const resetTokens = async (req, res) => {
 const findPercentMaintenance = async (req, res) => {
     try{
 
-        const id = req.params.id;
-        const foundPatient = await patient.findById(id);
+        const { patientID } = req.body;
+        const foundPatient = await patient.findById(patientID);
         if (!foundPatient) {
-            return res.status(404).json({ message: `Patient not found ${id}`});
+            return res.status(404).json({ message: `Patient not found ${patientID}`});
         }
 
-        const foundProtocol = await protocols.findOne( {providerID: foundPatient.providerID} );
+        const foundProtocol = await protocols.findOne( {practiceID: foundPatient.practiceID} );
+        //console.log(JSON.stringify(foundPatient.practiceID));
         if (!foundProtocol) {
             return res.status(404).json({ message: `Protocol not found.`});
         }
 
         //Find the last treatment of the patient 
-        const treatmentLength = foundPatient.treatments.length();
+        const treatmentLength = foundPatient.treatments.length;
 
         if(treatmentLength < 3){
-            return res.status(404).json({ message: `Not enough patient data`});
+            for( let i = 0; i < lastTreatment.bottles.length; i ++){
+                array.push(0);
+            }
+            return res.status(201).json({array, message: 'Array of 0\'s sent. Not enough treatment data.'});
+            //return res.status(404).json({ message: `Not enough patient data`});
         }
 
         let patientNextTreatmentID = null;
@@ -269,7 +274,7 @@ const findPercentMaintenance = async (req, res) => {
         let array = [];
 
         if(nextTreatment.attended == false && lastTreatment.attended == true && secondToLastTreatment.attended == true){
-            for(let i = 0; i < lastTreatment.bottles.length(); i++){
+            for(let i = 0; i < lastTreatment.bottles.length; i++){
 
                 let lastInjVol = lastTreatment.bottles[i].injVol;
                 let secLastInjVol = secondToLastTreatment.bottles[i].injVol;
@@ -280,45 +285,37 @@ const findPercentMaintenance = async (req, res) => {
                 let ptMaintBottle = foundPatient.maintenanceBottleNumber[i].maintenanceNumber;
                 let injVolIncreaseInterval = foundProtocol.nextDoseAdjustment.injectionVolumeIncreaseInterval;
     
+                const totalInjCountForMaint = (foundProtocol.nextDoseAdjustment.maxInjectionVol / injVolIncreaseInterval) * ptMaintBottle;
     
-                let percentMaintenance = 0;
-                const totalInjCountForMaint = (foundProtocol.nextDoseAdjustment.maxInjectionVol / injVolIncreaseInterval) * ptMaintBottle
-    
-                if(lastInjVol >= (secLastInjVol + injVolIncreaseInterval)){
+                if(lastInjVol >= (Math.round((secLastInjVol + injVolIncreaseInterval)*100)/100)){
                     lastDoseAdvancement = secLastDoseAdvancement + 1;
-                    await lastTreatment.save();
-                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                    array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                 }
                 else{
                     if(lastInjVol == secLastInjVol){
                         lastDoseAdvancement = secLastDoseAdvancement;
-                        await lastTreatment.save();
-                        array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                        array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                     }
                     else{
                         if((parseInt(lastTreatmentBN) > secLastTreatmentBN) && (parseInt(lastTreatmentBN) < ptMaintBottle))
                         {
                             lastDoseAdvancement = secLastDoseAdvancement + 1;
-                            await lastTreatment.save();
-                            array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                            array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                         }
                         else{
                             if(lastTreatmentBN == "M"){
                                 lastDoseAdvancement = totalInjCountForMaint;
-                                await lastTreatment.save();
-                                array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                                array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                             }
                             else{
-                                if((lastDoseAdvancement - ((secLastInjVol - lastInjVol) / injVolIncreaseInterval)) < 1)
+                                if((lastDoseAdvancement - ((Math.round((secLastInjVol - lastInjVol)*100)/100) / injVolIncreaseInterval)) < 1)
                                 {
                                     lastDoseAdvancement = 1;
-                                    await lastTreatment.save();
-                                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                                    array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                                 }
                                 else{
-                                    lastDoseAdvancement = (lastDoseAdvancement - ((secLastInjVol - lastInjVol) / injVolIncreaseInterval));
-                                    await lastTreatment.save();
-                                    array.push(percentMaintenance = lastDoseAdvancement / totalInjCountForMaint);
+                                    lastDoseAdvancement = (lastDoseAdvancement - ((Math.round((secLastInjVol - lastInjVol)*100)/100) / injVolIncreaseInterval));
+                                    array.push(Math.round(lastDoseAdvancement / totalInjCountForMaint * 100)/100);
                                 }
                             }
                         }
@@ -331,7 +328,7 @@ const findPercentMaintenance = async (req, res) => {
             for( let i = 0; i < lastTreatment.bottles.length; i ++){
                 array.push(0);
             }
-            return res.status(201).json({array, message: 'Array of 0\'s sent'});
+            return res.status(201).json({array, message: 'Array of 0\'s sent. Next Treatment not calculated.'});
         }
 
         //Sending over array of percent maintenance for each vial in the same order as stored in treatment
@@ -359,8 +356,8 @@ const findPercentMaintenance = async (req, res) => {
 
 const addAllergyMedication = async (req, res) => {
     try{
-        const { lastName, email, phone, DoB, medications  } = req.body;
-        const findPatient = await patient.findOne({lastName: lastName, email: email, phone: phone, DoB: DoB});
+        const { patientID, medications  } = req.body;
+        const findPatient = await patient.findOne({ patientID: patientID });
         findPatient.allergyMedication = medications;
         await findPatient.save();
     }
@@ -390,7 +387,7 @@ const updateLLR = async (req, res) => {
         const { patientID, date, bottleName, injLLR } = req.body;
         //const treatmentToUpdate = await treatment.findOneAndUpdate({patientID: patientID}, {...req.body} );
         const treatmentToUpdate = await treatment.findOne(
-            { patientID: patientID, date: date}
+            { patientID: patientID, date: date }
         );
         const treatmentIndex = treatmentToUpdate.bottles.findIndex(bottleName == bottleName);
         treatmentToUpdate.bottles[treatmentIndex].injLLR = injLLR;

@@ -9,6 +9,7 @@ export default function PatientSignUpScreen() {
   const [practiceName, setName] = useState('');
   const [providerNames, setProviderNames] = useState([]);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
   const [email, setEmail] = useState('');
   const [officeHours, setOfficeHours] = useState('');
   const [allergyShotHours, setAllergyShotHours] = useState('');
@@ -16,12 +17,13 @@ export default function PatientSignUpScreen() {
   const handleEnrollment = async () => {
 
     setDisplay('')
-    if (practiceName && providerNames && phoneNumber && email && officeHours && allergyShotHours) {
+    if (practiceName && providerNames && phoneNumber && address && email && officeHours && allergyShotHours) {
         try {
           const data = {
             practiceName,
             providerNames,
             phoneNumber,
+            address,
             email,
             officeHours,
             allergyShotHours
@@ -78,6 +80,14 @@ export default function PatientSignUpScreen() {
           value={providerNames}
           autoCapitalize="none"
           onChangeText={setProviderNames} />
+
+      <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Address"
+        placeholderTextColor="#7a7a7a"
+        value={address}
+        autoCapitalize="none"
+        onChangeText={setAddress} />
 
       <TextInput style={styles.input}
         underlineColorAndroid="transparent"
