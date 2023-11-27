@@ -39,12 +39,22 @@ export default function PatientDetails({ route, navigation }) {
     if (!protocol || !practice) { findProtocol(); }
 
     const getFirstTreatment = async () => {
-      const treatment = await axios.get(`http://localhost:5000/api/getFirstTreatment/${patient.practiceID}`)
+      const treatment = await axios.get(`http://localhost:5000/api/getFirstTreatment/${patient._id}`)
       if (treatment.data.length == 0) {
         setFirstTreatment('[No Recorded Treatments]')
       } 
       else {
-        setFirstTreatment(treatment.data)
+          //convert into javascript Date object
+          const javascriptDate = new Date(treatment.data[0].date);
+          //standardize timezone
+          const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
+          const setDate = utcDate.toLocaleDateString('en-US', {
+              year: '2-digit',
+              month: '2-digit',
+              day: '2-digit',
+          });
+  
+        setFirstTreatment(setDate)
       }
     }
     if (!firstTreatment && patient) { getFirstTreatment(); }
@@ -154,13 +164,13 @@ export default function PatientDetails({ route, navigation }) {
       <Text style={{ ...styles.prompt2, paddingTop: 10 }}>Treatment Information: </Text>
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-        <Text style={styles.prompt3}>Treatment start date: </Text>
+        <Text style={styles.prompt3}>Initial Treatment Date: </Text>
         <Text style={styles.data3}>{firstTreatment}</Text>
       </View>
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
         <Text style={styles.prompt3}>Frequency of injections: </Text>
-        <Text style={styles.data3}> [FREQUENCY FROM PROTOCOL]</Text>
+        <Text style={styles.data3}>[{protocol.injectionFrequency.freq}] {protocol.injectionFrequency.interval}</Text>
       </View>
     </View>
   )

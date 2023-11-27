@@ -8,7 +8,7 @@ exports.firstTreatment = async (req, res) => {
     try {
         
         const patientID = req.params.id
-        const earliest = await treatment.find({patientID: patientID}).sort({date: 1}).limit(1)
+        const earliest = await treatment.find({patientID: patientID})
 
         return res.status(200).json(earliest)
     }
