@@ -16,6 +16,7 @@ const addPatient = async (req, res) => {
         data.tokens = 0;
         data.providerID = 0;
         data.statusDate = new Date();
+        data.lastApptDateBeforeAttrition = new Date();
         data.missedAppointmentCount = 0;
 
         const dataToSave = await data.save();
