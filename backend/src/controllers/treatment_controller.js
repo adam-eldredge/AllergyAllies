@@ -272,13 +272,25 @@ exports.updateSuccessfulTreatment = async (req, res) => {
     try {
         
         const { patientID, date, arrayOfBottles } = req.body;
+        //This will update a specific appointment with the given date
         let treatmentToUpdate = await treatment.findOne( { patientID: patientID, date: date} );
 
+        let patientToFind = await patient.findById(patientID);
+        const treatmentLength = patientToFind.treatments.length;
+        let patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
+        let newDate = new Date(date);
+
         if(!treatmentToUpdate){
-            treatmentToUpdate = await treatment.findOne( { patientID: patientID, date: {$gte: date}} );
-        }
-        if(!treatmentToUpdate){
-            return res.status(400).json({ message: "Treatment not found" });
+            //This looks for the next treatment
+            treatmentToUpdate = await treatment.findById(patientLastTreatmentID);
+            if(treatmentToUpdate){
+                if(newDate > treatmentToUpdate.date){
+                    patientToFind.missedAppointmentCount = patientToFind.missedAppointmentCount + 1;
+                }
+            }
+            else{
+                return res.status(400).json({ message: "Treatment not found" });
+            }
         }
 
         let treatmentIndex = 0;
@@ -300,6 +312,7 @@ exports.updateSuccessfulTreatment = async (req, res) => {
         treatmentToUpdate.attended = true;
 
         await treatmentToUpdate.save();
+        await patientToFind.save();
         res.status(200).json({ message: 'Successful update'});
         
         
