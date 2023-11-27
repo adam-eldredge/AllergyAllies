@@ -96,7 +96,11 @@ const dataSchema = new mongoose.Schema({
             dose: String,
             frequency: String
         }]
-    }
+    },
+    missedAppointmentCount:{
+        required: false,
+        type: Number
+    },
 
 }, { collection: 'Patients' })
 
