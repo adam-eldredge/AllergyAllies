@@ -8,7 +8,7 @@ exports.firstTreatment = async (req, res) => {
     try {
         
         const patientID = req.params.id
-        const earliest = await treatment.find({patientID: patientID})
+        const earliest = await treatment.find({patientID: patientID}).sort({date: 1}).limit(1)
 
         return res.status(200).json(earliest)
     }
@@ -40,6 +40,19 @@ exports.getDaysSinceLastTreatment = async (req, res) => {
     const dateDifference = (today.getTime() - lastTreatmentDate.getTime()) / (1000 * 3600 * 24);
 
     return dateDifference;
+}
+
+exports.getLastTreatment = async (req, res) => {
+    try {
+        
+        const patientID = req.params.id
+        const latest = await treatment.find({patientID: patientID}).sort({_id: -1}).limit(1)
+
+        return res.status(200).json(latest)
+    }
+    catch (err) {
+        return res.status(400).json({message: err})
+    }
 }
 
 // Post method

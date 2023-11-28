@@ -227,7 +227,7 @@ const resetTokens = async (req, res) => {
 const findPercentMaintenance = async (req, res) => {
     try{
 
-        const { patientID } = req.body;
+        const patientID = req.params.patientID
         const foundPatient = await patient.findById(patientID);
         if (!foundPatient) {
             return res.status(404).json({ message: `Patient not found ${patientID}`});
@@ -337,7 +337,7 @@ const findPercentMaintenance = async (req, res) => {
     }
     catch(error){
         console.log(error);
-        return res.status(404).json({ message: `Error`});
+        return res.status(400).json({ message: `Error`});
     }
 }
 

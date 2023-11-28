@@ -11,13 +11,19 @@ export default function PatientDetails({ route, navigation }) {
 
   const [protocol, setProtocol] = useState();
   const [practice, setPractice] = useState();
-  const [percent, setPercent] = useState(0);
-  const [firstTreatment, setFirstTreatment] = useState();
+  const [percent, setPercent] = useState();
+  const [startDate, setStartDate] = useState();
+  const [lastTreatment, setLastTreatment] = useState();
   const [loading, setLoading] = useState(true);
+  const [maintenanceNums, setMaintenanceNums] = useState();
 
   // Get the current bottles for this patient's practice
   useEffect(() => {
-    const findProtocol = async () => {
+
+    /* 
+    1 - Get patient's practice and the practice's protocols
+    */
+    const findPracticeAndProtocol = async () => {
       const protocol = await axios.get(`http://localhost:5000/api/getProtocol/${patient.practiceID}`)
       const practice = await axios.get(`http://localhost:5000/api/practice/${patient.practiceID}`)
 
@@ -27,61 +33,154 @@ export default function PatientDetails({ route, navigation }) {
       if (practice.status == 200) {
         setPractice(practice.data);
       }
-
-      // Get patients percent maintenance
-      // try {
-      //   const percent = await axios.get(`http://localhost:5000/api/findPercentMaintenance/${patient._id}`)
-      // }
-      // catch (err) {
-
-      // }
     }
-    if (!protocol || !practice) { findProtocol(); }
+    if (!protocol || !practice) { findPracticeAndProtocol(); }
 
+    /* 
+    2 - Get the patient's first treatment
+    */
     const getFirstTreatment = async () => {
       const treatment = await axios.get(`http://localhost:5000/api/getFirstTreatment/${patient._id}`)
       if (treatment.data.length == 0) {
-        setFirstTreatment('[No Recorded Treatments]')
-      } 
+        setStartDate('[Unavailable]')
+      }
       else {
-          //convert into javascript Date object
-          const javascriptDate = new Date(treatment.data[0].date);
-          //standardize timezone
-          const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
-          const setDate = utcDate.toLocaleDateString('en-US', {
-              year: '2-digit',
-              month: '2-digit',
-              day: '2-digit',
-          });
-  
-        setFirstTreatment(setDate)
+        //convert into javascript Date object
+        const javascriptDate = new Date(treatment.data[0].date);
+        //standardize timezone
+        const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
+        const setDate = utcDate.toLocaleDateString('en-US', {
+          year: '2-digit',
+          month: '2-digit',
+          day: '2-digit',
+        });
+
+        setStartDate(setDate)
       }
     }
-    if (!firstTreatment && patient) { getFirstTreatment(); }
+    if (!startDate && patient) { getFirstTreatment(); }
 
-    if (practice && protocol && firstTreatment) {setLoading(false);}
+    /* 
+    3 - Get the patient's most recent treatment
+    */
+    const getLastTreatment = async () => {
+      const treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`)
+
+      console.log(treatment)
+
+      let practiceBottles = protocol.bottles
+      let lT = { bottles: [] }
+      // If we get a treatment
+      if (treatment.data.length > 0) {
+
+        let matches = true;
+        practiceBottles.map((bottle, index) => {
+          if (bottle.bottleName != treatment.data[0].bottles[index].nameOfBottle) {
+            matches = false;
+          }
+        })
+
+        if (matches == false) {
+          for (let i = 0; i < practiceBottles.length; i++) {
+            lT.bottles[i] = {
+              injVol: '[Unavailable]',
+              currBottleNumber: '[Unavailable]'
+            }
+          }
+        }
+        else {
+          lT = treatment.data[0]
+        }
+
+        setLastTreatment(lT)
+      }
+      else {
+        const bottle = {
+          injVol: '[Unavailable]',
+          currBottleNumber: '[Unavailable]'
+        }
+
+        for (let i = 0; i < practiceBottles.length; i++) {
+          lT.bottles[i] = bottle
+        }
+      }
+      setLastTreatment(lT)
+    }
+    if (!lastTreatment && protocol && patient) { getLastTreatment(); }
+
+    // GET PROGRESS BLOCK
+    const getPercentMaintenance = async () => {
+      try {
+        const percentMaintenance = await axios.get(`http://localhost:5000/api/findPercentMaintenance/${patient._id}`, {
+          validateStatus: () => true,
+        })
+        if (percentMaintenance.data.status === 200) {
+          setPercent(percentMaintenance.data)
+        }
+        else {
+          let length = protocol.bottles.length;
+          const arr = new Array(length);
+
+          for (let i = 0; i < length; i++) {
+            arr[i] = '[Unavailable] - Requires 2 Injections';
+          }
+          setPercent(arr)
+        }
+      }
+      catch (err) {
+        let length = protocol.bottles.length;
+        const arr = new Array(length);
+
+        for (let i = 0; i < length; i++) {
+          arr[i] = '[Unavailable] - Requires 2 Injections';
+        }
+        setPercent(arr)
+      }
+    }
+    if (!percent && patient && protocol) { getPercentMaintenance(); }
+
+    // GET MAINTENANCE NUMBERS
+    const getMaintNumber = () => {
+      const l = protocol.bottles.length;
+      let mN = []
+      const insert = {
+        maintenanceNumber: '[Unavailable]'
+      }
+      if (patient.maintenanceBottleNumber.length < l) {
+        for (let i = 0; i < l; i ++) {
+          mN[i] = insert;
+        }
+
+        setMaintenanceNums(mN);
+      }
+      else {
+        setMaintenanceNums(patient.maintenanceBottleNumber);
+      }
+    }
+    if (!maintenanceNums && protocol) {getMaintNumber();}
+    if (practice && protocol && startDate && lastTreatment && percent) { setLoading(false); }
   })
   if (loading) return ('Loading...');
-
+  console.log(maintenanceNums)
 
   // Create a section for each vial
   const Vials = () => (
     <div>
-      {patient.maintenanceBottleNumber.map((bottle, index) =>
+      {protocol.bottles.map((bottle, index) =>
         <View style={styles.section}>
           {/* VIAL NAME */}
-          <Text style={styles.prompt2}>{bottle.nameOfBottle}</Text>
+          <Text style={styles.prompt2}>{bottle.bottleName}</Text>
 
           {/* MAINTENANCE BOTTLE NUMBER */}
           <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
             <Text style={styles.prompt3}>Maintenance Bottle: </Text>
-            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{bottle.maintenanceNumber}</Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{maintenanceNums[index].maintenanceNumber}</Text>
           </View>
 
           {/* PROGRESS */}
           <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
             <Text style={styles.prompt3}>Progress: </Text>
-            <Text style={{ ...styles.data2, alignSelf: 'center', }}> [insert calc here]</Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{percent[index]}</Text>
           </View>
 
           {/* LAST INJECTION */}
@@ -90,17 +189,18 @@ export default function PatientDetails({ route, navigation }) {
           {/* DOSAGE */}
           <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
             <Text style={styles.prompt3}>Dosage: </Text>
-            <Text style={{ ...styles.data2, alignSelf: 'center', }}> [INSERT HERE] </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}> {lastTreatment.bottles[index].injVol} </Text>
           </View>
 
           {/* BOTTLE NUMBER */}
           <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
             <Text style={styles.prompt3}>Bottle: </Text>
-            <Text style={{ ...styles.data2, alignSelf: 'center', }}> [INSERT HERE]</Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}> {lastTreatment.bottles[index].currBottleNumber} </Text>
           </View>
         </View>
       )}
     </div>
+
   );
 
   const PracticeSection = () => (
@@ -165,7 +265,7 @@ export default function PatientDetails({ route, navigation }) {
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
         <Text style={styles.prompt3}>Initial Treatment Date: </Text>
-        <Text style={styles.data3}>{firstTreatment}</Text>
+        <Text style={styles.data3}>{startDate}</Text>
       </View>
 
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
