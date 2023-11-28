@@ -275,7 +275,7 @@ exports.updateAdverseTreatment = async (req, res) => {
             "injDilution": 0,
             "currBottleNumber": 2,
             "expirationDate": "2023-12-02T05:00:00.000+00:00",
-            "locationOfInjection": "Upper Left Arm"
+            "locationOfInjection": "Left Arm"
             "needsRefill": false
         }, ...
     ]
@@ -289,16 +289,22 @@ exports.updateSuccessfulTreatment = async (req, res) => {
         let treatmentToUpdate = await treatment.findOne( { patientID: patientID, date: date} );
 
         let patientToFind = await patient.findById(patientID);
+        let findProtocol = await protocol.findOne({practiceID: patientToFind.practiceID});
         const treatmentLength = patientToFind.treatments.length;
         let patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
         let newDate = new Date(date);
+
+        const nextAppointmentDate = new Date(date);
+        nextAppointmentDate.setDate(nextAppointmentDate.getDate() + parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.days)));
+        nextAppointmentDate.setHours(0,0,0,0);
 
         if(!treatmentToUpdate){
             //This looks for the next treatment
             treatmentToUpdate = await treatment.findById(patientLastTreatmentID);
             if(treatmentToUpdate){
-                if(newDate > treatmentToUpdate.date){
+                if(newDate.getTime() > treatmentToUpdate.date.getTime()){
                     patientToFind.missedAppointmentCount = patientToFind.missedAppointmentCount + 1;
+                    patientToFind.lastApptDateBeforeAttrition = nextAppointmentDate;
                 }
             }
             else{
@@ -311,14 +317,14 @@ exports.updateSuccessfulTreatment = async (req, res) => {
         for( let i = 0; i < arrayOfBottles.length; i++){
             treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle == arrayOfBottles[i].bottleName);
             treatmentToUpdate.bottles[treatmentIndex].injVol = arrayOfBottles[i].injVol;
-            treatmentToUpdate.bottles[treatmentIndex].injLLR = arrayOfBottles[i].injLLR;
-            treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
+            // treatmentToUpdate.bottles[treatmentIndex].injLLR = arrayOfBottles[i].injLLR;
+            // treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
             treatmentToUpdate.bottles[treatmentIndex].currBottleNumber = arrayOfBottles[i].currBottleNumber;
             treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement = treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement + 1;
 
             treatmentToUpdate.bottles[treatmentIndex].locationOfInjection = arrayOfBottles[i].locationOfInjection;
-            treatmentToUpdate.bottles[treatmentIndex].expirationDate = arrayOfBottles[i].expirationDate;
-            treatmentToUpdate.bottles[treatmentIndex].needsRefill = arrayOfBottles[i].needsRefill;
+            // treatmentToUpdate.bottles[treatmentIndex].expirationDate = arrayOfBottles[i].expirationDate;
+            // treatmentToUpdate.bottles[treatmentIndex].needsRefill = arrayOfBottles[i].needsRefill;
         }
 
         treatmentToUpdate.date = date;

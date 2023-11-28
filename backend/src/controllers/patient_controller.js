@@ -15,6 +15,7 @@ const addPatient = async (req, res) => {
         data.status = "ACTIVE";
         data.tokens = 0;
         data.statusDate = new Date();
+        data.lastApptDateBeforeAttrition = new Date();
         data.missedAppointmentCount = 0;
 
         const protocol = await protocols.findOne({ practiceID: practiceID });

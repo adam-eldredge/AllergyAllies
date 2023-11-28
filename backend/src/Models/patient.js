@@ -101,6 +101,10 @@ const dataSchema = new mongoose.Schema({
         required: false,
         type: Number
     },
+    lastApptDateBeforeAttrition:{
+        required: false,
+        type: Date
+    }
 
 }, { collection: 'Patients' })
 
