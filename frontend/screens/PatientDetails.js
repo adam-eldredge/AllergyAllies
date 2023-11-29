@@ -11,50 +11,196 @@ export default function PatientDetails({ route, navigation }) {
 
   const [protocol, setProtocol] = useState();
   const [practice, setPractice] = useState();
-  const [queriedProtocol, setQueriedProtocol] = useState(false);
+  const [percent, setPercent] = useState();
+  const [startDate, setStartDate] = useState();
+  const [lastTreatment, setLastTreatment] = useState();
+  const [loading, setLoading] = useState(true);
+  const [maintenanceNums, setMaintenanceNums] = useState();
 
   // Get the current bottles for this patient's practice
   useEffect(() => {
-    const findProtocol = async () => {
-      try {
-        const protocol = await axios.get(`http://localhost:5000/api/getProtocol/${patient.practiceID}`)
-        const practice = await axios.get(`http://localhost:5000/api/practice/${patient.practiceID}`)
 
-        if (protocol.status == 200) {
-          setProtocol(protocol.data.protocol);
-        }
-        if (practice.status == 200) {
-          setPractice(practice.data);
-          console.log(practice);
-        }
+    /* 
+    1 - Get patient's practice and the practice's protocols
+    */
+    const findPracticeAndProtocol = async () => {
+      const protocol = await axios.get(`http://localhost:5000/api/getProtocol/${patient.practiceID}`)
+      const practice = await axios.get(`http://localhost:5000/api/practice/${patient.practiceID}`)
 
-        setQueriedProtocol(true);
+      if (protocol.status == 200) {
+        setProtocol(protocol.data.protocol);
       }
-      catch (err) {
-        setQueriedProtocol(true);
-        return ('Something went wrong');
+      if (practice.status == 200) {
+        setPractice(practice.data);
       }
     }
+    if (!protocol || !practice) { findPracticeAndProtocol(); }
 
-    if (!queriedProtocol) { findProtocol(); }
+    /* 
+    2 - Get the patient's first treatment
+    */
+    const getFirstTreatment = async () => {
+      const treatment = await axios.get(`http://localhost:5000/api/getFirstTreatment/${patient._id}`)
+      if (treatment.data.length == 0) {
+        setStartDate('[Unavailable]')
+      }
+      else {
+        //convert into javascript Date object
+        const javascriptDate = new Date(treatment.data[0].date);
+        //standardize timezone
+        const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
+        const setDate = utcDate.toLocaleDateString('en-US', {
+          year: '2-digit',
+          month: '2-digit',
+          day: '2-digit',
+        });
+
+        setStartDate(setDate)
+      }
+    }
+    if (!startDate && patient) { getFirstTreatment(); }
+
+    /* 
+    3 - Get the patient's most recent treatment
+    */
+    const getLastTreatment = async () => {
+      const treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`)
+
+      console.log(treatment)
+
+      let practiceBottles = protocol.bottles
+      let lT = { bottles: [] }
+      // If we get a treatment
+      if (treatment.data.length > 0) {
+
+        let matches = true;
+        practiceBottles.map((bottle, index) => {
+          if (bottle.bottleName != treatment.data[0].bottles[index].nameOfBottle) {
+            matches = false;
+          }
+        })
+
+        if (matches == false) {
+          for (let i = 0; i < practiceBottles.length; i++) {
+            lT.bottles[i] = {
+              injVol: '[Unavailable]',
+              currBottleNumber: '[Unavailable]'
+            }
+          }
+        }
+        else {
+          lT = treatment.data[0]
+        }
+
+        setLastTreatment(lT)
+      }
+      else {
+        const bottle = {
+          injVol: '[Unavailable]',
+          currBottleNumber: '[Unavailable]'
+        }
+
+        for (let i = 0; i < practiceBottles.length; i++) {
+          lT.bottles[i] = bottle
+        }
+      }
+      setLastTreatment(lT)
+    }
+    if (!lastTreatment && protocol && patient) { getLastTreatment(); }
+
+    // GET PROGRESS BLOCK
+    const getPercentMaintenance = async () => {
+      try {
+        const percentMaintenance = await axios.get(`http://localhost:5000/api/findPercentMaintenance/${patient._id}`, {
+          validateStatus: () => true,
+        })
+        if (percentMaintenance.data.status === 200) {
+          setPercent(percentMaintenance.data)
+        }
+        else {
+          let length = protocol.bottles.length;
+          const arr = new Array(length);
+
+          for (let i = 0; i < length; i++) {
+            arr[i] = '[Unavailable] - Requires 2 Injections';
+          }
+          setPercent(arr)
+        }
+      }
+      catch (err) {
+        let length = protocol.bottles.length;
+        const arr = new Array(length);
+
+        for (let i = 0; i < length; i++) {
+          arr[i] = '[Unavailable] - Requires 2 Injections';
+        }
+        setPercent(arr)
+      }
+    }
+    if (!percent && patient && protocol) { getPercentMaintenance(); }
+
+    // GET MAINTENANCE NUMBERS
+    const getMaintNumber = () => {
+      const l = protocol.bottles.length;
+      let mN = []
+      const insert = {
+        maintenanceNumber: '[Unavailable]'
+      }
+      if (patient.maintenanceBottleNumber.length < l) {
+        for (let i = 0; i < l; i ++) {
+          mN[i] = insert;
+        }
+
+        setMaintenanceNums(mN);
+      }
+      else {
+        setMaintenanceNums(patient.maintenanceBottleNumber);
+      }
+    }
+    if (!maintenanceNums && protocol) {getMaintNumber();}
+    if (practice && protocol && startDate && lastTreatment && percent) { setLoading(false); }
   })
-  if (!protocol) return ('Something went wrong');
-
+  if (loading) return ('Loading...');
+  console.log(maintenanceNums)
 
   // Create a section for each vial
   const Vials = () => (
     <div>
       {protocol.bottles.map((bottle, index) =>
         <View style={styles.section}>
+          {/* VIAL NAME */}
           <Text style={styles.prompt2}>{bottle.bottleName}</Text>
-          <Text style={styles.data3}>Maintenance Bottle: x</Text>
-          <Text style={styles.data3}>x% to maintenance</Text>
-          <Text style={styles.prompt2}>Last injection:</Text>
-          <Text style={styles.data3}>Dosage: x ml</Text>
-          <Text style={styles.data3}>Bottle: x</Text>
+
+          {/* MAINTENANCE BOTTLE NUMBER */}
+          <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+            <Text style={styles.prompt3}>Maintenance Bottle: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{maintenanceNums[index].maintenanceNumber}</Text>
+          </View>
+
+          {/* PROGRESS */}
+          <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+            <Text style={styles.prompt3}>Progress: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{percent[index]}</Text>
+          </View>
+
+          {/* LAST INJECTION */}
+          <Text style={{ ...styles.prompt2, paddingTop: 14 }}>Last Injection</Text>
+
+          {/* DOSAGE */}
+          <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+            <Text style={styles.prompt3}>Dosage: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}> {lastTreatment.bottles[index].injVol} </Text>
+          </View>
+
+          {/* BOTTLE NUMBER */}
+          <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+            <Text style={styles.prompt3}>Bottle: </Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}> {lastTreatment.bottles[index].currBottleNumber} </Text>
+          </View>
         </View>
       )}
     </div>
+
   );
 
   const PracticeSection = () => (
@@ -64,9 +210,85 @@ export default function PatientDetails({ route, navigation }) {
 
       {/* PRACTICE NAME */}
       <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
-        <Text style={styles.prompt2}>Name: </Text>
+        <Text style={styles.prompt3}>Name: </Text>
         <Text style={{ ...styles.data2, alignSelf: 'center', }}>{practice.practiceName}</Text>
       </View>
+    </View>
+  )
+
+  const IconSection = () => (
+    <View style={styles.section}>
+      <IconButton
+        icon="account-circle"
+        iconColor="green"
+        size={150}
+        style={{ alignSelf: 'center', marginBottom: -10, marginTop: -5 }}
+      />
+      <Text style={styles.prompt}>{patient.firstName} {patient.lastName}</Text>
+      <Text style={{ fontSize: 12, alignSelf: 'center', }}>{patient.email}</Text>
+      <Text style={{ fontSize: 12, alignSelf: 'center', }}>{patient.phone}</Text>
+    </View>
+  )
+
+  const PersonalInfo = () => (
+    <View style={styles.section}>
+      {/* TITLE */}
+      <Text style={styles.prompt2}>Personal Info</Text>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Date of Birth: </Text>
+        <Text style={styles.data}>{patient.DoB}     </Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Height: </Text>
+        <Text style={styles.data}>{patient.height} in</Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Weight: </Text>
+        <Text style={styles.data}>{patient.weight} lb</Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Status: </Text>
+        <Text style={styles.data}>{patient.status}</Text>
+      </View>
+
+    </View>
+  )
+
+  const TreatmentInfo = () => (
+    <View style={styles.section}>
+      {/* TITLE */}
+      <Text style={{ ...styles.prompt2, paddingTop: 10 }}>Treatment Information: </Text>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Initial Treatment Date: </Text>
+        <Text style={styles.data3}>{startDate}</Text>
+      </View>
+
+      <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
+        <Text style={styles.prompt3}>Frequency of injections: </Text>
+        <Text style={styles.data3}>[{protocol.injectionFrequency.freq}] {protocol.injectionFrequency.interval}</Text>
+      </View>
+    </View>
+  )
+
+  const Buttons = () => (
+    <View style={{ flex: 1, flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start', padding: '7' }}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate('Maintenance', { patient })}>
+        <Text style={styles.buttonText}>Set Maintenance Bottle Numbers</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() =>
+          navigation.navigate('Injections', { patient })}>
+        <Text style={styles.buttonText}>Add an Injection</Text>
+      </TouchableOpacity>
     </View>
   )
 
@@ -74,85 +296,23 @@ export default function PatientDetails({ route, navigation }) {
   return (
     <View style={styles.container}>
       <View style={{ flex: 1, flexDirection: 'row', }}>
+        {/* ROW 1*/}
         <View>
-          <View style={styles.section}>
-            <IconButton
-            icon="account-circle"
-            iconColor="green"
-            size={150}
-            style={{alignSelf: 'center', marginBottom: -10, marginTop: -5}}
-            />
-            <Text style={styles.prompt}>{patient.firstName} {patient.lastName}</Text>
-            <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.email}</Text>
-            <Text style={{fontSize: 12, alignSelf: 'center',}}>{patient.phone}</Text>
-          </View>
-
-        <PracticeSection/>
-
-          <View style={styles.section}>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Date of Birth: </Text>
-            <Text style={styles.data}>07/09/2001     </Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Height: </Text>
-            <Text style={styles.data}>{patient.height} in</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Weight: </Text>
-            <Text style={styles.data}>{patient.weight} lb</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Practice: </Text>
-            <Text style={styles.data}>{patient.practice}</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt2}>Status: </Text>
-            <Text style={styles.data}>{patient.status}</Text>
-          </View>
-          </View>
+          <IconSection />
+          <PersonalInfo />
         </View>
+
+        {/* ROW 2*/}
         <View>
-        <View>
-          <View style={styles.section}>
-            <Text style={styles.prompt2}>Current Allergy Medications: </Text>
-            <Text style={{...styles.data2, marginLeft: 10}}>xxx</Text>
-            <Text style={{...styles.data2, marginLeft: 10}}>xxx</Text>
-          </View>
-          <View style={styles.section}>
-          <Text style={{...styles.prompt2, paddingTop: 10}}>Treatment Information: </Text>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt3}>Treatment start date: </Text>
-            <Text style = {styles.data3}>11/01/2023</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt3}>Tracking start date: </Text>
-            <Text style = {styles.data3}>11/05/2023</Text>
-          </View>
-          <View style={{flex: 1, flexDirection: 'row', paddingTop: 7}}>
-            <Text style={styles.prompt3}>Frequency of injections: </Text>
-            <Text style = {styles.data3}>2x/week</Text>
-          </View>
-          </View>
-       </View>
-       <View>
-          </View>
+          <PracticeSection />
+          <TreatmentInfo />
         </View>
+
+        {/* ROW 3*/}
         <Vials />
-        <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate('Maintenance', { patient })}>
-            <Text style={styles.buttonText}>Set Maintenance Bottle Numbers</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              navigation.navigate('Injections', { patient })}>
-            <Text style={styles.buttonText}>Add an Injection</Text>
-          </TouchableOpacity>
-        </View>
+
+        {/* ROW 4*/}
+        <Buttons />
       </View>
     </View>
   );
@@ -162,9 +322,11 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 40,
     alignSelf: 'center',
-    width: 800,
+    minWidth: 800,
+    flexDirection: 'column',
+    justifyContent: 'center'
   },
-    header: {
+  header: {
     fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 20,
@@ -215,7 +377,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1059d5',
     padding: 10,
     margin: 10,
-    height: 40,
+    height: 50,
     width: 150,
     justifyContent: 'center',
     borderRadius: 8,

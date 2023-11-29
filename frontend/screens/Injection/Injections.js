@@ -10,6 +10,7 @@ import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 
 import theme from './theme.js';
+import { updateSuccessfulTreatment } from '../../../backend/src/controllers/treatment_controller.js';
 
 export default function Injections({route, navigation}){
 
@@ -19,6 +20,7 @@ export default function Injections({route, navigation}){
    // Protocol information
    const [protocol, setProtocol] = useState();
    const [queriedProtocol, setQueriedProtocol] = useState(false);
+   const [nextTreatment, setNextTreatment] = useState();
 
    // Today's date
    const date = new Date();
@@ -48,10 +50,28 @@ export default function Injections({route, navigation}){
             return ('Something went wrong');
          }
       }
-
       if (!queriedProtocol) {findProtocol();}
+
+      // const findTreatment = async() => {
+      //    try {
+      //       const data = {
+      //          patientID: patient._id,
+      //          practiceID: userInfo.practiceID
+      //       }
+      //       console.log(data)
+      //       const treatment = await axios.post(`http://localhost:5000/api/nextTreatment`, data)
+      
+      //       if (treatment.status == 200) {
+      //          console.log(treatment)
+      //       }
+      //    }
+      //    catch (err) {
+      //       return ('Something went wrong');
+      //    }
+      // }
+      // if (!nextTreatment) {findTreatment();}
    })
-   if (!protocol) return ('Something went wrong');
+   if (!protocol) return ('Loading protocol and injection data...');
    
 
    // Input Fields
@@ -203,24 +223,35 @@ export default function Injections({route, navigation}){
    injectionForm.applyTheme(theme);
 
    injectionForm.onComplete.add((sender, options) => {
-      createInjectionObject(sender.data, protocol.bottles);
+      createInjectionObject(sender.data, protocol.bottles, patient);
   });
 
    return <Survey model={injectionForm} />;
 }
 
-const createInjectionObject = (data, bottles) => {
+const createInjectionObject = async (data, bottles, patient) => {
    let Injections = []
-   const numBottles = bottles.map((bottle, index) => {
+
+   bottles.map((bottle, index) => {
       const bottleInjection = {
          nameOfBottle: bottle.bottleName,
          injVol: eval(`data.volume${index}`),
          injDilution: eval(`data.dilution${index}`),
          currBottleNumber: eval(`data.bottleNum${index}`),
-         date: new Date()
+         locationOfInjection: eval(`data.location${index}`)
       }
+
       Injections.push(bottleInjection)
    })
-   console.log(Injections)
+
+   const obj = {
+      patientID: patient._id,
+      date: new Date().setHours(0,0,0,0),
+      arrayOfBottles: Injections
+   }
+   
+   // Send the treatment obj to the database
+   const sendSuccessfulTreatment = await axios.patch(`http://localhost:5000/api/updateSuccessfulTreatment`, obj);
+   
 }
 

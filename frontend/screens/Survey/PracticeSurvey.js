@@ -218,6 +218,11 @@ const handleProtocol = async (survey, pID) => {
         adjustBottleNumber: survey.doseAdjustments.generalAdjustmentRules.vialTestReactionAdjustment.reduceBottleNum
     }
 
+    const injectionFrequency = {
+        freq: survey.protocols.startingFrequency.numInjections,
+        interval: survey.protocols.startingFrequency.period
+    }
+
     let bottles = []
     const vialNames = survey.treatments.vials.map((vial) => {
         const bottleSchema = {
@@ -233,9 +238,9 @@ const handleProtocol = async (survey, pID) => {
         bottles: bottles,
         vialTestReactionAdjustment: vialTestReactionAdjustment,
         missedDoseAdjustment: missedDoseAdjustments,
-        largeReactionsDoseAdjustment: largeReactionsDoseAdjustment
+        largeReactionsDoseAdjustment: largeReactionsDoseAdjustment,
+        injectionFrequency: injectionFrequency
     }
-    //console.log(protocol);
 
     // Here is where we post or patch the protocol to the database.
     let currPracticeProtocol = await axios.get(`http://localhost:5000/api/getProtocol/${pID}`)
