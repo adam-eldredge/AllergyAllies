@@ -3,9 +3,11 @@ import { View, Platform, TouchableOpacity, StyleSheet, IconButton } from 'react-
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 
+//comment out these 3 lines to run on mobile
 import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
+
 import theme from './theme.js';
 import User from '../../User.js';
 

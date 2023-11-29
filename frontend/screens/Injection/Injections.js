@@ -3,9 +3,12 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert,
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import User from '../../User';
 import axios from 'axios';
+
+//comment out these 3 lines to run on mobile
 import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
+
 import theme from './theme.js';
 import { updateSuccessfulTreatment } from '../../../backend/src/controllers/treatment_controller.js';
 
@@ -17,6 +20,7 @@ export default function Injections({route, navigation}){
    // Protocol information
    const [protocol, setProtocol] = useState();
    const [queriedProtocol, setQueriedProtocol] = useState(false);
+   const [nextTreatment, setNextTreatment] = useState();
 
    // Today's date
    const date = new Date();
@@ -46,10 +50,28 @@ export default function Injections({route, navigation}){
             return ('Something went wrong');
          }
       }
-
       if (!queriedProtocol) {findProtocol();}
+
+      // const findTreatment = async() => {
+      //    try {
+      //       const data = {
+      //          patientID: patient._id,
+      //          practiceID: userInfo.practiceID
+      //       }
+      //       console.log(data)
+      //       const treatment = await axios.post(`http://localhost:5000/api/nextTreatment`, data)
+      
+      //       if (treatment.status == 200) {
+      //          console.log(treatment)
+      //       }
+      //    }
+      //    catch (err) {
+      //       return ('Something went wrong');
+      //    }
+      // }
+      // if (!nextTreatment) {findTreatment();}
    })
-   if (!protocol) return ('Something went wrong');
+   if (!protocol) return ('Loading protocol and injection data...');
    
 
    // Input Fields

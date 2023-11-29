@@ -6,7 +6,7 @@ import jwt_decode from 'jwt-decode';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
-export default function SignInScreen({navigation}) {
+export default function ProviderSignInScreen({navigation}) {
   const { signIn } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,6 +21,7 @@ export default function SignInScreen({navigation}) {
          
          // this needs to have your ip address for android (probably iOS too). 
          // get ip quickly from "Metro waiting on exp://<ip>:port"
+         // for desktop it should be 'http://localhost:5000/auth/'
          const response = await axios.post('http://localhost:5000/auth/', authData);
          console.log(response);
          // response successful
@@ -74,14 +75,8 @@ export default function SignInScreen({navigation}) {
             <TouchableOpacity
                style = {styles.signUpButton}
                onPress={() =>
-                  navigation.navigate('PatientSignUpScreen') }>
-               <Text style = {styles.logInButtonText}>I am a patient</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-               style = {styles.signUpButton}
-                  onPress={() =>
                   navigation.navigate('ProviderSignUpScreen') }>
-               <Text style = {styles.logInButtonText}>I am a provider</Text>
+               <Text style = {styles.signUpButtonText}>Sign Up</Text>
             </TouchableOpacity>
             </View>
     </View>
@@ -140,12 +135,18 @@ const styles = StyleSheet.create({
      fontWeight: '600'
   },
   signUpButton: {
-     backgroundColor: '#1059d5',
      padding: 10,
      margin: 10,
      height: 40,
      width: 150,
      justifyContent: 'center',
      borderRadius: 8,
+     borderColor: '#1059d5',
+     borderWidth: 1
   },
+  signUpButtonText:{
+   color: '#1059d5',
+   textAlign: 'center',
+   fontSize: 15,
+},
 })

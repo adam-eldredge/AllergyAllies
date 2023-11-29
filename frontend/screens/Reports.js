@@ -4,11 +4,12 @@ import { DataTable, IconButton } from 'react-native-paper';
 import axios from 'axios';
 import User from '../User';
 import AuthContext from '../AuthContext';
+import ProviderMenu from './ProviderMenu';
 
 export default function Reports({ navigation }) {
   const userInfo = User();
   const { signOut } = useContext(AuthContext);
-  const providerId = userInfo.providerId;
+  const providerId = userInfo.id;
   const [reports, setReports] = useState([]);
   const [attritionError, setAttritionError] = useState(null);
   const [maintenanceError, setMaintenanceError] = useState(null);
@@ -19,13 +20,16 @@ export default function Reports({ navigation }) {
 
   const generateAttritionReport = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/attritionReport/${providerId}`);
+      console.log('Generating Attrition Report...');
+      const response = await axios.get(`http://localhost:5000/api/attritionReport/${providerID}`);
+      console.log('Response:', response);
+  
       const newReport = {
         type: 'Attrition',
         dateGenerated: new Date().toLocaleDateString(),
         data: response.data,
       };
-
+  
       setReports((prevReports) => [...prevReports, newReport]);
       setAttritionError(null);
     } catch (error) {
@@ -170,64 +174,7 @@ export default function Reports({ navigation }) {
         </View>
       </Modal>
 
-      <View style={{backgroundColor: '#fcfcfc', flex: 1,}}>
-      <TouchableOpacity style={{marginTop: 50, marginBottom: 10, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
-               onPress={() =>
-                  signOut()
-               }>
-                <Text style={{color: 'white', size: 5, marginRight: -10, marginLeft: 12, fontWeight: 500}}>Sign out</Text>
-                  <IconButton
-                     icon="exit-to-app"
-                     iconColor="white"
-                     size={14}
-                  />
-        </TouchableOpacity>
-        <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 15}}
-               onPress={() =>
-                  navigation.navigate('ViewPatients')
-               }>
-               <Text style={{...styles.providerDashboardText, fontSize: 12, marginBottom: -15}}>My Patients</Text>
-               <IconButton
-                  icon="account-heart"
-                  iconColor="white"
-                  size={37}
-               />
-            </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#937fd0'}}
-               onPress={() =>
-                  navigation.navigate('PracticeSurvey')
-               }>
-               <Text style={{...styles.providerDashboardText, fontSize: 12}}>View/Edit</Text>
-               <Text style={{...styles.providerDashboardText, fontSize: 12, marginTop: 10, marginBottom: -15}}>Practice Info</Text>
-               <IconButton
-                  icon="pencil"
-                  iconColor="white"
-                  size={37}
-               />
-            </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#7fd0ae'}}
-               onPress={() =>
-                  navigation.navigate('AllAlerts')
-               }>
-                  <Text style={styles.providerDashboardText}>Alerts</Text>
-                  <IconButton
-                     icon="bell-ring"
-                     iconColor="white"
-                     size={37}
-                  />
-               </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
-            onPress={() =>
-              navigation.navigate('Portal')
-             }>
-               <Text style={styles.providerDashboardText}>Home</Text>
-              <IconButton
-                icon="home"
-                iconColor="white"
-                size={37}
-              />
-            </TouchableOpacity>
-      </View>
+      <ProviderMenu navigation={navigation} />
     </View>
   );
 }
