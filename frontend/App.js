@@ -8,7 +8,7 @@ import Reports from './screens/Reports.js';
 import Injections from './screens/Injection/Injections.js';
 import Maintenance from './screens/Injection/MaintenanceBottleNum.js';
 import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
-import SignInScreen from './screens/SignInScreen';
+import ProviderSignInScreen from './screens/ProviderSignInScreen';
 import LoadingScreen from './screens/LoadingScreen.js';
 import PatientSignUpScreen from './screens/signup/PatientSignUpScreen';
 import ProviderSignUpScreen from './screens/signup/ProviderSignUpScreen.js';
@@ -32,6 +32,7 @@ import jwt_decode from 'jwt-decode';
 import InitialMobileScreen from './screens/PatientScreens/InitialMobileScreen.js'
 import InjectionInfo from './screens/PatientScreens/InjectionInfo.js';
 import EditCurrentMedications from './screens/PatientScreens/EditCurrentMedications.js';
+import PatientSignInScreen from './screens/PatientScreens/PatientSignInScreen.js';
 //import AppointmentInfo from './screens/AppointmentInfo';
 
 // Secure store doesn't work on web, only iOS and android ^
@@ -55,10 +56,10 @@ const InitialMobileStack = (
       }}
     />
     <Stack.Screen
-      name="SignIn"
-      component={SignInScreen}
+      name="PatientSignIn"
+      component={PatientSignInScreen}
       options={{
-        title: 'Sign In',
+        title: 'Patient Login',
         headerTitleAlign: 'center',
         headerTitleStyle: { textAlign: 'center' },
         headerBackTitleVisible: false,
@@ -70,6 +71,7 @@ const InitialMobileStack = (
               component={PatientSignUpScreen}
               options={{
                 title: 'Patient Sign Up',
+                headerBackTitleVisible: false,
                 headerTitleAlign: 'center',
                 headerTitleStyle: {textAlign: 'center'},
                 //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
@@ -112,10 +114,10 @@ const InitialDesktopStack = (
       }}
     />
     <Stack.Screen
-      name="SignIn"
-      component={SignInScreen}
+      name="ProviderSignInScreen"
+      component={ProviderSignInScreen}
       options={{
-        title: 'Sign In',
+        title: 'Provider Login',
         headerTitleAlign: 'center',
         headerTitleStyle: { textAlign: 'center' },
         //animationTypeForReplace: state.isSignout ? 'pop' : 'push',
@@ -125,7 +127,7 @@ const InitialDesktopStack = (
               name="PatientSignUpScreen"
               component={PatientSignUpScreen}
               options={{
-                title: 'Patient Sign Up',
+                title: 'Patient Signup',
                 headerTitleAlign: 'center',
                 headerTitleStyle: {textAlign: 'center'},
                //animationTypeForReplace: state.isSignout ? 'pop' : 'push',

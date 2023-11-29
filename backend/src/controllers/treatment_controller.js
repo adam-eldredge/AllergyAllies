@@ -59,6 +59,20 @@ exports.addTreatment = async (req, res) => {
             return res.status(404).json({ message: "Protocol not found" });
         }
         
+        //function that takes in a date from MongoDB and converts it into readable format
+        function formatDate(mongoDate){
+
+            //convert into javascript Date object
+            const javascriptDate = new Date(mongoDate);
+            //standardize timezone
+            const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
+            return utcDate.toLocaleDateString('en-US', {
+                year: '2-digit',
+                month: '2-digit',
+                day: '2-digit',
+            });
+    
+        }
 
         const findPractice = await practice.findById(practiceID);
 
@@ -75,11 +89,15 @@ exports.addTreatment = async (req, res) => {
         //Add patient treatment data to end of array
         
         patientToFind.treatments.push(data.id);
+        /*
+            TODO need to pass in maintenanceNumber somewhere
+        */
         let maintenanceNumber = 1;
 
-        let tempArray = [{nameOfBottle: String, maintenanceNumber}];
+        let tempArray = [];
 
         for(let i = 0; i < findProtocol.bottles.length; i++){
+            //console.log(tempArray);
             tempArray.push( {nameOfBottle: JSON.stringify(findProtocol.bottles[i].bottleName), maintenanceNumber} );
         }
         patientToFind.maintenanceBottleNumber = tempArray;
@@ -91,10 +109,12 @@ exports.addTreatment = async (req, res) => {
 
         let startingInjVol = JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol);
         let newMap = new Map();
+        //var newDate2 = new Date(newDate.setMonth(newDate.getMonth()+ findProtocol.bottles[i].shelfLife));
 
         //Adds bottles to treatment with starting inj value and 0 for all other fields
         if(treatmentLength == 1){
             for(let i = 0; i < findProtocol.bottles.length; i++){
+                let newDate = new Date(date);
                 data.bottles.push({
                     nameOfBottle: findProtocol.bottles[i].bottleName,
                     injVol: parseFloat(startingInjVol),
@@ -103,8 +123,9 @@ exports.addTreatment = async (req, res) => {
                     currBottleNumber: "1",
                     currentDoseAdvancement: 0,
                     adverseReaction: false,
+                    needsVialTest: false,
                     locationOfInjection: "",
-                    expirationDate: null,
+                    expirationDate: formatDate(new Date(newDate.setMonth(newDate.getMonth()+ findProtocol.bottles[i].shelfLife))),
                     needsRefill: false
                 });
                 newMap.set(findProtocol.bottles[i].bottleName, {name: findProtocol.bottles[i].bottleName, values: newVialValues});
@@ -207,18 +228,20 @@ exports.deleteTreatment = async (req, res) => {
 */
 exports.updateAdverseTreatment = async (req, res) => {
     try {
-        const { patientID, date, bottleName, injVol, injDilution, injLLR, currBottleNumber, expirationDate, needsRefill } = req.body;
+        const { patientID, date, bottleName, injVol, injDilution, injLLR, currBottleNumber } = req.body;
         const treatmentToUpdate = await treatment.findOne( { patientID: patientID, date: date} );
         const treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle == bottleName);
+        console.log(treatmentToUpdate);
         treatmentToUpdate.bottles[treatmentIndex].injVol = injVol;
         treatmentToUpdate.bottles[treatmentIndex].injLLR = injLLR;
         treatmentToUpdate.bottles[treatmentIndex].injDilution = injDilution;
         treatmentToUpdate.bottles[treatmentIndex].currBottleNumber = currBottleNumber;
         treatmentToUpdate.bottles[treatmentIndex].adverseReaction = true;
         treatmentToUpdate.bottles[treatmentIndex].needsVialTest = true;
+        treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement = treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement - 1;
         
-        treatmentToUpdate.bottles[treatmentIndex].expirationDate = expirationDate;
-        treatmentToUpdate.bottles[treatmentIndex].needsRefill = needsRefill;
+        // treatmentToUpdate.bottles[treatmentIndex].expirationDate = expirationDate;
+        // treatmentToUpdate.bottles[treatmentIndex].needsRefill = needsRefill;
         await treatmentToUpdate.save();
         res.status(200).json({ message: 'Successful update'});
         
@@ -239,7 +262,7 @@ exports.updateAdverseTreatment = async (req, res) => {
             "injDilution": 0,
             "currBottleNumber": 2,
             "expirationDate": "2023-12-02T05:00:00.000+00:00",
-            "locationOfInjection": "Upper Left Arm"
+            "locationOfInjection": "Left Arm"
             "needsRefill": false
         }, ...
     ]
@@ -249,27 +272,53 @@ exports.updateSuccessfulTreatment = async (req, res) => {
     try {
         
         const { patientID, date, arrayOfBottles } = req.body;
-        const treatmentToUpdate = await treatment.findOne( { patientID: patientID, date: date} );
+        //This will update a specific appointment with the given date
+        let treatmentToUpdate = await treatment.findOne( { patientID: patientID, date: date} );
+
+        let patientToFind = await patient.findById(patientID);
+        let findProtocol = await protocol.findOne({practiceID: patientToFind.practiceID});
+        const treatmentLength = patientToFind.treatments.length;
+        let patientLastTreatmentID = patientToFind.treatments[treatmentLength - 1];
+        let newDate = new Date(date);
+
+        const nextAppointmentDate = new Date(date);
+        nextAppointmentDate.setDate(nextAppointmentDate.getDate() + parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.days)));
+        nextAppointmentDate.setHours(0,0,0,0);
+
+        if(!treatmentToUpdate){
+            //This looks for the next treatment
+            treatmentToUpdate = await treatment.findById(patientLastTreatmentID);
+            if(treatmentToUpdate){
+                if(newDate.getTime() > treatmentToUpdate.date.getTime()){
+                    patientToFind.missedAppointmentCount = patientToFind.missedAppointmentCount + 1;
+                    patientToFind.lastApptDateBeforeAttrition = nextAppointmentDate;
+                }
+            }
+            else{
+                return res.status(400).json({ message: "Treatment not found" });
+            }
+        }
 
         let treatmentIndex = 0;
         
         for( let i = 0; i < arrayOfBottles.length; i++){
             treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle == arrayOfBottles[i].bottleName);
             treatmentToUpdate.bottles[treatmentIndex].injVol = arrayOfBottles[i].injVol;
-            treatmentToUpdate.bottles[treatmentIndex].injLLR = arrayOfBottles[i].injLLR;
-            treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
+            // treatmentToUpdate.bottles[treatmentIndex].injLLR = arrayOfBottles[i].injLLR;
+            // treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
             treatmentToUpdate.bottles[treatmentIndex].currBottleNumber = arrayOfBottles[i].currBottleNumber;
-            treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement = treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement++;
+            treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement = treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement + 1;
 
             treatmentToUpdate.bottles[treatmentIndex].locationOfInjection = arrayOfBottles[i].locationOfInjection;
-            treatmentToUpdate.bottles[treatmentIndex].expirationDate = arrayOfBottles[i].expirationDate;
-            treatmentToUpdate.bottles[treatmentIndex].needsRefill = arrayOfBottles[i].needsRefill;
+            // treatmentToUpdate.bottles[treatmentIndex].expirationDate = arrayOfBottles[i].expirationDate;
+            // treatmentToUpdate.bottles[treatmentIndex].needsRefill = arrayOfBottles[i].needsRefill;
         }
 
         treatmentToUpdate.date = date;
         treatmentToUpdate.attended = true;
 
         await treatmentToUpdate.save();
+        await patientToFind.save();
         res.status(200).json({ message: 'Successful update'});
         
         
@@ -323,7 +372,7 @@ exports.nextTreatment = async(req, res) => {
             patientLastName: lastTreatment.patientLastName, 
             patientFirstName: lastTreatment.patientFirstName, 
             patientID: lastTreatment.patientID, 
-            date: nextAppointmentDate, 
+            date: formatDate(nextAppointmentDate), 
             attended: false
         });
 
@@ -335,6 +384,21 @@ exports.nextTreatment = async(req, res) => {
 
         let newLastVialTestMap = new Map();
         let newNextVialTestMap = new Map();
+
+        //function that takes in a date from MongoDB and converts it into readable format
+        function formatDate(mongoDate){
+
+            //convert into javascript Date object
+            const javascriptDate = new Date(mongoDate);
+            //standardize timezone
+            const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
+            return utcDate.toLocaleDateString('en-US', {
+                year: '2-digit',
+                month: '2-digit',
+                day: '2-digit',
+            });
+    
+        }
 
         for(let i = 0; i < patientBottleCount; i++){
             let antigenName = lastTreatment.bottles[i].nameOfBottle;
@@ -351,14 +415,17 @@ exports.nextTreatment = async(req, res) => {
             let newBottleNumber = BottleNumberCalc(antigenCurrBottleNumber, antigenLLR, antigenInjVol, antigenDil, antigenMaintenanceBN, antigenName);
             let stringTemp = "";
             let triggerVialTest = false;
+            let newExpirationDate = new Date(lastTreatment.bottles[i].expirationDate);
             if(newBottleNumber == 999){
                 stringTemp = "M";
             }
             else{
                 stringTemp = parseInt(newBottleNumber);
             }
-            if(newBottleNumber > parseInt(antigenCurrBottleNumber)){
+            if(newBottleNumber != parseInt(antigenCurrBottleNumber)){
                 triggerVialTest = true;
+                let newDate = new Date(today);
+                newExpirationDate = new Date(newDate.setMonth(newDate.getMonth()+ findProtocol.bottles[i].shelfLife));
             }
 
             let lastVialTestValues = lastTreatment.lastVialTests.get(antigenName).values;
@@ -380,7 +447,7 @@ exports.nextTreatment = async(req, res) => {
                 locationOfInjection: "",
                 needsVialTest: triggerVialTest,
                 needsRefill: false,
-                expirationDate: lastTreatment.bottles[i].expirationDate
+                expirationDate: formatDate(newExpirationDate)
             });
 
             newNextVialTestMap.set(antigenName, {values: newVialValues});
