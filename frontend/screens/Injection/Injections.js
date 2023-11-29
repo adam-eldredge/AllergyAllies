@@ -7,6 +7,7 @@ import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
 import theme from './theme.js';
+import { updateSuccessfulTreatment } from '../../../backend/src/controllers/treatment_controller.js';
 
 export default function Injections({route, navigation}){
 
@@ -206,7 +207,7 @@ export default function Injections({route, navigation}){
    return <Survey model={injectionForm} />;
 }
 
-const createInjectionObject = (data, bottles, patient) => {
+const createInjectionObject = async (data, bottles, patient) => {
    let Injections = []
 
    bottles.map((bottle, index) => {
@@ -223,10 +224,12 @@ const createInjectionObject = (data, bottles, patient) => {
 
    const obj = {
       patientID: patient._id,
-      date: new Date(),
-      bottles: Injections
+      date: new Date().setHours(0,0,0,0),
+      arrayOfBottles: Injections
    }
-
+   
    // Send the treatment obj to the database
+   const sendSuccessfulTreatment = await axios.patch(`http://localhost:5000/api/updateSuccessfulTreatment`, obj);
+   
 }
 

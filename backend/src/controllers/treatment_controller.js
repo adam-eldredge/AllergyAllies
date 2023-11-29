@@ -315,10 +315,10 @@ exports.updateSuccessfulTreatment = async (req, res) => {
         let treatmentIndex = 0;
         
         for( let i = 0; i < arrayOfBottles.length; i++){
-            treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle == arrayOfBottles[i].bottleName);
+            treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle == arrayOfBottles[i].nameOfBottle);
             treatmentToUpdate.bottles[treatmentIndex].injVol = arrayOfBottles[i].injVol;
             // treatmentToUpdate.bottles[treatmentIndex].injLLR = arrayOfBottles[i].injLLR;
-            // treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
+            treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
             treatmentToUpdate.bottles[treatmentIndex].currBottleNumber = arrayOfBottles[i].currBottleNumber;
             treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement = treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement + 1;
 

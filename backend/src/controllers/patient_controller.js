@@ -243,14 +243,6 @@ const findPercentMaintenance = async (req, res) => {
         //Find the last treatment of the patient 
         const treatmentLength = foundPatient.treatments.length;
 
-        if(treatmentLength < 3){
-            for( let i = 0; i < lastTreatment.bottles.length; i ++){
-                array.push(0);
-            }
-            return res.status(201).json({array, message: 'Array of 0\'s sent. Not enough treatment data.'});
-            //return res.status(404).json({ message: `Not enough patient data`});
-        }
-
         let patientNextTreatmentID = null;
         let patientLastTreatmentID = null;
         let patientSecondToLastTreatmentID = null;
@@ -274,6 +266,14 @@ const findPercentMaintenance = async (req, res) => {
         const lastTreatment = await treatment.findById(patientLastTreatmentID);
         const secondToLastTreatment = await treatment.findById(patientSecondToLastTreatmentID);
         let array = [];
+
+        if(treatmentLength < 3){
+            for( let i = 0; i < lastTreatment.bottles.length; i ++){
+                array.push(0);
+            }
+            return res.status(201).json({array, message: 'Array of 0\'s sent. Not enough treatment data.'});
+            //return res.status(404).json({ message: `Not enough patient data`});
+        }
 
         if(nextTreatment.attended == false && lastTreatment.attended == true && secondToLastTreatment.attended == true){
             for(let i = 0; i < lastTreatment.bottles.length; i++){
