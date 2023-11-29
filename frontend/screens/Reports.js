@@ -1,10 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal } from 'react-native';
 import { DataTable, IconButton } from 'react-native-paper';
 import axios from 'axios';
 import User from '../User';
 import AuthContext from '../AuthContext';
 import ProviderMenu from './ProviderMenu';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Reports({ navigation }) {
   const userInfo = User();
@@ -17,6 +18,29 @@ export default function Reports({ navigation }) {
   const [needsRetestError, setNeedsRetestError] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
+
+  const getStoredReports = async () => {
+    try {
+      const storedReports = await AsyncStorage.getItem('reports');
+      if (storedReports) {
+        setReports(JSON.parse(storedReports));
+      }
+    } catch (error) {
+      console.error('Error getting stored reports:', error);
+    }
+  };
+
+  const storeReports = async (newReports) => {
+    try {
+      await AsyncStorage.setItem('reports', JSON.stringify(newReports));
+    } catch (error) {
+      console.error('Error storing reports:', error);
+    }
+  };
+
+  useEffect(() => {
+    getStoredReports();
+  }, []);
 
   const generateAttritionReport = async () => {
     try {
@@ -32,6 +56,7 @@ export default function Reports({ navigation }) {
   
       setReports((prevReports) => [...prevReports, newReport]);
       setAttritionError(null);
+      storeReports([...reports, newReport]);
     } catch (error) {
       console.error('Error fetching attrition report:', error);
       setAttritionError('Error fetching attrition report. Please try again.');
@@ -49,6 +74,7 @@ export default function Reports({ navigation }) {
 
       setReports((prevReports) => [...prevReports, newReport]);
       setMaintenanceError(null);
+      storeReports([...reports, newReport]);
     } catch (error) {
       console.error('Error fetching Approaching Maintenance report:', error);
       setMaintenanceError('Error fetching Approaching Maintenance report. Please try again.');
@@ -66,6 +92,7 @@ export default function Reports({ navigation }) {
 
       setReports((prevReports) => [...prevReports, newReport]);
       setNeedsRetestError(null);
+      storeReports([...reports, newReport]);
     } catch (error) {
       console.error('Error fetching Needs Retest report:', error);
       setNeedsRetestError('Error fetching Needs Retest report. Please try again.');
@@ -83,6 +110,7 @@ export default function Reports({ navigation }) {
   
       setReports((prevReports) => [...prevReports, newReport]);
       setRefillError(null); // Fix the typo here
+      storeReports([...reports, newReport]);
     } catch (error) {
       console.error('Error fetching Refills report:', error);
       setRefillError('Error fetching Refills report. Please try again.'); // Fix the typo here
