@@ -38,21 +38,24 @@ export default function ViewPatients({ navigation }) {
     const PList = () => (
         <div>
             {renderData.map((p, index) =>
-            <TouchableOpacity onPress={() => handlePatientSelect(p)} key={p.id}>
                 <DataTable.Row style={index == renderData.length - 1 ? { ...stylesList[index % 2], borderBottomEndRadius: 8, borderBottomStartRadius: 8 } : stylesList[index % 2]}>
                     <DataTable.Cell>{p.firstName}</DataTable.Cell>
                     <DataTable.Cell>{p.lastName}</DataTable.Cell>
+                    <DataTable.Cell>{p.DoB}</DataTable.Cell>
                     <DataTable.Cell>{p.email}</DataTable.Cell>
                     <DataTable.Cell textStyle={{ marginLeft: 20 }}>{p.status}</DataTable.Cell>
-                    <DataTable.Cell >Patient Account</DataTable.Cell>
+                    <DataTable.Cell ><TouchableOpacity
+                        style={styles.ViewButton}
+                        onPress={() => handlePatientSelect(p)} key={p.id}>
+                        <Text style={styles.ButtonText}> View </Text>
+                    </TouchableOpacity></DataTable.Cell>
                 </DataTable.Row>
-            </TouchableOpacity>
             )}
         </div>
     );
 
     function handlePatientSelect(patient) {
-       navigation.navigate('PatientDetails', { patient });
+        navigation.navigate('PatientDetails', { patient });
     }
 
     function updateRenderData() {
@@ -66,7 +69,7 @@ export default function ViewPatients({ navigation }) {
                     newList.push(element);
                 }
             }
-            else if (filter == 'All'){
+            else if (filter == 'All') {
                 newList.push(element);
             }
             else if (patientName && element.status == filter) {
@@ -75,7 +78,7 @@ export default function ViewPatients({ navigation }) {
                     newList.push(element);
                 }
             }
-            else if (element.status == filter){
+            else if (element.status == filter) {
                 newList.push(element);
             }
         })
@@ -84,7 +87,7 @@ export default function ViewPatients({ navigation }) {
     }
 
     return (
-        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
+        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
             <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
                 <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 30 }}>
                     <Text style={styles.header}>Patients</Text>
@@ -113,9 +116,10 @@ export default function ViewPatients({ navigation }) {
                     <DataTable.Header style={styles.tableHeader}>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>First Name</DataTable.Title>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Last Name</DataTable.Title>
+                        <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14}}>D.o.B</DataTable.Title>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Email</DataTable.Title>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14, marginLeft: 20 }}>Status</DataTable.Title>
-                        <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Profile</DataTable.Title>
+                        <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14, marginLeft: 40 }}>Profile</DataTable.Title>
                     </DataTable.Header>
                     <PList />
                 </DataTable>
@@ -153,7 +157,7 @@ const styles = StyleSheet.create({
     },
     table: {
         marginLeft: 100,
-        width: 700,
+        minWidth: 950,
     },
     tableHeader: {
         backgroundColor: '#cbdeff',
@@ -164,21 +168,21 @@ const styles = StyleSheet.create({
     tableRow2: {
         backgroundColor: '#ebebeb',
     },
-    providerDashboardItem:{
+    providerDashboardItem: {
         borderRadius: 8,
         height: 100,
         width: 100,
         marginBottom: 10,
         alignItems: 'center',
-     },
-     providerDashboardText:{
+    },
+    providerDashboardText: {
         color: 'white',
         textAlign: 'center',
         fontSize: 15,
         fontWeight: '600',
         marginTop: 20,
         marginBottom: -10,
-     },
+    },
     dropdown: {
         margin: 15,
         height: 40,
@@ -192,5 +196,18 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#1059d5',
         padding: 10
-    }
+    },
+    ViewButton: {
+        backgroundColor: '#1059d5',
+        padding: 10,
+        marginLeft: 40,
+        height: 30,
+        justifyContent: 'center',
+        borderRadius: 8,
+    },
+    ButtonText: {
+        color: 'white',
+        textAlign: 'center',
+        fontSize: 15,
+    },
 })
