@@ -8,7 +8,7 @@ import AuthContext from '../AuthContext';
 export default function Reports({ navigation }) {
   const userInfo = User();
   const { signOut } = useContext(AuthContext);
-  const providerId = userInfo.providerId;
+  const providerID = userInfo.id;
   const [reports, setReports] = useState([]);
   const [attritionError, setAttritionError] = useState(null);
   const [maintenanceError, setMaintenanceError] = useState(null);
@@ -19,7 +19,7 @@ export default function Reports({ navigation }) {
 
   const generateAttritionReport = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/attritionReport/${providerId}`);
+      const response = await axios.get(`http://localhost:5000/api/attritionReport/${providerID}`);
       const newReport = {
         type: 'Attrition',
         dateGenerated: new Date().toLocaleDateString(),
@@ -36,7 +36,7 @@ export default function Reports({ navigation }) {
 
   const generateApproachingMaintenanceReport = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/approachingMaintenanceReport/${providerId}`);
+      const response = await axios.get(`http://localhost:5000/api/approachingMaintenanceReport/${providerID}`);
       const newReport = {
         type: 'Approaching Maintenance',
         dateGenerated: new Date().toLocaleDateString(),
@@ -53,7 +53,7 @@ export default function Reports({ navigation }) {
 
   const needsRetestReport = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/needsRetestReport/${providerId}`);
+      const response = await axios.get(`http://localhost:5000/api/needsRetestReport/${providerID}`);
       const newReport = {
         type: 'Needs Retest',
         dateGenerated: new Date().toLocaleDateString(),
@@ -70,7 +70,7 @@ export default function Reports({ navigation }) {
 
   const refillsReport = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/refillsReport/${providerId}`);
+      const response = await axios.get(`http://localhost:5000/api/refillsReport/${providerID}`);
       const newReport = {
         type: 'Refills',
         dateGenerated: new Date().toLocaleDateString(),

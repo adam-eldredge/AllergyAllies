@@ -235,56 +235,55 @@ exports.generateRefillsReport = async (req, res) => {
     const reportType = "Refills";
     const patientRefillsData = [];
 
-    const patientsList = await getAllPatientsHelper(providerID);
-    const foundProvider = await Provider.findById(providerID);
+    const provider = await Provider.findById(providerID);
+    if (!provider) {
+        return res.status(401).json({ message: "Provider not found"});
+    }
+
+    const patientsList = await getAllPatientsHelper(provider.practiceID);
 
     for (const p of patientsList) {
+        
         const patientTreatment = await treatment.findOne({
-            providerID: p.providerID.toString(),
-            patientID: p._id.toString(),
+            patientID: p._id,
         });
 
-        const foundProtocol = await protocol.findOne({ practiceID: foundProvider.practiceID });
+        const foundProtocol = await protocol.findOne({ practiceID: provider.practiceID });
 
         if (!foundProtocol || !patientTreatment) {
             continue;
         }
 
-        // also need to check for expiration. Can have provider insert expiration date each time,
-        // or just include as survey question (After how many days do your vials expire?)
-
+        const vialInfo = [];
         const bottleRefillsData = [];
         const bottleExpirationData = [];
         for (const b of patientTreatment.bottles) {
-            const currentDate = new Date();
-            // check if bottle will expire within two weeks
-            const expireSoonDate = b.expirationDate;
-            expireSoonDate.setDate(expireSoonDate.getDate() - 7);
-
-            const expiresSoon = currentDate >= expireSoonDate;
-
-            if(expiresSoon) {
+  
+            if(b.bottleStatus === "EXPIRING") {
                 bottleExpirationData.push({
                     bottleName: b.nameOfBottle,
                     expirationDate: b.expirationDate,
                 });
             }
-            else if (b.needsRefill) {
-                const matchingBottle = foundProtocol.bottles.find(
-                    (protocolBottle) => protocolBottle.bottleName === b.nameOfBottle
-                );
-
+            else if (b.bottleStatus === "NEEDS_MIX") {
                 bottleRefillsData.push({
                     bottleName: b.nameOfBottle,
-                    volumeLeft: matchingBottle.bottleSize - b.injSumForBottleNumber,
                 });
             }
+
+            const matchingBottle = await findMatchingBottle(p, b);
+            let patientCurrentBottleNumber = b.currBottleNumber;
+            if (patientCurrentBottleNumber === 'M') {
+                patientCurrentBottleNumber = matchingBottle.maintenanceNumber;
+            }
+            vialInfo.push(`${b.nameOfBottle} ${patientCurrentBottleNumber}/${matchingBottle.maintenanceNumber}`);
         }
 
         patientRefillsData.push({
             patientName: p.firstName + " " + p.lastName,
             refillData: bottleRefillsData,
             expirationData: bottleExpirationData,
+            vialInfo: vialInfo,
             DOB: p.DoB,
             phone: p.phone,
             email: p.email,
@@ -292,8 +291,12 @@ exports.generateRefillsReport = async (req, res) => {
     }
 
     try {
-        const savedReport = await generateReport(providerID, practiceID, reportType, true, patientRefillsData);
-        return res.status(200).json(savedReport);
+        if (patientRefillsData.length > 0) {
+            const savedReport = await generateReport(providerID, provider.practiceID, reportType, true, patientRefillsData);
+            return res.status(200).json(savedReport);
+        } else {
+            return res.status(201).json({message: "No patients need refills"});
+        }
     } catch (error) {
         return res.status(400).json({ message: error.message }); 
     }
@@ -406,11 +409,6 @@ exports.patientRetested = async (req, res) => {
         return res.status(404).json({ message: error.message });
     }
 }
-
-
-
-
-
 
 /* Get records and compile functions */
 

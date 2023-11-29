@@ -6,14 +6,7 @@ const { checkExpiration, needsRetestSnoozeCheck} = require('../helpers/alerts_he
 
 /* TODO:
     reaction alert creation
-    injection needs mixed alert
-    injection expiration alert
     perform vial test alert
-
-    Any time the last Injection Volume reaches the Max IV set by the Practice, 
-    there should be an alert to perform a Vial Test before the next injection 
-    record can be entered UNLESS the Bottle number is “M” (e.g., the patient is 
-    at his/her maintenance dose).  
 */
 async function checkIfRecentAlertExists(patient, alertType) {
     const oldAlert = await providerAlerts.findOne({
@@ -198,10 +191,16 @@ async function needsRefillAlertLogic(bundleArray) {
 
             await bundle.treatment.save();
             
+            /*
             if (needsMix) {
                 createAlert(bundle.patient, "NeedsMixAlert");
             } else if (expiresSoon) {
                 createAlert(bundle.patient, "ExpiresSoonAlert");
+            }
+            */
+
+            if(needsMix || expiresSoon) {
+                createAlert(bundle.patient, "NeedsRefillAlert");
             }
         }
     } catch (error) {

@@ -43,17 +43,18 @@ function maintenancePDFHelper(foundReport) {
 
 function refillsPDFHelper(foundReport) {
     // Initialize headers and rows
-    const headers = ["Patient", "Needs Refill", "Expires Soon", "DoB","Phone number", "Email"];
+    const headers = ["Patient", "Vial Info", "Needs Mixing", "Expired or Expiring Soon", "DoB","Phone number", "Email"];
     const rows = [];
 
     foundReport.data.forEach((patient) => {
-        const refillBottles = patient.refillData.map(item => `${item.bottleName}: ${item.volumeLeft}ml remains`);
+        const refillBottles = patient.refillData.map(item => `${item.bottleName}`);
         const expirationBottles = patient.expirationData.map(item => `${item.bottleName}: ${formatDate(item.expirationDate)}`);
 
         const rowData = [
             patient.patientName,
-            refillBottles,
-            expirationBottles,
+            patient.vialInfo.join('\n'),
+            refillBottles.join('\n'),
+            expirationBottles.join('\n'),
             patient.DOB,
             patient.phone,
             patient.email,
@@ -68,7 +69,9 @@ function refillsPDFHelper(foundReport) {
         rows: rows,
     };
 
-    const tableOptions = {};
+    const tableOptions = {
+        padding: 5,
+    };
 
     return { table, tableOptions };
 }

@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert,
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { useRoute } from '@react-navigation/native';
 
+/* File not used ? */
+
 export default function Alerts({navigation}){
       return (
          <View>

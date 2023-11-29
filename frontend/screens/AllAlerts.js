@@ -64,7 +64,7 @@ export default function AllAlerts({navigation}){
       <ScrollView style={{ backgroundColor: '#fcfcfc'}}>
          <Text style={styles.title}>Your Alerts</Text>
 
-         <View style={{ alignItems: 'flex-end', marginRight: 245 }}>
+         <View style={{ alignItems: 'flex-end', marginRight: 520 }}>
             <TouchableOpacity onPress={undoDelete}>
                   <Text style = {{ textDecorationLine: 'underline', color: '#1059d5', fontSize: 15, fontWeight: 'bold' }}>Undo</Text>
             </TouchableOpacity>
