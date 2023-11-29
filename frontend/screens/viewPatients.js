@@ -84,11 +84,13 @@ export default function ViewPatients({ navigation }) {
     }
 
     return (
-        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
-            <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 30 }}>
-                    <Text style={styles.header}>Patients</Text>
-                    <TextInput style={styles.input}
+        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white' }}>
+        <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 30 }}>
+                <Text style={styles.header}>Patients</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TextInput
+                        style={styles.input}
                         underlineColorAndroid="transparent"
                         placeholder="Last Name"
                         placeholderTextColor="#7a7a7a"
@@ -96,7 +98,8 @@ export default function ViewPatients({ navigation }) {
                         autoCapitalize="none"
                         onChangeText={(name) => {
                             setPatientName(name)
-                        }} />
+                        }}
+                    />
                     <SelectList
                         placeholder='Filter'
                         search={false}
@@ -109,6 +112,7 @@ export default function ViewPatients({ navigation }) {
                         dropdownStyles={styles.dropdownSelect}
                     />
                 </View>
+            </View>
                 <DataTable style={styles.table}>
                     <DataTable.Header style={styles.tableHeader}>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>First Name</DataTable.Title>
@@ -120,8 +124,9 @@ export default function ViewPatients({ navigation }) {
                     <PList />
                 </DataTable>
                 <View style={{ height: 30 }}></View>
-            </View>
-            <ProviderMenu navigation={navigation} />
+        </View>
+        <View style={{width: 900}}></View>
+        <ProviderMenu navigation={navigation} style={{ alignSelf: 'flex-end', marginRight: 20 }} />
         </View>
     );
 }
