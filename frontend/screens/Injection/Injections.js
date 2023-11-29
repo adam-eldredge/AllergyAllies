@@ -200,24 +200,33 @@ export default function Injections({route, navigation}){
    injectionForm.applyTheme(theme);
 
    injectionForm.onComplete.add((sender, options) => {
-      createInjectionObject(sender.data, protocol.bottles);
+      createInjectionObject(sender.data, protocol.bottles, patient);
   });
 
    return <Survey model={injectionForm} />;
 }
 
-const createInjectionObject = (data, bottles) => {
+const createInjectionObject = (data, bottles, patient) => {
    let Injections = []
-   const numBottles = bottles.map((bottle, index) => {
+
+   bottles.map((bottle, index) => {
       const bottleInjection = {
          nameOfBottle: bottle.bottleName,
          injVol: eval(`data.volume${index}`),
          injDilution: eval(`data.dilution${index}`),
          currBottleNumber: eval(`data.bottleNum${index}`),
-         date: new Date()
+         locationOfInjection: eval(`data.location${index}`)
       }
+
       Injections.push(bottleInjection)
    })
-   console.log(Injections)
+
+   const obj = {
+      patientID: patient._id,
+      date: new Date(),
+      bottles: Injections
+   }
+
+   // Send the treatment obj to the database
 }
 
