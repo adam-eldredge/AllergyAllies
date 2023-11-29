@@ -30,6 +30,7 @@ export default function PatientProfile() {
 
     const findPatient = async () => {
       if (email){
+        //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
         const patientObj = await axios.get(`http://192.168.12.124:5000/api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
@@ -37,12 +38,14 @@ export default function PatientProfile() {
     if (!patient) { findPatient(); }
 
     const findPractice = async () => {
+      //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
       const practiceObj = await axios.get(`http://192.168.12.124:5000/api/practice/${patient.practiceID}`)
       setPractice(practiceObj.data)
     }
     if (!practice && patient) { findPractice(); }
 
     const findProtocol = async () => {
+      //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
       const protocolObj = await axios.get(`http://192.168.12.124:5000/api/getProtocol/${patient.practiceID}`)
       setProtocol(protocolObj.data.protocol)
     }
@@ -223,6 +226,7 @@ const styles = StyleSheet.create({
   signOutButton: {
     backgroundColor: '#ffe3e7',
     padding: 5,
+    marginTop: 30,
     marginHorizontal: 50,
     height: 40,
     justifyContent: 'center',

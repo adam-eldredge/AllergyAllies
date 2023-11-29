@@ -3,9 +3,12 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert,
 import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import User from '../../User';
 import axios from 'axios';
+
+//comment out these 3 lines to run on mobile
 import 'survey-core/defaultV2.min.css';
 import { Model } from 'survey-core';
 import { Survey } from 'survey-react-ui';
+
 import theme from './theme.js';
 
 export default function Injections({route, navigation}){

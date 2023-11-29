@@ -22,12 +22,22 @@ export default function InitialScreen({navigation}){
                     </View>
                     <Text style = {styles.subtitle}>Manage your allergies from anywhere, at any time.</Text>
                     <Text style = {styles.description}>Keep track of appointments, calculate injection dosages, record data, and more with AllergyAlly.</Text>
+                    <View style = {{flexDirection: 'row'}}>
                     <TouchableOpacity
-                        style = {styles.signUpButton}
+                        style = {styles.logInButton}
                         onPress={() =>
-                        navigation.navigate('SignIn') }>
-                        <Text style = {styles.logInButtonText}>Sign In or Create an Account</Text>
+                        navigation.navigate('ProviderSignInScreen') }>
+                        <Text style = {styles.logInButtonText}>Provider Login</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity
+                        style = {styles.createAccountButton}
+                        onPress={() =>
+                        navigation.navigate('ProviderSignUpScreen') }>
+                        <Text style = {styles.createAccountText}>Provider Signup</Text>
+                    </TouchableOpacity>
+
+                    </View>
+                    
                     <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', marginLeft: 48, marginTop: 35,}}>
                         <IconButton
                         icon="doctor"
@@ -58,7 +68,7 @@ export default function InitialScreen({navigation}){
                         size={60}
                         />
                         <View>
-                            <Text style = {styles.text}>As a Patient</Text>
+                            <Text style = {styles.text}>As a Patient: Download the mobile app!</Text>
                             <Text style = {styles.text2}>   • View upcoming appointment deadlines</Text>
                             <Text style = {styles.text2}>   • Keep track of treatment history</Text>
                             <Text style = {styles.text2}>   • Report reactions to treatment</Text>
@@ -84,12 +94,41 @@ const styles = StyleSheet.create({
         borderColor: '#509045',
         backgroundColor: '#cee1ff'
     },
-    logInButtonText:{
-        color: '#509045',
+    logInButton: {
+        backgroundColor: 'white',
+        width: 150,
+        padding: 15,
+        borderRadius: 8,
+        margin: 10,
+        marginLeft: 60,
+        shadowColor: '#041f4f',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: .3,
+        shadowRadius: 3,
+    },
+    createAccountButton: {
+       backgroundColor: '#053B94',
+       width: 150,
+       margin: 10,
+       padding: 15,
+       borderRadius: 8,
+       shadowColor: '#041f4f',
+       shadowOffset: { width: 0, height: 2 },
+       shadowOpacity: .3,
+       shadowRadius: 3,
+  },
+    createAccountText: {
+        color: 'white',
         textAlign: 'center',
         fontSize: 15,
         fontWeight: '600',
     },
+        logInButtonText:{
+            color: '#053B94',
+            textAlign: 'center',
+            fontSize: 15,
+            fontWeight: '600',
+        },
     title:{
         marginLeft: 60,
         marginTop: 60,
