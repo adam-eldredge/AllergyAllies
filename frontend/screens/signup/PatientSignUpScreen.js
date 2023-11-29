@@ -124,7 +124,7 @@ export default function PatientSignUpScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Allergy Ally</Text>
+      <Text style={styles.title}>AllergyAlly</Text>
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         <TextInput style={styles.shortInput}

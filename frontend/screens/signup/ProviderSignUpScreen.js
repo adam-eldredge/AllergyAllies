@@ -96,7 +96,7 @@ export default function ProviderSignUpScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Allergy Ally</Text>
+      <Text style={styles.title}>AllergyAlly</Text>
 
       <View style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
         <TextInput style={styles.shortInput}
@@ -258,5 +258,5 @@ const styles = StyleSheet.create({
     width: 150,
     justifyContent: 'center',
     borderRadius: 8,
-  },
+  }
 })

@@ -21,10 +21,16 @@ export default function InitialMobileScreen({navigation}){
       </View>
       <View style={styles.buttonContainer}>
       <TouchableOpacity
-      style = {styles.signUpButton}
+      style = {styles.logInButton}
       onPress={() =>
-      navigation.navigate('SignIn') }>
-      <Text style = {styles.logInButtonText}>Sign In or Create an Account</Text>
+      navigation.navigate('PatientSignIn') }>
+      <Text style = {styles.logInButtonText}>Patient Login</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      style = {styles.createAccountButton}
+      onPress={() =>
+      navigation.navigate('PatientSignUpScreen') }>
+      <Text style = {styles.createAccountText}>Patient Signup</Text>
     </TouchableOpacity>
       </View>
     </View>
@@ -51,19 +57,35 @@ export default function InitialMobileScreen({navigation}){
         marginHorizontal: 20,
         marginBottom: 20,
       },
-    signUpButton: {
+    logInButton: {
         //justifyContent: 'center',
         backgroundColor: 'white',
         padding: 15,
+        paddingHorizontal: 60,
         borderRadius: 8,
         margin: 4,
-        justifyContent: 'flex-end',
-        //alignItems: 'center',
         shadowColor: '#041f4f',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 1,
+        shadowOpacity: .3,
         shadowRadius: 3,
     },
+    createAccountButton: {
+      //justifyContent: 'center',
+      //backgroundColor: '#1059d5',
+      borderColor: 'white',
+      borderWidth: 1,
+      padding: 15,
+      paddingHorizontal: 60,
+      borderRadius: 8,
+      margin: 4,
+      marginTop: 10,
+  },
+  createAccountText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: 15,
+    fontWeight: '600',
+},
     logInButtonText:{
         color: '#1059d5',
         textAlign: 'center',
@@ -77,6 +99,6 @@ export default function InitialMobileScreen({navigation}){
         alignItems: 'center',
       },
       buttonContainer: {
-        marginBottom: 50,
+        marginBottom: 50
       },
   });
