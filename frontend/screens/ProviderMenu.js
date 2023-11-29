@@ -12,7 +12,7 @@ const ProviderMenu = ({ navigation }) => {
   };
 
   return (
-    <View style={{ backgroundColor: '#fcfcfc', flex: 1 }}>
+    <View style={{ backgroundColor: '#fcfcfc', flex: 1, marginLeft: 30 }}>
       <TouchableOpacity
         style={{
           marginTop: 50,
@@ -32,7 +32,7 @@ const ProviderMenu = ({ navigation }) => {
 
       <TouchableOpacity
         style={{ ...styles.providerDashboardItem, backgroundColor: '#7fd0c3', marginTop: 15 }}
-        onPress={() => navigateToScreen('Home')}
+        onPress={() => navigateToScreen('Portal')}
       >
         <Text style={styles.providerDashboardText}>Home</Text>
         <IconButton icon="home" iconColor="white" size={37} />

@@ -9,7 +9,7 @@ import ProviderMenu from './ProviderMenu';
 export default function Reports({ navigation }) {
   const userInfo = User();
   const { signOut } = useContext(AuthContext);
-  const providerId = userInfo.providerId;
+  const providerId = userInfo.id;
   const [reports, setReports] = useState([]);
   const [attritionError, setAttritionError] = useState(null);
   const [maintenanceError, setMaintenanceError] = useState(null);
@@ -20,13 +20,16 @@ export default function Reports({ navigation }) {
 
   const generateAttritionReport = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/attritionReport/${providerId}`);
+      console.log('Generating Attrition Report...');
+      const response = await axios.get(`http://localhost:5000/api/attritionReport/${providerID}`);
+      console.log('Response:', response);
+  
       const newReport = {
         type: 'Attrition',
         dateGenerated: new Date().toLocaleDateString(),
         data: response.data,
       };
-
+  
       setReports((prevReports) => [...prevReports, newReport]);
       setAttritionError(null);
     } catch (error) {
