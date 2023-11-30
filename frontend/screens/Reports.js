@@ -19,11 +19,23 @@ export default function Reports({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
 
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedReport(null);
+  };
+
+  const openModal = (report) => {
+    setSelectedReport(report);
+    setModalVisible(true);
+  };
+
   const getStoredReports = async () => {
     try {
       const storedReports = await AsyncStorage.getItem('reports');
       if (storedReports) {
-        setReports(JSON.parse(storedReports));
+        const allReports = JSON.parse(storedReports);
+        const providerReports = allReports.filter((report) => report.providerID === providerID);
+        setReports(providerReports);
       }
     } catch (error) {
       console.error('Error getting stored reports:', error);
@@ -39,24 +51,40 @@ export default function Reports({ navigation }) {
   };
 
   useEffect(() => {
-    getStoredReports();
+    const fetchData = async () => {
+      await getStoredReports();
+    };
+
+    fetchData();
   }, []);
+
+  const removeReport = (index) => {
+    setReports((prevReports) => {
+      const updatedReports = [...prevReports];
+      updatedReports.splice(index, 1);
+      storeReports(updatedReports);
+      return updatedReports;
+    });
+  };
 
   const generateAttritionReport = async () => {
     try {
       console.log('Generating Attrition Report...');
       const response = await axios.get(`http://localhost:5000/api/attritionReport/${providerID}`);
       console.log('Response:', response);
-  
+
       const newReport = {
         type: 'Attrition',
         dateGenerated: new Date().toLocaleDateString(),
         data: response.data,
       };
-  
-      setReports((prevReports) => [...prevReports, newReport]);
+
+      setReports((prevReports) => {
+        const updatedReports = [...prevReports, newReport];
+        storeReports(updatedReports);
+        return updatedReports;
+      });
       setAttritionError(null);
-      storeReports([...reports, newReport]);
     } catch (error) {
       console.error('Error fetching attrition report:', error);
       setAttritionError('Error fetching attrition report. Please try again.');
@@ -72,9 +100,12 @@ export default function Reports({ navigation }) {
         data: response.data,
       };
 
-      setReports((prevReports) => [...prevReports, newReport]);
+      setReports((prevReports) => {
+        const updatedReports = [...prevReports, newReport];
+        storeReports(updatedReports);
+        return updatedReports;
+      });
       setMaintenanceError(null);
-      storeReports([...reports, newReport]);
     } catch (error) {
       console.error('Error fetching Approaching Maintenance report:', error);
       setMaintenanceError('Error fetching Approaching Maintenance report. Please try again.');
@@ -90,9 +121,12 @@ export default function Reports({ navigation }) {
         data: response.data,
       };
 
-      setReports((prevReports) => [...prevReports, newReport]);
+      setReports((prevReports) => {
+        const updatedReports = [...prevReports, newReport];
+        storeReports(updatedReports);
+        return updatedReports;
+      });
       setNeedsRetestError(null);
-      storeReports([...reports, newReport]);
     } catch (error) {
       console.error('Error fetching Needs Retest report:', error);
       setNeedsRetestError('Error fetching Needs Retest report. Please try again.');
@@ -107,24 +141,17 @@ export default function Reports({ navigation }) {
         dateGenerated: new Date().toLocaleDateString(),
         data: response.data,
       };
-  
-      setReports((prevReports) => [...prevReports, newReport]);
-      setRefillError(null); // Fix the typo here
-      storeReports([...reports, newReport]);
+
+      setReports((prevReports) => {
+        const updatedReports = [...prevReports, newReport];
+        storeReports(updatedReports);
+        return updatedReports;
+      });
+      setRefillError(null);
     } catch (error) {
       console.error('Error fetching Refills report:', error);
-      setRefillError('Error fetching Refills report. Please try again.'); // Fix the typo here
+      setRefillError('Error fetching Refills report. Please try again.');
     }
-  };
-
-  const openModal = (report) => {
-    setSelectedReport(report);
-    setModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setSelectedReport(null);
   };
 
   return (
@@ -163,6 +190,7 @@ export default function Reports({ navigation }) {
             <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Past Reports</DataTable.Title>
             <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Type</DataTable.Title>
             <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>Date Generated</DataTable.Title>
+            <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}></DataTable.Title>
           </DataTable.Header>
 
           {reports.map((report, index) => (
@@ -178,6 +206,13 @@ export default function Reports({ navigation }) {
               </DataTable.Cell>
               <DataTable.Cell>{report.type}</DataTable.Cell>
               <DataTable.Cell>{report.dateGenerated}</DataTable.Cell>
+              <DataTable.Cell>
+                {report.data && (
+                  <TouchableOpacity onPress={() => removeReport(index)}>
+                    <Text style={{ color: 'red', textDecorationLine: 'underline' }}>Delete</Text>
+                  </TouchableOpacity>
+                )}
+              </DataTable.Cell>
             </DataTable.Row>
           ))}
         </DataTable>
