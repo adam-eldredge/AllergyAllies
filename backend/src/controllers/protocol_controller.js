@@ -5,7 +5,7 @@ const addProtocol = async (req, res) => {
 
         const {
             practiceID,
-            nextDoseAdjustments,
+            nextDoseAdjustment,
             bottles,
             vialTestReactionAdjustment,
             missedDoseAdjustment,
@@ -15,7 +15,7 @@ const addProtocol = async (req, res) => {
 
         const data = new protocol ({
             practiceID,
-            nextDoseAdjustments,
+            nextDoseAdjustment,
             bottles,
             vialTestReactionAdjustment,
             missedDoseAdjustment,

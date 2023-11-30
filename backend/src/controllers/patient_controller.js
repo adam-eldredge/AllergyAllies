@@ -256,9 +256,7 @@ const findPercentMaintenance = async (req, res) => {
             patientLastTreatmentID = foundPatient.treatments[treatmentLength - 2];
             patientSecondToLastTreatmentID = foundPatient.treatments[treatmentLength - 3];
         } catch (error) {
-            if (error instanceof RangeError){
-                return res.status(201).json({ message: 'Treatments not added correctly.'})
-            }
+            return res.status(201).json({ message: 'Treatments not added correctly.'});
         }
         
 
