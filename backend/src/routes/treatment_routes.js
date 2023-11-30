@@ -35,4 +35,7 @@ router.get('/getDaysSinceLastTreatment', treatmentController.getDaysSinceLastTre
 // GET to find last treatment
 router.get('/getLastTreatment/:id', treatmentController.getLastTreatment);
 
+// GET to find second to last treatment
+router.get('/getSecondLastTreatment/:id', treatmentController.getSecondLastTreatment);
+
 module.exports = router;

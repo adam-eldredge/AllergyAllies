@@ -12,7 +12,7 @@ import { Survey } from 'survey-react-ui';
 import theme from './theme.js';
 import { updateSuccessfulTreatment } from '../../../backend/src/controllers/treatment_controller.js';
 
-let temp;
+let calcOnce = true;
 
 export default function Injections({route, navigation}){
 
@@ -31,10 +31,11 @@ export default function Injections({route, navigation}){
    const {patient} = route.params
 
    // Calculated value - NEEDS TO BE UPDATED WITH JIMMY'S CALCULATIONS
-   const [calculatedVolume, setCalculatedVolume] = useState('0');
-   const [calculatedDilution, setCalculatedDilution] = useState('0');
-   const [calculatedBottleNum, setCalculatedBottleNum] = useState('0');
-   const [arrayOfBottles, setArrayOfBottles] = useState();
+   const [arrayOfBottles, setArrayOfBottles] = useState(Array(99).fill({
+      injVol: 0,
+      injDilution: 0,
+      currBottleNumber: "1",
+   }));
 
    useEffect(() => {
       const findProtocol = async() => {
@@ -61,28 +62,29 @@ export default function Injections({route, navigation}){
                patientID: patient._id,
                practiceID: userInfo.practiceID
             }
-            //console.log(data)
+
             let lastTreatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`);
-            let treatment = null;
-            if(lastTreatment.data[0].attended == true){
+            if(lastTreatment.data[0].attended && calcOnce){
                nextTreatment = await axios.post(`http://localhost:5000/api/nextTreatment`, data);
                /*
                   Read the new numbers and print them
                */
                lastTreatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`);
                setArrayOfBottles(lastTreatment.data[0].bottles);
+               calcOnce = false;
             }
             else{
                /*
                   Read the last calculated numbers and print them
                */
-              temp = lastTreatment.data[0].bottles;
-              setArrayOfBottles(lastTreatment.data[0].bottles);
+               if(calcOnce){
+                  setArrayOfBottles(lastTreatment.data[0].bottles);
+                  calcOnce = false;
+               }
             }
-            //const treatment = await axios.post(`http://localhost:5000/api/nextTreatment`, data);
-      
-            if (treatment.status == 200) {
-               console.log(treatment)
+
+            if(arrayOfBottles && lastTreatment.data[0]){
+               nextTreatment = true;
             }
          }
          catch (err) {
@@ -115,7 +117,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: temp[index].injVol,
+                           defaultValue: arrayOfBottles[index].injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -124,7 +126,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedBottleNum,
+                           defaultValue: arrayOfBottles[index].currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -134,7 +136,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedDilution,
+                           defaultValue: arrayOfBottles[index].injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -177,7 +179,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedVolume,
+                           defaultValue: arrayOfBottles[index].injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -186,7 +188,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedBottleNum,
+                           defaultValue: arrayOfBottles[index].currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -196,7 +198,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedDilution,
+                           defaultValue: arrayOfBottles[index].injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -272,6 +274,6 @@ const createInjectionObject = async (data, bottles, patient) => {
    
    // Send the treatment obj to the database
    const sendSuccessfulTreatment = await axios.patch(`http://localhost:5000/api/updateSuccessfulTreatment`, obj);
-   
+
 }
 
