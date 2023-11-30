@@ -64,27 +64,19 @@ export default function Injections({route, navigation}){
             }
 
             let lastTreatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`);
-            if(lastTreatment.data[0].attended && calcOnce){
-               nextTreatment = await axios.post(`http://localhost:5000/api/nextTreatment`, data);
+            if(lastTreatment.data[0].attended){
+               next = await axios.post(`http://localhost:5000/api/nextTreatment`, data);
                /*
                   Read the new numbers and print them
                */
                lastTreatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`);
-               setArrayOfBottles(lastTreatment.data[0].bottles);
-               calcOnce = false;
+               console.log(lastTreatment)
+               setNextTreatment(lastTreatment.data[0].bottles);
+               console.log(nextTreatment)
             }
             else{
-               /*
-                  Read the last calculated numbers and print them
-               */
-               if(calcOnce){
-                  setArrayOfBottles(lastTreatment.data[0].bottles);
-                  calcOnce = false;
-               }
-            }
-
-            if(arrayOfBottles && lastTreatment.data[0]){
-               nextTreatment = true;
+               setNextTreatment(lastTreatment.data[0].bottles);
+               console.log(nextTreatment)
             }
          }
          catch (err) {
@@ -93,7 +85,7 @@ export default function Injections({route, navigation}){
       }
       if (!nextTreatment) {findTreatment();}
    })
-   if (!protocol) return ('Loading protocol and injection data...');
+   if (!protocol || !nextTreatment) return ('Loading protocol and injection data...');
    
 
    // Input Fields
@@ -117,7 +109,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].injVol,
+                           defaultValue: nextTreatment[index].injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -126,7 +118,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].currBottleNumber,
+                           defaultValue: nextTreatment[index].currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -136,7 +128,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].injDilution,
+                           defaultValue: nextTreatment[index].injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -179,7 +171,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].injVol,
+                           defaultValue: nextTreatment[index].injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -188,7 +180,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].currBottleNumber,
+                           defaultValue: nextTreatment[index].currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -198,7 +190,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: arrayOfBottles[index].injDilution,
+                           defaultValue: nextTreatment[index].injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true

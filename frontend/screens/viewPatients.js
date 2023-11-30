@@ -125,6 +125,7 @@ export default function ViewPatients({ navigation }) {
                 </DataTable>
                 <View style={{ height: 30 }}></View>
             </View>
+            <View style = {{width:900}} />
             <ProviderMenu navigation={navigation} />
         </View>
     );
