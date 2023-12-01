@@ -164,6 +164,7 @@ const bottleSchema = new mongoose.Schema({
         require: true,
         type: String,
     },
+    // months
     shelfLife: {
         require: true,
         type: Number
