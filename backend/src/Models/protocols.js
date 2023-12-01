@@ -173,6 +173,17 @@ const bottleSchema = new mongoose.Schema({
     largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
 })
 
+const injectionFrequency = new mongoose.Schema({
+    freq: {
+        require: true,
+        type: Number
+    },
+    interval: {
+        require: true,
+        type: String
+    }
+})
+
 // we need default values 
 const dataSchema = new mongoose.Schema({
     practiceID: {
@@ -192,7 +203,8 @@ const dataSchema = new mongoose.Schema({
     bottles: [bottleSchema],
     vialTestReactionAdjustment: vialTestReactionAdjustments,
     missedDoseAdjustment: missedDoseAdjustments,
-    largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,  
+    largeReactionsDoseAdjustment: largeReactionsDoseAdjustments,
+    injectionFrequency: injectionFrequency  
 }, { collection: 'Protocols' })
 
 module.exports = mongoose.model('protocol', dataSchema)

@@ -5,6 +5,7 @@ import { SelectList } from 'react-native-dropdown-select-list'
 import AuthContext from '../AuthContext';
 import User from '../User';
 import axios from 'axios';
+import ProviderMenu from './ProviderMenu';
 
 export default function ViewPatients({ navigation }) {
 
@@ -83,11 +84,13 @@ export default function ViewPatients({ navigation }) {
     }
 
     return (
-        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
-            <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
-                <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 30 }}>
-                    <Text style={styles.header}>Patients</Text>
-                    <TextInput style={styles.input}
+        <View style={{ flex: 1, flexDirection: 'row', backgroundColor: 'white' }}>
+        <View style={{ flex: 1, flexDirection: 'column', backgroundColor: 'white' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 30 }}>
+                <Text style={styles.header}>Patients</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <TextInput
+                        style={styles.input}
                         underlineColorAndroid="transparent"
                         placeholder="Last Name"
                         placeholderTextColor="#7a7a7a"
@@ -95,7 +98,8 @@ export default function ViewPatients({ navigation }) {
                         autoCapitalize="none"
                         onChangeText={(name) => {
                             setPatientName(name)
-                        }} />
+                        }}
+                    />
                     <SelectList
                         placeholder='Filter'
                         search={false}
@@ -108,6 +112,7 @@ export default function ViewPatients({ navigation }) {
                         dropdownStyles={styles.dropdownSelect}
                     />
                 </View>
+            </View>
                 <DataTable style={styles.table}>
                     <DataTable.Header style={styles.tableHeader}>
                         <DataTable.Title textStyle={{ fontWeight: 'bold', color: 'black', fontSize: 14 }}>First Name</DataTable.Title>
@@ -119,65 +124,9 @@ export default function ViewPatients({ navigation }) {
                     <PList />
                 </DataTable>
                 <View style={{ height: 30 }}></View>
-            </View>
-            <View style={{flex: 1, marginLeft: 900}}>
-            <TouchableOpacity style={{marginTop: 50, marginBottom: 10, backgroundColor: '#dc6c82', height: 30, width: 100, borderRadius: 5, flexDirection: 'row', alignItems: 'center'}}
-                onPress={() =>
-                    signOut()
-                }>
-                    <Text style={{color: 'white', size: 5, marginRight: -10, marginLeft: 12, fontWeight: 500}}>Sign out</Text>
-                    <IconButton
-                        icon="exit-to-app"
-                        iconColor="white"
-                        size={14}
-                    />
-            </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#71a1f3', marginTop: 15}}
-                onPress={() =>
-                    navigation.navigate('Reports')
-                }>
-                <Text style={{...styles.providerDashboardText, fontSize: 12, marginBottom: -15}}>Reports</Text>
-                <IconButton
-                    icon="file-chart"
-                    iconColor="white"
-                    size={37}
-                />
-            </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#937fd0'}}
-               onPress={() =>
-                  navigation.navigate('PracticeSurvey')
-               }>
-               <Text style={{...styles.providerDashboardText, fontSize: 12}}>View/Edit</Text>
-               <Text style={{...styles.providerDashboardText, fontSize: 12, marginTop: 10, marginBottom: -15}}>Practice Info</Text>
-               <IconButton
-                  icon="pencil"
-                  iconColor="white"
-                  size={37}
-               />
-            </TouchableOpacity>
-            <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#7fd0ae'}}
-               onPress={() =>
-                  navigation.navigate('AllAlerts')
-               }>
-                  <Text style={styles.providerDashboardText}>Alerts</Text>
-                  <IconButton
-                     icon="bell-ring"
-                     iconColor="white"
-                     size={37}
-                  />
-               </TouchableOpacity>
-               <TouchableOpacity style={{...styles.providerDashboardItem, backgroundColor: '#6e85f4'}}
-            onPress={() =>
-              navigation.navigate('Portal')
-             }>
-               <Text style={styles.providerDashboardText}>Home</Text>
-              <IconButton
-                icon="home"
-                iconColor="white"
-                size={37}
-              />
-            </TouchableOpacity>
         </View>
+        <View style={{width: 900}}></View>
+        <ProviderMenu navigation={navigation} style={{ alignSelf: 'flex-end', marginRight: 20 }} />
         </View>
     );
 }

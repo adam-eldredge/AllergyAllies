@@ -26,15 +26,15 @@ const dataSchema = new mongoose.Schema({
         type: String
     },
     DoB: {
-        required: false,
+        required: true,
         type: String
     },
     height: {
-        required: false,
+        required: true,
         type: String
     },
     weight: {
-        required: false,
+        required: true,
         type: String
     },
     treatments: {
@@ -52,6 +52,10 @@ const dataSchema = new mongoose.Schema({
             nameOfBottle: String,
             maintenanceNumber: Number,
         }],
+    },
+    practiceID: {
+        require: true,
+        type: String,
     },
     // DEFAULT, INACTIVE, MAINTENANCE, ATTRITION
     status: {

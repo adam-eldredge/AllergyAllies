@@ -12,12 +12,26 @@ const addPatient = async (req, res) => {
         const data = new patient({
             firstName, lastName, email, phone, password, DoB, height, weight, practiceID
         });
-        data.status = "DEFAULT";
+        data.status = "ACTIVE";
         data.tokens = 0;
-        data.providerID = 0;
         data.statusDate = new Date();
         data.lastApptDateBeforeAttrition = new Date();
         data.missedAppointmentCount = 0;
+
+        const protocol = await protocols.findOne({ practiceID: practiceID });
+
+        if (protocol) {
+            const bottles = protocol.bottles;
+            var b = []
+            bottles.map((bottle) => {
+                b.push({
+                    bottleName: bottle.bottleName,
+                    maintenanceNumber: 0
+                })
+            })
+
+            data.maintenanceBottleNumber = b
+        }
 
         const dataToSave = await data.save();
         return res.status(200).json(dataToSave);
@@ -228,7 +242,7 @@ const resetTokens = async (req, res) => {
 const findPercentMaintenance = async (req, res) => {
     try{
 
-        const { patientID } = req.body;
+        const patientID = req.params.patientID
         const foundPatient = await patient.findById(patientID);
         if (!foundPatient) {
             return res.status(404).json({ message: `Patient not found ${patientID}`});
@@ -242,14 +256,6 @@ const findPercentMaintenance = async (req, res) => {
 
         //Find the last treatment of the patient 
         const treatmentLength = foundPatient.treatments.length;
-
-        if(treatmentLength < 3){
-            for( let i = 0; i < lastTreatment.bottles.length; i ++){
-                array.push(0);
-            }
-            return res.status(201).json({array, message: 'Array of 0\'s sent. Not enough treatment data.'});
-            //return res.status(404).json({ message: `Not enough patient data`});
-        }
 
         let patientNextTreatmentID = null;
         let patientLastTreatmentID = null;
@@ -274,6 +280,14 @@ const findPercentMaintenance = async (req, res) => {
         const lastTreatment = await treatment.findById(patientLastTreatmentID);
         const secondToLastTreatment = await treatment.findById(patientSecondToLastTreatmentID);
         let array = [];
+
+        if(treatmentLength < 3){
+            for( let i = 0; i < lastTreatment.bottles.length; i ++){
+                array.push(0);
+            }
+            return res.status(201).json({array, message: 'Array of 0\'s sent. Not enough treatment data.'});
+            //return res.status(404).json({ message: `Not enough patient data`});
+        }
 
         if(nextTreatment.attended == false && lastTreatment.attended == true && secondToLastTreatment.attended == true){
             for(let i = 0; i < lastTreatment.bottles.length; i++){
@@ -338,7 +352,7 @@ const findPercentMaintenance = async (req, res) => {
     }
     catch(error){
         console.log(error);
-        return res.status(404).json({ message: `Error`});
+        return res.status(400).json({ message: `Error`});
     }
 }
 

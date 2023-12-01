@@ -42,6 +42,19 @@ exports.getDaysSinceLastTreatment = async (req, res) => {
     return dateDifference;
 }
 
+exports.getLastTreatment = async (req, res) => {
+    try {
+        
+        const patientID = req.params.id
+        const latest = await treatment.find({patientID: patientID}).sort({_id: -1}).limit(1)
+
+        return res.status(200).json(latest)
+    }
+    catch (err) {
+        return res.status(400).json({message: err})
+    }
+}
+
 // Post method
 exports.addTreatment = async (req, res) => {
     try {
@@ -158,11 +171,10 @@ exports.getAllTreatments = async (req, res) => {
     }
 }
 
-
 // Get ALL treatments across patients
 exports.getAllTreatmentsByID = async (req, res) => {
     try {
-        const patientID = req.params.patientID;
+        const patientID = req.params.patientID
         const data = await treatment.find({patientID: patientID});
         res.json(data)
     }
@@ -170,6 +182,7 @@ exports.getAllTreatmentsByID = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+
 
 // Get treatment by patientID and treatment date
 
@@ -302,10 +315,10 @@ exports.updateSuccessfulTreatment = async (req, res) => {
         let treatmentIndex = 0;
         
         for( let i = 0; i < arrayOfBottles.length; i++){
-            treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle == arrayOfBottles[i].bottleName);
+            treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle == arrayOfBottles[i].nameOfBottle);
             treatmentToUpdate.bottles[treatmentIndex].injVol = arrayOfBottles[i].injVol;
             // treatmentToUpdate.bottles[treatmentIndex].injLLR = arrayOfBottles[i].injLLR;
-            // treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
+            treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
             treatmentToUpdate.bottles[treatmentIndex].currBottleNumber = arrayOfBottles[i].currBottleNumber;
             treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement = treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement + 1;
 
