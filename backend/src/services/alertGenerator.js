@@ -1,6 +1,7 @@
 const providerAlerts = require('../Models/alert');
 const Patient = require('../Models/patient');
 const { checkExpiration, needsRetestSnoozeCheck} = require('../helpers/alerts_helper');
+const { addTokensHelper } = require('../controllers/patient_controller');
 
 /* This file generates alerts for the provider and updates patient status*/
 
@@ -235,6 +236,7 @@ async function maintenanceAlertLogic(bundleArray) {
                 if (patientInDB) {
                     patientInDB.status = 'MAINTENANCE';
                     patientInDB.statusDate = new Date();
+                    addTokensHelper(patientInDB.id, "AtMaintenance");
                     await patientInDB.save();
                 }
 
