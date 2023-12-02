@@ -60,22 +60,25 @@ export default function PatientProgress({navigation}){
     const findPatient = async () => {
       if (email){
         //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-        const patientObj = await axios.get(`http://172.20.10.3:5000/api/findPatient/${email}`)
+        const patientObj = await axios.get(`http:///192.168.0.160:5000/api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
     }
-    if (!patient) { findPatient(); }
+    if (!patient) { findPatient(); console.log("can't find patient")}
 
     const findTreatments = async () => {
       //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-      const treatmentsObj = await axios.get(`http://172.20.10.3:5000/api/getAllTreatmentsByID/${patient._id}`)
+      const treatmentsObj = await axios.get(`http:///192.168.0.160:5000/api/getAllTreatmentsByID/${patient._id}`)
       //sort treatments by date
       const sortedTreatments = treatmentsObj.data.slice().sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
         return dateB - dateA;
       });
-      setTreatments(sortedTreatments)
+      
+      // only return appointments attended / not future appointment deadline
+      const attendedTreatments = sortedTreatments.filter(treatment => treatment.attended === true);
+      setTreatments(attendedTreatments)
     }
     if (!treatments && patient) { findTreatments(); }
 

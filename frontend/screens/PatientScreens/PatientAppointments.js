@@ -1,28 +1,120 @@
 
 
-import React, { Component } from 'react'
+import React, { Component, useState, useEffect } from 'react'
 import { View, Text, TouchableOpacity, Image, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
 import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import User from '../../User';
+import axios from 'axios';
 
 const Tab = createBottomTabNavigator();
 
 export default function PatientAppointments({navigation}){
 
     const userInfo = User();
+    const email = userInfo.email;
     const firstName = userInfo.firstName;
+
+
+    const [patient, setPatient] = useState();
+    const [treatments, setTreatments] = useState();
+    const [loading, setLoading] = useState(true);
+    const [activeSlide, setActiveSlide] = useState(0);
+    const [futureAppointmentDeadline, setFutureAppointmentDeadline] = useState(null);
+
+    //function that takes in a date from MongoDB and converts it into readable format
+    //includes day of week
+    function formatDateWithDay(mongoDate){
+
+        const javascriptDate = new Date(mongoDate);
+        const utcDate = new Date(javascriptDate.getTime() + javascriptDate.getTimezoneOffset() * 60 * 1000);
     
-    //get from backend: (num appointments attended late/num appointments attended on time * 100)
-    var compliance = 40;
+        return utcDate.toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            });
+    
+        }
+
+
+          //get the list of treatments associated with patient
+  useEffect(() => {
+
+    const findPatient = async () => {
+      if (email){
+        //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
+        const patientObj = await axios.get(`http:///192.168.0.160:5000/api/findPatient/${email}`)
+        setPatient(patientObj.data)
+      }
+    }
+    if (!patient) {console.log("can't find patient"); findPatient(); }
+
+    const findTreatments = async () => {
+        //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
+        const treatmentsObj = await axios.get(`http:///192.168.0.160:5000/api/getAllTreatmentsByID/${patient._id}`)
+        
+       
+
+        //sort treatments by date
+        const sortedTreatments = treatmentsObj.data.slice().sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateB - dateA;
+        });
+  
+         // only return appointments attended / not future appointment deadline
+      const attendedTreatments = sortedTreatments.filter(treatment => treatment.attended === true);
+      setTreatments(attendedTreatments)
+
+      const treatmentNotAttended = treatmentsObj.data.filter(treatment => treatment.attended === false);
+        if (treatmentNotAttended.length === 1) {
+          setFutureAppointmentDeadline(formatDateWithDay(treatmentNotAttended[0].date));
+          console.log('Date of future appointment:', futureAppointmentDeadline);
+        } else if (treatmentNotAttended.length > 1) {
+          setFutureAppointmentDeadline("More than one future appointment found")
+          throw new Error('More than one not attended appointment found.');
+        } else {
+          setFutureAppointmentDeadline("No appointment deadline found!")
+          console.log('No appointments with attended = false found.');
+        }
+      
+      
+
+      }
+
+    if (!treatments && patient) { findTreatments(); }
+
+    if (patient && treatments) { setLoading(false) }
+
+
+    
+
+  })
+
+  if (loading) {
+    return <Text>Loading...</Text>
+   }
+
     var msg = "";
-    if (compliance >= 80)
-      msg = "Great job!";
-    else if (compliance >= 60)
-      msg = "Keep it up!";
-    else
-      msg = "Talk to your doctor about ways you can improve.";
+    if (patient.missedAppointmentCount){
+        //appointments attended on time over total appointments
+        var compliance = ((treatments.length - patient.missedAppointmentCount)/treatments.length * 100).toFixed(1);
+        if (compliance >= 80)
+        msg = "Great job!";
+      else if (compliance >= 60)
+        msg = "Keep it up!";
+      else
+        msg = "Talk to your doctor about ways you can improve.";
+    }    
+    else {
+        var compliance  = "-"
+        msg = "No compliance rate available yet."   
+    }
+    
+   
 
 
       return (
@@ -46,7 +138,7 @@ export default function PatientAppointments({navigation}){
 onPress={() =>
     navigation.navigate('Upcoming')
   }>
-    <Text style={styles.appointmentText}>Monday 10/9/2023</Text>
+    <Text style={styles.appointmentText}>{futureAppointmentDeadline}</Text>
 </TouchableOpacity>
 
 <Image style={{ width: "150%", height: "20%", marginTop: 150, marginLeft: -85}} source={require('../AdPlaceholder.png')} />
