@@ -111,6 +111,9 @@ Separate the user authentication for patients and providers so that patients are
 
 Use third-party user auth such as Firebase for better security, and to implement forgot password, verify email, etc. functionality.
 
+Some known issues:
+- Practice can change treatment vials via survey - can cause display issues for patient's previous treatments
+
 ---
 
 *FEATURES IN BACKLOG* <br>
