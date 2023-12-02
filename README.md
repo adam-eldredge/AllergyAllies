@@ -42,15 +42,15 @@ To run this project on mobile using the Expo Go app, there are some things you n
 
 **1. Comment out these 3 import statements:**
 
-        import 'survey-core/defaultV2.min.css'; <br>
-        import { Model } from 'survey-core'; <br>
+        import 'survey-core/defaultV2.min.css';
+        import { Model } from 'survey-core';
         import { Survey } from 'survey-react-ui';
 
 in these files:
 
-screens/Injection/Injections.js <br>
-screens/Injection/MaintenanceBottleNum.js <br>
-screens/survey/PracticeSurvey.js
+- screens/Injection/Injections.js
+- screens/Injection/MaintenanceBottleNum.js
+- screens/survey/PracticeSurvey.js
 
 The library used to load the Practice Survey is not available on React Native mobile. Although the survey is not needed on mobile, the app cannot run with these import statements.
 
@@ -61,26 +61,29 @@ The library used to load the Practice Survey is not available on React Native mo
 **2. Change the IP address in any files that make Axios requests to the backend:**
 
 You can find the IP address under the QR code after running npx expo start. 
-For example:
-Metro waiting on exp://172.16.10.16:8081
-Here, the IP address is 172.16.10.16 (whatever is after the // and before the :)
+For example: <br>
+Metro waiting on exp://172.16.10.16:8081 <br>
+Here, the IP address is 172.16.10.16 (whatever is after the // and before the :) <br>
 
 Example request:
+
          const response = await axios.post('http://172.16.10.16:5000/auth/', authData);
+
  (don't change the port)        
 
 
-Use localhost for web:
+Use localhost for web: <br>
 Example request:
+
          const response = await axios.post('http://localhost:5000/auth/', authData);    
 
 These are the files that make Axios requests:     
-ProviderSignInScreen.js
-PatientSignInScreen.js
-PatientProgress.js
-PatientProfile.js
-ViewAllAppointments.js
-PatientAppointments.js  
+- ProviderSignInScreen.js
+- PatientSignInScreen.js
+- PatientProgress.js
+- PatientProfile.js
+- ViewAllAppointments.js
+- PatientAppointments.js  
 
 If you don't change the IP address on a certain screen, it will be stuck on "Loading..." because it cannot grab the data properly. The app will still run. On the sign in screens, if you don't change the IP address on the signin screen, it will not let you sign in.
 
@@ -112,14 +115,14 @@ Use third-party user auth such as Firebase for better security, and to implement
 
 *FEATURES IN BACKLOG* <br>
 
--Push notification reminders about upcoming appointment deadline for patients
--Patient tokens displaying on frontend of patient app
--SNOT Surveys to track patient symptoms
--Patient ability to upload pictures and send to providers
--Provider ability to download reports as a PDF or CSV
--Display provider's scrolling ads on patient home screen (uploaded by provider in practice survey)
--Fully integrate patient reporting of adverse reactions
--Make app deployable
+- Push notification reminders about upcoming appointment deadline for patients
+- Patient tokens displaying on frontend of patient app
+- SNOT Surveys to track patient symptoms
+- Patient ability to upload pictures and send to providers
+- Provider ability to download reports as a PDF or CSV
+- Display provider's scrolling ads on patient home screen (uploaded by provider in practice survey)
+- Fully integrate patient reporting of adverse reactions
+- Make app deployable
 
 
 
