@@ -1,5 +1,9 @@
 # AllergyAllies
 
+
+AllergyAlly includes a mobile application for patients undergoing subcutaneous immunotherapy for environmental allergy desensitization, as well as a practitioner web application for patient monitoring. The app has a variety of functionalities, including calculating the patient’s next dosage, tracking their appointment attendance, and alerting practitioners of patients who are at risk of attrition. This will be a highly useful tool in ensuring the effectiveness of patients’ therapy, as poor compliance with injection schedules can set treatment backwards. Additionally, it will help to reduce rates of attrition for patients. To build the frontend of the app, we used React Native with Expo. We also used a MongoDB database to maintain patient and practice accounts that include all relevant data, and an Express and Node backend to tie together all functionalities of the app.
+
+
 Frontend instructions:
 1. Install Node, React, and React Native
 2. Install Expo CLI globally by running the command npm i -g expo cli
@@ -11,6 +15,7 @@ Frontend instructions:
         npx expo install react-native-screens react-native-safe-area-context
 
 5. To run the frontend:
+
         npx expo start
 
 6. To run the app on desktop, press w. To run it on your mobile device, download the Expo Go app and scan the QR code.
@@ -21,6 +26,7 @@ Backend instructions:
 1. cd into backend from a separate terminal window
 
 2. run:
+
         npm start
 
 run backend (restart on changes): npm run server (may need to npm install --save-dev nodemon)
@@ -35,14 +41,14 @@ To run this project on mobile using the Expo Go app, there are some things you n
 
 1. Comment out these 3 import statements:
 
-import 'survey-core/defaultV2.min.css';
-import { Model } from 'survey-core';
+import 'survey-core/defaultV2.min.css'; <br>
+import { Model } from 'survey-core'; <br>
 import { Survey } from 'survey-react-ui';
 
 in these files:
 
-screens/Injection/Injections.js
-screens/Injection/MaintenanceBottleNum.js
+screens/Injection/Injections.js <br>
+screens/Injection/MaintenanceBottleNum.js <br>
 screens/survey/PracticeSurvey.js
 
 The library used to load the Practice Survey is not available on React Native mobile. Although the survey is not needed on mobile, the app cannot run with these import statements.
