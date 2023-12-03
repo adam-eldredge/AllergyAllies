@@ -64,10 +64,14 @@ export default function PatientDetails({ route, navigation }) {
     3 - Get the patient's most recent treatment
     */
     const getLastTreatment = async () => {
-      const treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`)
+      let treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`)  
+      //console.log(treatment.data)
+      if(treatment.data[0].attended == false /*&& !checkIfCalcTreatment*/){
+        //checkIfCalcTreatment = true;
+        treatment = await axios.get(`http://localhost:5000/api/getSecondLastTreatment/${patient._id}`)
+      }
 
-      console.log(treatment)
-
+      //console.log(treatment.data)
       let practiceBottles = protocol.bottles
       let lT = { bottles: [] }
       // If we get a treatment
@@ -114,8 +118,8 @@ export default function PatientDetails({ route, navigation }) {
         const percentMaintenance = await axios.get(`http://localhost:5000/api/findPercentMaintenance/${patient._id}`, {
           validateStatus: () => true,
         })
-        if (percentMaintenance.data.status === 200) {
-          setPercent(percentMaintenance.data)
+        if (percentMaintenance.status === 200) {
+          setPercent(percentMaintenance.data.array)
         }
         else {
           let length = protocol.bottles.length;
@@ -161,7 +165,7 @@ export default function PatientDetails({ route, navigation }) {
     if (practice && protocol && startDate && lastTreatment && percent) { setLoading(false); }
   })
   if (loading) return ('Loading...');
-  console.log(maintenanceNums)
+  //console.log(maintenanceNums)
 
   // Create a section for each vial
   const Vials = () => (
@@ -180,7 +184,7 @@ export default function PatientDetails({ route, navigation }) {
           {/* PROGRESS */}
           <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
             <Text style={styles.prompt3}>Progress: </Text>
-            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{percent[index]}</Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{percent[index]*100 + "\%"}</Text>
           </View>
 
           {/* LAST INJECTION */}

@@ -13,11 +13,12 @@ export default function PatientSignUpScreen() {
   const [email, setEmail] = useState('');
   const [officeHours, setOfficeHours] = useState('');
   const [allergyShotHours, setAllergyShotHours] = useState('');
+  const [practiceCode, setPracticeCode] = useState('');
 
   const handleEnrollment = async () => {
 
     setDisplay('')
-    if (practiceName && providerNames && phoneNumber && address && email && officeHours && allergyShotHours) {
+    if (practiceName && providerNames && phoneNumber && address && email && officeHours && allergyShotHours && practiceCode) {
         try {
           const data = {
             practiceName,
@@ -26,7 +27,8 @@ export default function PatientSignUpScreen() {
             address,
             email,
             officeHours,
-            allergyShotHours
+            allergyShotHours,
+            practiceCode
           }
 
           const practiceExists = await axios.get(`http://localhost:5000/api/practiceByName/${practiceName}`);
@@ -120,6 +122,14 @@ export default function PatientSignUpScreen() {
         value={allergyShotHours}
         autoCapitalize="none"
         onChangeText={setAllergyShotHours} />
+
+    <TextInput style={styles.input}
+        underlineColorAndroid="transparent"
+        placeholder="Practice Code used for Patient Enrollment"
+        placeholderTextColor="#7a7a7a"
+        value={practiceCode}
+        autoCapitalize="none"
+        onChangeText={setPracticeCode} />
 
       <Text style={styles.message}>{display}</Text>
       <TouchableOpacity

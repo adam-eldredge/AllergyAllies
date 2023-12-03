@@ -12,6 +12,9 @@ import { Survey } from 'survey-react-ui';
 import theme from './theme.js';
 import { updateSuccessfulTreatment } from '../../../backend/src/controllers/treatment_controller.js';
 
+let calcOnce = true;
+let temp = null;
+
 export default function Injections({route, navigation}){
 
    // Current user
@@ -20,7 +23,8 @@ export default function Injections({route, navigation}){
    // Protocol information
    const [protocol, setProtocol] = useState();
    const [queriedProtocol, setQueriedProtocol] = useState(false);
-   const [nextTreatment, setNextTreatment] = useState();
+   let [nextTreatment, setNextTreatment] = useState();
+   let [lastTreatment, setLastTreatment] = useState();
 
    // Today's date
    const date = new Date();
@@ -29,9 +33,11 @@ export default function Injections({route, navigation}){
    const {patient} = route.params
 
    // Calculated value - NEEDS TO BE UPDATED WITH JIMMY'S CALCULATIONS
-   const [calculatedVolume, setCalculatedVolume] = useState('0');
-   const [calculatedDilution, setCalculatedDilution] = useState('0');
-   const [calculatedBottleNum, setCalculatedBottleNum] = useState('0');
+   let [arrayOfBottles, setArrayOfBottles] = useState(Array(99).fill({
+      injVol: 0,
+      injDilution: 0,
+      currBottleNumber: "1",
+   }));
 
    useEffect(() => {
       const findProtocol = async() => {
@@ -52,26 +58,48 @@ export default function Injections({route, navigation}){
       }
       if (!queriedProtocol) {findProtocol();}
 
-      // const findTreatment = async() => {
-      //    try {
-      //       const data = {
-      //          patientID: patient._id,
-      //          practiceID: userInfo.practiceID
-      //       }
-      //       console.log(data)
-      //       const treatment = await axios.post(`http://localhost:5000/api/nextTreatment`, data)
-      
-      //       if (treatment.status == 200) {
-      //          console.log(treatment)
-      //       }
-      //    }
-      //    catch (err) {
-      //       return ('Something went wrong');
-      //    }
-      // }
-      // if (!nextTreatment) {findTreatment();}
-   })
-   if (!protocol) return ('Loading protocol and injection data...');
+      const findTreatment = async() => {
+         try {
+            const data = {
+               patientID: patient._id,
+               practiceID: userInfo.practiceID
+            }
+
+            setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`))
+            if(lastTreatment.data[0].attended && calcOnce){
+                  calcOnce = false;
+                  await axios.post(`http://localhost:5000/api/nextTreatment`, data)
+                  setNextTreatment(lastTreatment.data[0])
+                  /*
+                     Read the new numbers and print them
+                  */
+                  setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`));
+                  setArrayOfBottles(lastTreatment.data[0].bottles);
+                  //setNextTreatment(lastTreatment.data[0].bottles);
+            }
+            else{
+                  /*
+                     Read the last calculated numbers and print them
+                  */
+                  setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`));
+                  setArrayOfBottles(lastTreatment.data[0].bottles);
+                  setNextTreatment(lastTreatment.data[0]);
+            }
+            //setNextTreatment(lastTreatment.data[0].bottles);
+         }
+         catch (err) {
+            return ('Something went wrong');
+         }
+      }
+      if (!nextTreatment) {findTreatment();}
+      /*
+         Displays correct values on update, but numbers will glitch around
+      */
+      if(lastTreatment != undefined){
+         setArrayOfBottles(lastTreatment.data[0].bottles);
+      }
+   }, [lastTreatment])
+   if (!protocol || !nextTreatment) return ('Loading protocol and injection data...');
    
 
    // Input Fields
@@ -95,7 +123,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedVolume,
+                           defaultValue: arrayOfBottles[index].injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -104,7 +132,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedBottleNum,
+                           defaultValue: arrayOfBottles[index].currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -114,7 +142,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedDilution,
+                           defaultValue: arrayOfBottles[index].injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -157,7 +185,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedVolume,
+                           defaultValue: arrayOfBottles[index].injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -166,7 +194,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedBottleNum,
+                           defaultValue: arrayOfBottles[index].currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -176,7 +204,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: calculatedDilution,
+                           defaultValue: arrayOfBottles[index].injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -225,7 +253,7 @@ export default function Injections({route, navigation}){
    injectionForm.onComplete.add((sender, options) => {
       createInjectionObject(sender.data, protocol.bottles, patient);
   });
-
+  console.log("How many")
    return <Survey model={injectionForm} />;
 }
 
@@ -246,12 +274,18 @@ const createInjectionObject = async (data, bottles, patient) => {
 
    const obj = {
       patientID: patient._id,
-      date: new Date().setHours(0,0,0,0),
+      /*
+         Reason why this doesn't work during testing, we are updating it with the same date
+         This date needs to be updated during testing like this:
+         date: new Date(2023-12-17).setHours(0,0,0,0),
+      */
+      date: new Date('2024-01-05').setHours(0,0,0,0),
       arrayOfBottles: Injections
    }
    
    // Send the treatment obj to the database
+   console.log("Treatment added, check the date!")
    const sendSuccessfulTreatment = await axios.patch(`http://localhost:5000/api/updateSuccessfulTreatment`, obj);
-   
+
 }
 

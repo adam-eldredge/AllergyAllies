@@ -55,6 +55,18 @@ exports.getLastTreatment = async (req, res) => {
     }
 }
 
+exports.getSecondLastTreatment = async (req, res) => {
+    try {
+        
+        const patientID = req.params.id
+        const latest = await treatment.find({patientID: patientID}).sort({_id: -1}).limit(2)
+        return res.status(200).json([latest.at(1)])
+    }
+    catch (err) {
+        return res.status(400).json({message: err})
+    }
+}
+
 // Post method
 exports.addTreatment = async (req, res) => {
     try {
