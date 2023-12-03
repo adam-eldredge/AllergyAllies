@@ -221,7 +221,7 @@ const resetTokens = async (req, res) => {
 }
 
 
-//This has to be called AFTER nextTreatment has been called ONCE
+
 /*
     This method returns an array of numbers corresponding to the vials from the protocol and in patient bottles
 */
@@ -258,11 +258,15 @@ const findPercentMaintenance = async (req, res) => {
         } catch (error) {
             return res.status(201).json({ message: 'Treatments not added correctly.'});
         }
+    
         
-
         const nextTreatment = await treatment.findById(patientNextTreatmentID);
-        const lastTreatment = await treatment.findById(patientLastTreatmentID);
-        const secondToLastTreatment = await treatment.findById(patientSecondToLastTreatmentID);
+        let lastTreatment = await treatment.findById(patientLastTreatmentID);
+        let secondToLastTreatment = await treatment.findById(patientSecondToLastTreatmentID);
+        if(nextTreatment.attended == true){
+            secondToLastTreatment = lastTreatment;
+            lastTreatment = nextTreatment;
+        }
         let array = [];
 
         if(treatmentLength < 3){
@@ -273,7 +277,7 @@ const findPercentMaintenance = async (req, res) => {
             //return res.status(404).json({ message: `Not enough patient data`});
         }
 
-        if(nextTreatment.attended == false && lastTreatment.attended == true && secondToLastTreatment.attended == true){
+        if(lastTreatment.attended == true && secondToLastTreatment.attended == true){
             for(let i = 0; i < lastTreatment.bottles.length; i++){
 
                 let lastInjVol = lastTreatment.bottles[i].injVol;

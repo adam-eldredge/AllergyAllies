@@ -13,6 +13,7 @@ import theme from './theme.js';
 import { updateSuccessfulTreatment } from '../../../backend/src/controllers/treatment_controller.js';
 
 let calcOnce = true;
+let temp = null;
 
 export default function Injections({route, navigation}){
 
@@ -22,7 +23,8 @@ export default function Injections({route, navigation}){
    // Protocol information
    const [protocol, setProtocol] = useState();
    const [queriedProtocol, setQueriedProtocol] = useState(false);
-   const [nextTreatment, setNextTreatment] = useState();
+   let [nextTreatment, setNextTreatment] = useState();
+   let [lastTreatment, setLastTreatment] = useState();
 
    // Today's date
    const date = new Date();
@@ -31,7 +33,7 @@ export default function Injections({route, navigation}){
    const {patient} = route.params
 
    // Calculated value - NEEDS TO BE UPDATED WITH JIMMY'S CALCULATIONS
-   const [arrayOfBottles, setArrayOfBottles] = useState(Array(99).fill({
+   let [arrayOfBottles, setArrayOfBottles] = useState(Array(99).fill({
       injVol: 0,
       injDilution: 0,
       currBottleNumber: "1",
@@ -63,28 +65,40 @@ export default function Injections({route, navigation}){
                practiceID: userInfo.practiceID
             }
 
-            let lastTreatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`);
-            if(lastTreatment.data[0].attended){
-               next = await axios.post(`http://localhost:5000/api/nextTreatment`, data);
-               /*
-                  Read the new numbers and print them
-               */
-               lastTreatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`);
-               console.log(lastTreatment)
-               setNextTreatment(lastTreatment.data[0].bottles);
-               console.log(nextTreatment)
+            setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`))
+            if(lastTreatment.data[0].attended && calcOnce){
+                  calcOnce = false;
+                  await axios.post(`http://localhost:5000/api/nextTreatment`, data)
+                  setNextTreatment(lastTreatment.data[0])
+                  /*
+                     Read the new numbers and print them
+                  */
+                  setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`));
+                  setArrayOfBottles(lastTreatment.data[0].bottles);
+                  //setNextTreatment(lastTreatment.data[0].bottles);
             }
             else{
-               setNextTreatment(lastTreatment.data[0].bottles);
-               console.log(nextTreatment)
+                  /*
+                     Read the last calculated numbers and print them
+                  */
+                  setLastTreatment(await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`));
+                  setArrayOfBottles(lastTreatment.data[0].bottles);
+                  setNextTreatment(lastTreatment.data[0]);
             }
+            //setNextTreatment(lastTreatment.data[0].bottles);
          }
          catch (err) {
             return ('Something went wrong');
          }
       }
       if (!nextTreatment) {findTreatment();}
-   })
+      /*
+         Displays correct values on update, but numbers will glitch around
+      */
+      if(lastTreatment != undefined){
+         setArrayOfBottles(lastTreatment.data[0].bottles);
+      }
+   }, [lastTreatment])
    if (!protocol || !nextTreatment) return ('Loading protocol and injection data...');
    
 
@@ -109,7 +123,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: nextTreatment[index].injVol,
+                           defaultValue: arrayOfBottles[index].injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -118,7 +132,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: nextTreatment[index].currBottleNumber,
+                           defaultValue: arrayOfBottles[index].currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -128,7 +142,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: nextTreatment[index].injDilution,
+                           defaultValue: arrayOfBottles[index].injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -171,7 +185,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Volume:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: nextTreatment[index].injVol,
+                           defaultValue: arrayOfBottles[index].injVol,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
                         },
@@ -180,7 +194,7 @@ export default function Injections({route, navigation}){
                            title: 'Bottle Number:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: nextTreatment[index].currBottleNumber,
+                           defaultValue: arrayOfBottles[index].currBottleNumber,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -190,7 +204,7 @@ export default function Injections({route, navigation}){
                            title: 'Injection Dilution:',
                            type: 'text',
                            inputType: 'numeric',
-                           defaultValue: nextTreatment[index].injDilution,
+                           defaultValue: arrayOfBottles[index].injDilution,
                            startWithNewLine: false,
                            enableIf: `{b${index}} == "Edit"`,
                            isRequired: true
@@ -239,7 +253,7 @@ export default function Injections({route, navigation}){
    injectionForm.onComplete.add((sender, options) => {
       createInjectionObject(sender.data, protocol.bottles, patient);
   });
-
+  console.log("How many")
    return <Survey model={injectionForm} />;
 }
 
@@ -260,11 +274,17 @@ const createInjectionObject = async (data, bottles, patient) => {
 
    const obj = {
       patientID: patient._id,
-      date: new Date().setHours(0,0,0,0),
+      /*
+         Reason why this doesn't work during testing, we are updating it with the same date
+         This date needs to be updated during testing like this:
+         date: new Date(2023-12-17).setHours(0,0,0,0),
+      */
+      date: new Date('2024-01-05').setHours(0,0,0,0),
       arrayOfBottles: Injections
    }
    
    // Send the treatment obj to the database
+   console.log("Treatment added, check the date!")
    const sendSuccessfulTreatment = await axios.patch(`http://localhost:5000/api/updateSuccessfulTreatment`, obj);
 
 }

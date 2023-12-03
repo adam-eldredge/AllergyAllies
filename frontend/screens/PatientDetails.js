@@ -65,17 +65,13 @@ export default function PatientDetails({ route, navigation }) {
     */
     const getLastTreatment = async () => {
       let treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`)  
-      console.log(treatment.data)
-      /*
-        TODO if the last treatment is a calculated one, grab the one before it
-        It isn't updating on the page for some reason.
-      */
+      //console.log(treatment.data)
       if(treatment.data[0].attended == false /*&& !checkIfCalcTreatment*/){
         //checkIfCalcTreatment = true;
         treatment = await axios.get(`http://localhost:5000/api/getSecondLastTreatment/${patient._id}`)
       }
 
-      console.log(treatment.data)
+      //console.log(treatment.data)
       let practiceBottles = protocol.bottles
       let lT = { bottles: [] }
       // If we get a treatment
@@ -122,8 +118,8 @@ export default function PatientDetails({ route, navigation }) {
         const percentMaintenance = await axios.get(`http://localhost:5000/api/findPercentMaintenance/${patient._id}`, {
           validateStatus: () => true,
         })
-        if (percentMaintenance.data.status === 200) {
-          setPercent(percentMaintenance.data)
+        if (percentMaintenance.status === 200) {
+          setPercent(percentMaintenance.data.array)
         }
         else {
           let length = protocol.bottles.length;
@@ -188,7 +184,7 @@ export default function PatientDetails({ route, navigation }) {
           {/* PROGRESS */}
           <View style={{ flex: 1, flexDirection: 'row', paddingTop: 7 }}>
             <Text style={styles.prompt3}>Progress: </Text>
-            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{percent[index]}</Text>
+            <Text style={{ ...styles.data2, alignSelf: 'center', }}>{percent[index]*100 + "\%"}</Text>
           </View>
 
           {/* LAST INJECTION */}
