@@ -1,16 +1,16 @@
 const {app, server} = require('../index');
 const schedule = require('node-schedule');
 const mongoose = require('mongoose');
-const ProviderAlerts = require('../Models/alert');
-const Treatment = require('../Models/treatment');
 const { mockPatient, mockProtocol, mockTreatment} = require('./mockData/mockData');
 const {
     attritionAlertLogic, 
     needsRetestAlertLogic,
     maintenanceAlertLogic,
+    needsRetestAlertLogic,
     missedAppointmentJob,
     needsRetestJob,
     maintenanceJob,
+    needsRefillJob,
 } = require('../services/alertGenerator');
 
 /* Fails if alerts already exist */
@@ -97,4 +97,5 @@ afterAll(async () => {
     schedule.cancelJob(needsRetestJob);
     schedule.cancelJob(missedAppointmentJob);
     schedule.cancelJob(maintenanceJob);
+    schedule.cancelJob(needsRefillJob);
 });

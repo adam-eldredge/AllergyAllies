@@ -175,28 +175,42 @@ const eventsConfig = [
 const addTokens = async (req, res) => {
     try {
         const id = req.params.id;
-        const foundPatient = await patient.findById(id);
-        if (!foundPatient) {
-            return res.status(404).json({ message: `Patient not found ${id}`});
-        }
 
         // Identify which event was received.
-        const event = req.body;
+        const eventName = req.body.eventName;
 
         // search through array to determine which tokens to add. 
-        const eventDef = eventsConfig.find( (e) => e.name === event.name);
+        const result = await addTokensHelper(id, eventName)
 
         // add tokens and save in db
-        if (eventDef) {
-            const tokensToAdd = eventDef.tokens;
-            foundPatient.tokens += tokensToAdd;
-            await foundPatient.save();
-            return res.status(200).json({ message: `Patient now has: ${foundPatient.tokens} tokens`});
+        if (result.success) {
+            return res.status(200).json({ message: `Patient tokens added`});
         } else {
-            return res.status(400).json({ message: `Event not found: ${event.name}`});
+            return res.status(400).json({ message: result.message});
         }
+
     } catch (error) {
         return res.status(500).json({ message: error.message });
+    }
+}
+
+const addTokensHelper = async (patientID, eventName) => {
+    try {
+        const foundPatient = await patient.findById(patientID);
+        if (!foundPatient) {
+            return {success: false, message: "Patient not found"};
+        }
+        const eventDef = eventsConfig.find((e) => e.eventName === eventName);
+
+        if (eventDef) {
+            foundPatient.tokens += eventDef.tokens;
+            await foundPatient.save();
+            return {success: true, tokens: foundPatient.tokens}
+        } else {
+            return {success: false, message: "Event not found"};
+        }
+    } catch (err) {
+        return { success: false, message: err.message};
     }
 }
 
@@ -438,5 +452,6 @@ module.exports = {
     getAllergyMedication,
     updateMaintenanceBottleNums,
     updateLLR,
-    findPatient
+    findPatient,
+    addTokensHelper
 }

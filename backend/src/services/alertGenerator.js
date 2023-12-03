@@ -1,26 +1,13 @@
-const schedule = require('node-schedule');
-const Treatment = require('../Models/treatment');
-const Protocol = require('../Models/protocols');
 const providerAlerts = require('../Models/alert');
-
-//const alertService = require('./alertService');
-const Provider = require('../Models/provider');
 const Patient = require('../Models/patient');
-
-const { getAllPatientsHelper } = require('../controllers/patient_controller');
+const { checkExpiration, needsRetestSnoozeCheck} = require('../helpers/alerts_helper');
+const { addTokensHelper } = require('../controllers/patient_controller');
 
 /* This file generates alerts for the provider and updates patient status*/
 
 /* TODO:
     reaction alert creation
-    injection needs mixed alert
-    injection expiration alert
     perform vial test alert
-
-    Any time the last Injection Volume reaches the Max IV set by the Practice, 
-    there should be an alert to perform a Vial Test before the next injection 
-    record can be entered UNLESS the Bottle number is “M” (e.g., the patient is 
-    at his/her maintenance dose).  
 */
 async function checkIfRecentAlertExists(patient, alertType) {
     const oldAlert = await providerAlerts.findOne({
@@ -63,60 +50,16 @@ async function createAlert(patient, alertType) {
     return alert;
 }
 
-// creates array of patients, relevant protocol, and treatment
-async function getPatientsProtocolsTreatments(alertType) {
-    const patientsList = await Patient.find();
-    if (!patientsList) {return;}
-
-    const bundleArray = []
-    for (const patient of patientsList) {
-        if (!patient.practiceID) { continue; }
-
-        let attended = true;
-        if (alertType === "attrition") {
-            attended = false;
-        }
-
-        const treatment = await Treatment.findOne({
-            patientID: patient._id,
-            attended: attended
-        });
-
-        if (!treatment) {continue;}
-
-        const protocol = await Protocol.findOne({
-            practiceID: patient.practiceID
-        });
-
-        if (!protocol) {continue;}
-
-        const patientPracticeTreatmentBundle = {
-            patient: patient,
-            protocol: protocol,
-            treatment: treatment
-        }
-
-        bundleArray.push(patientPracticeTreatmentBundle);
-    }
-
-    return bundleArray;
-}
-
-async function attritionAlert() {
-    const alertType = "attrition";
-    const bundleArray = await getPatientsProtocolsTreatments(alertType);
-    await attritionAlertLogic(bundleArray);
-}
-
 // determine if injection(appointment) was missed
 async function attritionAlertLogic(bundleArray) {
     console.log("Attrition Job running");
-    try {
-        // this array is just used in testing
-        const alertsArray = [];
-        if (bundleArray.length === 0) { return alertsArray; }
-        for (const bundle of bundleArray) {
 
+    // this array used for testing
+    const alertsArray = [];
+    if (bundleArray.length === 0) { return alertsArray; }
+
+    try {
+        for (const bundle of bundleArray) {
             const injectionInterval = bundle.protocol.nextDoseAdjustment.injectionInterval;
             const lastInjectionDate = bundle.treatment.date;
             const currentDate = new Date();
@@ -144,33 +87,6 @@ async function attritionAlertLogic(bundleArray) {
     } catch (error) {
         console.error('Error with checking missed appt: ', error);
     }
-}
-
-async function needsRetestSnoozeCheck(patientTemp) {
-
-    const patient = await Patient.findById(patientTemp._id);
-    if (!patient || !patient.needsRetestData || !patient.needsRetestData.needsRetestSnooze) {
-        return;
-    } 
-
-    const dateOfSnooze = patient.needsRetestData.needsRetestSnooze.dateOfSnooze;
-    const snoozeDuration = patient.needsRetestData.needsRetestSnooze.snoozeDuration;
-
-    const snoozeExpirationDate = new Date(dateOfSnooze);
-    snoozeExpirationDate.setDate(snoozeExpirationDate.getDate() + snoozeDuration);
-
-    const today = new Date();
-
-    if (today > snoozeExpirationDate) {
-        patient.needsRetestData.needsRetestSnooze.active = false;
-        await patient.save();
-    }
-}
-
-async function needsRetestAlert() {
-    const alertType = "needsRetest";
-    const bundleArray = await getPatientsProtocolsTreatments(alertType);
-    await needsRetestAlertLogic(bundleArray);
 }
 
 // needs test
@@ -201,8 +117,9 @@ async function needsRetestAlertLogic(bundleArray) {
             const maxInjectVol = bundle.protocol.nextDoseAdjustment.maxInjectionVol;
             let needsRetest = true;
 
-            const treatmentStartDate = formatDate(bundle.patient.treatmentStartDate);
+            if(!bundle.patient.treatmentStartDate) { continue; }
 
+            const treatmentStartDate = formatDate(bundle.patient.treatmentStartDate);
             // calculate 18 months from treatmentStartDate
             const oneYearLater = new Date(treatmentStartDate);
             oneYearLater.setMonth(oneYearLater.getMonth() + 18);
@@ -233,46 +150,63 @@ async function needsRetestAlertLogic(bundleArray) {
     }
 }
 
-// refills not working - no bottle size for vials, no current epipen/allergy drops support in project
-async function needsRefillAlert() {
-    const patientsList = await getAllPatientsHelper(providerID);
+async function needsRefillAlertLogic(bundleArray) {
+    console.log("Needs refill job running");
+    
+    const alertsArray = [];
+    if (bundleArray.length === 0) { return alertsArray; }
 
-    const Refills = [];
+    let needsMix = false;
+    let expiresSoon = false;
 
-    for (const p of patientsList) {
-        const patientTreatment = await Treatment.find({
-            providerID: p.providerID.toString(),
-            patientID: p._id.toString(),
-        });
+    try {
+        // patient, treatment, protocol
+        for (const bundle of bundleArray) {
+            const maxInjectionVol = bundle.protocol.nextDoseAdjustment.maxInjectionVol;
 
-        const providerProtocol = await protocol.findOne({providerID: p.providerID});
+            for (const bottle of bundle.treatment.bottles) {
+                const currentInjectionVol = bottle.injVol;
+                const injectionRatio = currentInjectionVol/maxInjectionVol;
 
-        if (!providerProtocol || !patientTreatment) {
-            continue;
-        }
+                if (injectionRatio >= 0.80 && bottle.currBottleNumber !== 'M') {
+                    // patient vials need to be mixed 
+                    needsMix = true;
+                    //await updateBottleStatus(bottle, true, "NEEDS_MIX");
+                    bottle.needsRefill = true;
+                    bottle.bottleStatus = "NEEDS_MIX";
+                    continue;
+                } 
+                
+                expiresSoon = checkExpiration(bottle);
+                if (expiresSoon) { 
+                    //await updateBottleStatus(bottle, true, "EXPIRATION");
+                    bottle.needsRefill = true;
+                    bottle.bottleStatus = "EXPIRATION";
+                    continue;
+                }
 
-        for (const b of patientTreatment.bottles) {
-            const matchingBottle = providerProtocol.bottles.find(
-                (protocolBottle) => protocolBottle.bottleName === b.nameOfBottle
-            );
+                bottle.needsRefill = false;
+                bottle.bottleStatus = "DEFAULT";
+                //await updateBottleStatus(bottle, false, "DEFAULT");
+            }
 
-            const bottleSize = matchingBottle.bottleSize;
+            await bundle.treatment.save();
+            
+            /*
+            if (needsMix) {
+                createAlert(bundle.patient, "NeedsMixAlert");
+            } else if (expiresSoon) {
+                createAlert(bundle.patient, "ExpiresSoonAlert");
+            }
+            */
 
-            const currentInjVol = b.injVol;
-
-            if (b.injTotalSum + currentInjVol * 3 >= bottleSize) {
-                b.needsRefill = true;
-            } else {
-                b.needsRefill = false;
+            if(needsMix || expiresSoon) {
+                createAlert(bundle.patient, "NeedsRefillAlert");
             }
         }
+    } catch (error) {
+        console.error(error); 
     }
-}
-
-async function maintenanceAlert() {
-    const alertType = "maintenance";
-    const bundleArray = await getPatientsProtocolsTreatments(alertType);
-    await maintenanceAlertLogic(bundleArray);
 }
 
 // at maintenance alert - all vials at M and highest concentration
@@ -302,6 +236,7 @@ async function maintenanceAlertLogic(bundleArray) {
                 if (patientInDB) {
                     patientInDB.status = 'MAINTENANCE';
                     patientInDB.statusDate = new Date();
+                    addTokensHelper(patientInDB.id, "AtMaintenance");
                     await patientInDB.save();
                 }
 
@@ -324,21 +259,9 @@ async function maintenanceAlertLogic(bundleArray) {
     }
 }
 
-// This string means: run daily, at midnight
-const scheduleString = '0 0 * * *';
-const missedAppointmentJob = schedule.scheduleJob(scheduleString, attritionAlert);
-const needsRetestJob = schedule.scheduleJob(scheduleString, needsRetestAlert);
-//const needsRefillJob = schedule.scheduleJob(scheduleString, needsRefillAlert);
-const maintenanceJob = schedule.scheduleJob(scheduleString, maintenanceAlert);
-
 module.exports = {
-    attritionAlert,
-    needsRetestAlert,
-    maintenanceAlert,
     attritionAlertLogic,
     needsRetestAlertLogic,
     maintenanceAlertLogic,
-    missedAppointmentJob,
-    needsRetestJob,
-    maintenanceJob
+    needsRefillAlertLogic,
 };
