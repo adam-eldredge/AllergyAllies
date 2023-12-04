@@ -3,11 +3,13 @@ import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Di
 import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 
+//still a hard coded screen, should contain practice office hours and other appointment info
+
 export default function Upcoming({navigation}){
       return (
          <ScrollView>
             <View style = {styles.header}>
-                <Text style={styles.headerText}>Monday 10/9/2023 - Friday 10/13/2023</Text>
+                <Text style={styles.headerText}>12/11/2023</Text>
             </View>
             <View style={styles.info}>
                 <IconButton
@@ -25,28 +27,12 @@ export default function Upcoming({navigation}){
             </View>
             <View style={styles.info}>
                 <IconButton
-                     icon="doctor"
-                     iconColor="#1059d5"
-                     size={30}/>
-                <Text style={{fontSize:18, fontWeight:500}}>Dr. Mark Williams</Text>
-            </View>
-            <View style={styles.info}>
-                <IconButton
                      icon="needle"
                      iconColor="#1059d5"
                      size={30}/>
                 <Text style={{fontSize:18, fontWeight:500}}>Dosage: XX.00mg</Text>
             </View>
-            <TouchableOpacity style = {styles.infoBottom}
-            onPress={() =>
-                navigation.navigate('UpcomingInfo')
-              }>
-                <IconButton
-                     icon="message-question"
-                     iconColor="#1059d5"
-                     size={30}/>
-                <Text style={{fontSize:18, color:'#1059d5', textDecorationLine: 'underline', fontWeight:500}}>Additional Info</Text>
-            </TouchableOpacity>
+          
          </ScrollView>
       )
    }

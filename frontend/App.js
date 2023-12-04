@@ -15,7 +15,6 @@ import ProviderSignUpScreen from './screens/signup/ProviderSignUpScreen.js';
 import practiceEnrollment from './screens/signup/practiceEnrollment.js';
 import PatientHome from './screens/PatientScreens/PatientHome.js';
 import Upcoming from './screens/Upcoming.js';
-import UpcomingInfo from './screens/UpcomingInfo.js';
 import InitialScreen from './screens/InitialScreen.js';
 import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
@@ -161,8 +160,7 @@ const InitialDesktopStack = (
 const SignedInMobileStack = (
   <>
       <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'AllergyAlly'}} />
-      <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
-      <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
+      <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment', headerBackTitleVisible: false}} />
       <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
       <Stack.Screen name= "ViewAllAppointments" component={ViewAllAppointments} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
       <Stack.Screen name="InjectionInfo" component={InjectionInfo} options={{title: 'AllergyAlly', headerBackTitleVisible: false}} />
@@ -179,7 +177,6 @@ const SignedInDesktopStack = (
       <Stack.Screen name="Reports" component={Reports} />
       <Stack.Screen name="PatientHome" component={PatientHome} options={{title: 'Allergy Ally'}} />
       <Stack.Screen name="Upcoming" component={Upcoming} options={{title: 'Upcoming Appointment'}} />
-      <Stack.Screen name="UpcomingInfo" component={UpcomingInfo} options={{title: 'Additional Info'}} />
       <Stack.Screen name="PatientSignUpScreen" component={PatientSignUpScreen} options={{title: 'Patient Sign Up'}} />
       <Stack.Screen name="ProviderSignUpScreen" component={ProviderSignUpScreen} options={{title: 'Provider Sign Up'}} />
       <Stack.Screen name="PracticeEnrollmentScreen" component={practiceEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
