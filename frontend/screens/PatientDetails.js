@@ -65,8 +65,8 @@ export default function PatientDetails({ route, navigation }) {
     */
     const getLastTreatment = async () => {
       let treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`)  
-      //console.log(treatment.data)
-      if(treatment.data[0].attended == false /*&& !checkIfCalcTreatment*/){
+      //console.log(patient)
+      if(treatment.data[0].attended == false && (patient.treatments.length > 2)){
         //checkIfCalcTreatment = true;
         treatment = await axios.get(`http://localhost:5000/api/getSecondLastTreatment/${patient._id}`)
       }
