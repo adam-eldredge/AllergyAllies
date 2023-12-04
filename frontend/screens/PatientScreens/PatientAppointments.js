@@ -1,7 +1,7 @@
 
 
 import React, { Component, useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, Image, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, Image, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView, Platform } from 'react-native'
 import { useRoute } from '@react-navigation/native';
 import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -130,6 +130,12 @@ export default function PatientAppointments({navigation}){
 
   if (loading) {
     return <Text>Loading...</Text>
+   }
+  
+   //the days until deadline feature crashed the web version of the app, put this here so it doesn't crash
+   if (Platform.OS === 'web')
+   {
+    return <Text>Web version of mobile app</Text>
    }
 
     var msg = "";
