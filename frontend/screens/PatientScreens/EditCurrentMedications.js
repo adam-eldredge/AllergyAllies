@@ -1,13 +1,29 @@
 import Checkbox from 'expo-checkbox';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert, ScrollView } from 'react-native';
 
-export default function EditCurrentMedications() {
-  const [isChecked, setChecked] = useState(false);
+export default function EditCurrentMedications({navigation}) {
+  const [isCheckedSteroid, setCheckedSteroid] = useState(false);
+  const [isCheckedNasalAnti, setCheckedNasalAnti] = useState(false);
+  const [isCheckedOralAnti, setCheckedOralAnti] = useState(false);
+  const [isCheckedOther, setCheckedOther] = useState(false);
 
   
 const handleSubmit = () => {
 
+
+  Alert.alert(
+    'Thank You',
+    'Medications Updated',
+    [
+      {
+        text: 'OK'
+      },
+    ]
+  );
+
+  //need to send values back to profile screen to update it
+  navigation.goBack();
 
  
  
@@ -26,7 +42,7 @@ const handleSubmit = () => {
 
 
     <View style={styles.boxAndText}>
-    <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
+    <Checkbox style={styles.checkbox} value={isCheckedSteroid} onValueChange={setCheckedSteroid} />
     <View>
     <Text style = {{marginTop: 18}}>Nasal Steroid Sprays</Text>
     <Text style={styles.subtitle}> e.g. Flonase, Nasonex, Nasacort</Text>
@@ -34,7 +50,7 @@ const handleSubmit = () => {
     </View>
 
     <View style={styles.boxAndText}>
-    <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
+    <Checkbox style={styles.checkbox} value={isCheckedNasalAnti} onValueChange={setCheckedNasalAnti} />
     <View>
     <Text style = {{marginTop: 18}}>Nasal Antihistamine Sprays</Text>
     <Text style={styles.subtitle}> e.g. Astelin, Patanase</Text>
@@ -42,7 +58,7 @@ const handleSubmit = () => {
     </View>
 
     <View style={styles.boxAndText}>
-    <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
+    <Checkbox style={styles.checkbox} value={isCheckedOralAnti} onValueChange={setCheckedOralAnti} />
     <View>
     <Text style = {{marginTop: 18}}>Oral Antihistamines</Text>
     <Text style={styles.subtitle}> e.g. Zyrtec, Benadryl, Claritin, Allegra</Text>
@@ -50,7 +66,7 @@ const handleSubmit = () => {
     </View>
 
     <View style={styles.boxAndText}>
-    <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
+    <Checkbox style={styles.checkbox} value={isCheckedOther} onValueChange={setCheckedOther} />
     <View>
     <Text style = {{marginTop: 18}}>Other</Text>
     <Text style={styles.subtitle}> e.g. Singulair, Cromolyn</Text>

@@ -8,6 +8,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import User from '../../User';
 import axios from 'axios';
 
+//PATIENT HOME SCREEN
+
 const Tab = createBottomTabNavigator();
 
 export default function PatientAppointments({navigation}){

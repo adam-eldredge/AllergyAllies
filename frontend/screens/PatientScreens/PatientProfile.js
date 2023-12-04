@@ -11,7 +11,7 @@ import axios from 'axios';
 
 
 
-export default function PatientProfile() {
+export default function PatientProfile({navigation}) {
 
   const { signOut } = useContext(AuthContext);
   const userInfo = User();
@@ -31,22 +31,22 @@ export default function PatientProfile() {
     const findPatient = async () => {
       if (email){
         //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-        const patientObj = await axios.get(`http://192.168.12.124:5000/api/findPatient/${email}`)
+        const patientObj = await axios.get(`http://172.20.10.3:5000/api/findPatient/${email}`)
         setPatient(patientObj.data)
       }
     }
-    if (!patient) { findPatient(); }
+    if (!patient) { console.log("can't find patient"); findPatient(); }
 
     const findPractice = async () => {
       //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-      const practiceObj = await axios.get(`http://192.168.12.124:5000/api/practice/${patient.practiceID}`)
+      const practiceObj = await axios.get(`http://172.20.10.3:5000/api/practice/${patient.practiceID}`)
       setPractice(practiceObj.data)
     }
     if (!practice && patient) { findPractice(); }
 
     const findProtocol = async () => {
       //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
-      const protocolObj = await axios.get(`http://192.168.12.124:5000/api/getProtocol/${patient.practiceID}`)
+      const protocolObj = await axios.get(`http://172.20.10.3:5000/api/getProtocol/${patient.practiceID}`)
       setProtocol(protocolObj.data.protocol)
     }
     if (!protocol && patient) { findProtocol(); }
@@ -87,11 +87,20 @@ export default function PatientProfile() {
   const CurrentMedications = () => (
     <View style={styles.textBoxContainer}>
 
-      <View style={styles.textBoxDivider}>
-        <Text style={styles.textBoxTitle}>Current Allergy Medications                                                                                                               </Text>
+
+      <View style = {{flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderBottomColor: '#e3e3e3', marginHorizontal: 9, paddingRight: 12}}>
+        <Text style={styles.textBoxTitle}>Current Allergy Medications                                                                                       </Text>
+  
+        <TouchableOpacity style = {{}}
+        onPress={() => navigation.navigate('EditCurrentMedications')}>
+        <FontAwesomeIcon icon={faPenToSquare} color={'#0d3375'} size={20}/> 
+        </TouchableOpacity>
+      
       </View>
 
-      {/* HARDCODED NEEDS TO BE FIXED */}
+      
+
+      {/* HARDCODED NEEDS TO BE FIXED, grab values from EditCurrentMedications screen */}
       <Text style={styles.textBoxContent}>Nasal Steroid Spray </Text>
       <Text style={styles.textBoxContent}>Nasal Antihistamine Spray </Text>
       <Text style={styles.textBoxContent}>Oral Antihistamine </Text>
