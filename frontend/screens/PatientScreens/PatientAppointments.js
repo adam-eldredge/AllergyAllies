@@ -42,7 +42,7 @@ export default function PatientAppointments({navigation}){
         }
 
 
-          //get the list of treatments associated with patient
+          
   useEffect(() => {
 
     const findPatient = async () => {
@@ -54,11 +54,11 @@ export default function PatientAppointments({navigation}){
     }
     if (!patient) {console.log("Patient home screen can't find patient"); findPatient(); }
 
+    //get the list of treatments associated with patient
     const findTreatments = async () => {
         //replace with your IP address, find quickly from "Metro waiting on exp://<ip>:port" under QR code
         const treatmentsObj = await axios.get(`http://172.20.10.3:5000/api/getAllTreatmentsByID/${patient._id}`)
         
-       
 
         //sort treatments by date
         const sortedTreatments = treatmentsObj.data.slice().sort((a, b) => {
@@ -67,13 +67,13 @@ export default function PatientAppointments({navigation}){
           return dateB - dateA;
         });
   
-         // only return appointments attended / not future appointment deadline
-      const attendedTreatments = sortedTreatments.filter(treatment => treatment.attended === true);
-      setTreatments(attendedTreatments)
+        // only return appointments attended, not appointment deadline
+        const attendedTreatments = sortedTreatments.filter(treatment => treatment.attended === true);
+        setTreatments(attendedTreatments)
 
-      const treatmentNotAttended = treatmentsObj.data.filter(treatment => treatment.attended === false);
-        if (treatmentNotAttended.length === 1) {
-
+        //get appointment deadline
+        const treatmentNotAttended = treatmentsObj.data.filter(treatment => treatment.attended === false);
+          if (treatmentNotAttended.length === 1) {
           //set appointment deadline
           setFutureAppointmentDeadline(formatDateWithDay(treatmentNotAttended[0].date));
           console.log('Date of future appointment:', futureAppointmentDeadline);
@@ -81,28 +81,26 @@ export default function PatientAppointments({navigation}){
           //get days until appointment deadline
           const today = new Date(); // current date
           const todayUtc = new Date(today.getTime() + today.getTimezoneOffset() * 60 * 1000);
-
           const appointmentDeadline = new Date(treatmentNotAttended[0].date);
           const deadlineUtc = new Date(appointmentDeadline.getTime() + appointmentDeadline.getTimezoneOffset() * 60 * 1000);
           
-          // set both dates to the same time (midnight) to ensure accurate day calculation
+          // set both dates to the same time (midnight) to ensure accurate day calculation (might still have issue at certain times of day)
           deadlineUtc.setUTCHours(0, 0, 0, 0);
           todayUtc.setUTCHours(0, 0, 0, 0);
-          console.log(deadlineUtc)
-          console.log(todayUtc)
+          console.log('Deadline:', deadlineUtc)
+          console.log('Current date:', todayUtc)
+
           // Calculate the difference in milliseconds between today and the appointment deadline
           const timeDifference = deadlineUtc.getTime() - todayUtc.getTime();
           console.log(timeDifference)
 
           if (timeDifference < 0) {
             //deadline overdue
-            // calculate the positive difference (days passed since deadline)
             setDaysUntilDeadline(Math.ceil(-timeDifference / (1000 * 3600 * 24)));
-            console.log('Days until deadline:', daysUntilDeadline)
             setDeadlineOverdue(true); 
           }
             else {
-            //deadline in future
+            //deadline in future or today
             setDaysUntilDeadline(Math.ceil(timeDifference / (1000 * 3600 * 24)));
           }
         
@@ -138,6 +136,7 @@ export default function PatientAppointments({navigation}){
     return <Text>Web version of mobile app</Text>
    }
 
+   //get compliance rate
     var msg = "";
     if (patient.missedAppointmentCount){
         //appointments attended on time over total appointments
@@ -154,7 +153,8 @@ export default function PatientAppointments({navigation}){
         msg = "No compliance rate available yet."   
     }
 
-
+    
+    //get text for appointment deadline information
     var deadlineMsg = "";
     var deadlineMsg2 = "";
     var deadlineMsg3 = "";
@@ -172,7 +172,6 @@ export default function PatientAppointments({navigation}){
     }
 
       return (
-
         <ScrollView style = {styles.container}>
         <Text style = {styles.welcome}>Welcome, {firstName}</Text>
         <View style = {styles.card}>
@@ -192,7 +191,7 @@ export default function PatientAppointments({navigation}){
         <Text style = {styles.overdueSubtext}>{deadlineMsg3}</Text>
         </TouchableOpacity>
 
-<Image style={{ width: "150%", height: "20%", marginTop: 10, marginLeft: -85, marginBottom: 150}} source={require('../AdPlaceholder.png')} />
+        <Image style={{ width: "150%", height: "20%", marginTop: 10, marginLeft: -85, marginBottom: 150}} source={require('../AdPlaceholder.png')} />
 
     </ScrollView>
 
@@ -207,11 +206,6 @@ export default function PatientAppointments({navigation}){
     card: {
      alignItems: 'center',
      borderRadius: 8,
-     //shadowOpacity: 0.1,
-     //shadowOffset: {width: 2, height: 4},
-     //shadowColor: 'black',
-     //shadowOpacity: 0.05,
-     //shadowRadius: 8,
      backgroundColor: 'white',
      marginTop: 18,
      marginBottom: 30,
@@ -224,11 +218,6 @@ export default function PatientAppointments({navigation}){
       width: 320,
       alignSelf: 'center',
       justifyContent: 'center',
-      //shadowOpacity: 0.1,
-      //shadowOffset: {width: 2, height: 4},
-      //shadowColor: 'black',
-      //shadowOpacity: 0.05,
-      //shadowRadius: 8,
       backgroundColor: '#0d3375',
       marginTop: 2,
       marginBottom: 30,
@@ -240,7 +229,7 @@ export default function PatientAppointments({navigation}){
      alignSelf: 'center',
      color: '#0d3375'
      },
-     title1 :{
+    title1: {
      marginHorizontal: 8,
      marginVertical: 5,
      textAlign: 'center',
@@ -249,7 +238,7 @@ export default function PatientAppointments({navigation}){
      fontStyle: 'italic',
      color: '#3d3d3d'
      },
-     subtext :{
+    subtext: {
       marginHorizontal: 8,
       marginTop: 40,
       marginBottom: 5,
@@ -259,7 +248,7 @@ export default function PatientAppointments({navigation}){
       fontStyle: 'italic',
       color: 'white'
       },
-      overdueSubtext :{
+     overdueSubtext: {
         marginHorizontal: 8,
         marginVertical: 5,
         textAlign: 'center',
@@ -268,7 +257,7 @@ export default function PatientAppointments({navigation}){
         fontStyle: 'italic',
         color: '#ff7661'
         },
-     message :{
+     message: {
          marginHorizontal: 8,
          marginVertical: 5,
          textAlign: 'center',
@@ -276,123 +265,34 @@ export default function PatientAppointments({navigation}){
          fontWeight: '600',
          color: '#539CF5'
          },
-         message2 :{
-          marginHorizontal: 8,
-      marginVertical: 5,
-      textAlign: 'center',
-      fontSize: 18,
-      fontWeight: '400',
-      color: '#539CF5'
-          },
-     title2 :{
-         marginBottom: 15,
-         textAlign: 'center',
-         fontSize: 20,
-         fontWeight: '600',
-     },
-     compliance: {
-         paddingTop: 10,
-         marginBottom: -5,
-         margin: 20,
-         height: 120,
-         width: 120,
-         justifyContent: 'center',
-         textAlignVertical: 'center',
-         alignSelf: 'center',
-         borderWidth: 1,
-         borderColor: '#539CF5',
-         borderRadius: 60,
-         backgroundColor: '#539CF5'
-     },
      complianceNum: {
-         //alignSelf: 'center',
          textAlign: 'center',
          fontSize: 32,
          fontWeight: '600',
          color: '#539CF5',
          margin: 10
- 
      },
      days: {
-      //alignSelf: 'center',
-      //marginTop: 50,
       textAlign: 'center',
       fontSize: 32,
       fontWeight: '600',
       color: 'white',
       marginBottom: 10
-  },
-  overdue: {
-    //alignSelf: 'center',
-    //marginTop: 50,
+      },
+    overdue: {
     textAlign: 'center',
     fontSize: 32,
     fontWeight: '600',
     color: '#ff7661',
     marginBottom: 10
-},
-  subDays: {
-    //alignSelf: 'center',
-    //marginTop: 50,
+    },
+    subDays: {
     textAlign: 'center',
     fontSize: 20,
     fontWeight: '600',
     color: '#688ab3',
     marginBottom: 10
-
-},
-     subtitle :{
-         paddingBottom: 15,
-         textAlign: 'center',
-         fontSize: 16,
-         color: '#8b8b8b',
-         fontStyle: 'italic',
-     },
-     appointment: {
-         width: Dimensions.get('window').width - 30,
-         //marginLeft: 15,
-         marginVertical: 8,
-         height: 60,
-         borderRadius: 8,
-         backgroundColor: '#84aef8',
-         justifyContent: 'center',
-         paddingHorizontal: 20,
-         textstyle:{fontsize: 60}
-     },
-     appointmentText: {
-         fontSize: 24,
-         marginVertical: 4,
-         fontWeight: '500',
-         color: 'white',
-         textAlign: 'center'
-     },
-     pastAppointmentText: {
-         fontSize: 17,
-         marginBottom: 10,
-         fontWeight: '500',
-         marginTop: 12,
-     },
-     pastAppointment: {
-         width: Dimensions.get('window').width - 30,
-         marginLeft: 15,
-         marginBottom: 10,
-         height: 70,
-         borderRadius: 8,
-         backgroundColor: '#d1ddf2',
-         paddingLeft: 20,
-         textstyle:{fontsize: 60}
-     },
-     flags: {
-         flex: 1,
-         flexDirection: 'row',
-         flexWrap: 'wrap',
-         alignItems: 'center',
-         //marginTop: 10,
-     },
-     flagText: {
-         backgroundColor: 'red',
-         color: 'white',
-     },
+    }
  })
 
 

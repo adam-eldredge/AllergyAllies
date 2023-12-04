@@ -9,6 +9,8 @@ import PatientProgress from './PatientProgress.js';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ReportReaction from './ReportReaction.js';
 
+//TAB NAVIGATOR FOR PATIENT APP 
+
 const Tab = createBottomTabNavigator();
 
 export default function PatientHome(){
