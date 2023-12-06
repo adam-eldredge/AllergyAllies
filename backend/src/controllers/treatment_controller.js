@@ -112,17 +112,12 @@ exports.addTreatment = async (req, res) => {
         await data.save();
 
         //Add patient treatment data to end of array
-        
         patientToFind.treatments.push(data.id);
-        /*
-            TODO need to pass in maintenanceNumber somewhere
-        */
         let maintenanceNumber = 1;
 
         let tempArray = [];
 
         for(let i = 0; i < findProtocol.bottles.length; i++){
-            //console.log(tempArray);
             tempArray.push( {nameOfBottle: JSON.stringify(findProtocol.bottles[i].bottleName), maintenanceNumber} );
         }
         patientToFind.maintenanceBottleNumber = tempArray;
@@ -134,7 +129,6 @@ exports.addTreatment = async (req, res) => {
 
         let startingInjVol = JSON.stringify(findProtocol.nextDoseAdjustment.startingInjectionVol);
         let newMap = new Map();
-        //var newDate2 = new Date(newDate.setMonth(newDate.getMonth()+ findProtocol.bottles[i].shelfLife));
 
         //Adds bottles to treatment with starting inj value and 0 for all other fields
         if(treatmentLength == 1){
@@ -246,7 +240,7 @@ exports.deleteTreatment = async (req, res) => {
 
 
 /*
-    This update is for a single vial in the panel of bottles. For when there is an adverse reaction, should be done 
+    This update is for a single vial in the panel of bottles, when there is an adverse reaction, should be done 
     before next treatment is called.
 
     Some of this information can be removed and changed
@@ -310,13 +304,14 @@ exports.updateSuccessfulTreatment = async (req, res) => {
         nextAppointmentDate.setDate(nextAppointmentDate.getDate() + parseInt(JSON.stringify(findProtocol.missedDoseAdjustment.range1.days)));
         nextAppointmentDate.setHours(0,0,0,0);
 
+        patientToFind.lastApptDateBeforeAttrition = nextAppointmentDate;
+
         if(!treatmentToUpdate){
             //This looks for the next treatment
             treatmentToUpdate = await treatment.findById(patientLastTreatmentID);
             if(treatmentToUpdate){
                 if(newDate.getTime() > treatmentToUpdate.date.getTime()){
                     patientToFind.missedAppointmentCount = patientToFind.missedAppointmentCount + 1;
-                    patientToFind.lastApptDateBeforeAttrition = nextAppointmentDate;
                 }
             }
             else{
@@ -329,14 +324,11 @@ exports.updateSuccessfulTreatment = async (req, res) => {
         for( let i = 0; i < arrayOfBottles.length; i++){
             treatmentIndex = treatmentToUpdate.bottles.findIndex(x => x.nameOfBottle == arrayOfBottles[i].nameOfBottle);
             treatmentToUpdate.bottles[treatmentIndex].injVol = arrayOfBottles[i].injVol;
-            // treatmentToUpdate.bottles[treatmentIndex].injLLR = arrayOfBottles[i].injLLR;
             treatmentToUpdate.bottles[treatmentIndex].injDilution = arrayOfBottles[i].injDilution;
             treatmentToUpdate.bottles[treatmentIndex].currBottleNumber = arrayOfBottles[i].currBottleNumber;
             treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement = treatmentToUpdate.bottles[treatmentIndex].currentDoseAdvancement + 1;
 
             treatmentToUpdate.bottles[treatmentIndex].locationOfInjection = arrayOfBottles[i].locationOfInjection;
-            // treatmentToUpdate.bottles[treatmentIndex].expirationDate = arrayOfBottles[i].expirationDate;
-            // treatmentToUpdate.bottles[treatmentIndex].needsRefill = arrayOfBottles[i].needsRefill;
         }
 
         treatmentToUpdate.date = date;
@@ -425,6 +417,7 @@ exports.nextTreatment = async(req, res) => {
     
         }
 
+        //Set respective vial's values
         for(let i = 0; i < patientBottleCount; i++){
             let antigenName = lastTreatment.bottles[i].nameOfBottle;
             let antigenInjVol = lastTreatment.bottles[i].injVol;

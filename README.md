@@ -111,7 +111,10 @@ Separate the user authentication for patients and providers so that patients are
 
 Use third-party user auth such as Firebase for better security, and to implement forgot password, verify email, etc. functionality.
 
+Improve date handling throughout to a unified format
+
 Some known issues:
+- Database discrepancies cause application to behave unexpectedly and crash occasionally
 - Practice can change treatment vials via survey - can cause display issues for patient's previous treatments
 
 ---
@@ -121,11 +124,12 @@ Some known issues:
 - Push notification reminders about upcoming appointment deadline for patients
 - Patient tokens displaying on frontend of patient app
 - SNOT Surveys to track patient symptoms
-- Patient ability to upload pictures and send to providers
+- Patient ability to upload pictures and send to providers of adverse reactions
 - Provider ability to download reports as a PDF or CSV
 - Display provider's scrolling ads on patient home screen (uploaded by provider in practice survey)
 - Fully integrate patient reporting of adverse reactions
-- Make app deployable
+- Make app deployable and connected to Dr. Williams website
+
 
 
 

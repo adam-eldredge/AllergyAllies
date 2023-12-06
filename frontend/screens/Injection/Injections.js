@@ -275,11 +275,14 @@ const createInjectionObject = async (data, bottles, patient) => {
    const obj = {
       patientID: patient._id,
       /*
-         Reason why this doesn't work during testing, we are updating it with the same date
+         Reason why this doesn't work during testing, we are updating a treatment with the same date
          This date needs to be updated during testing like this:
-         date: new Date(2023-12-17).setHours(0,0,0,0),
+         date: new Date('2023-12-17').setHours(0,0,0,0), 
+         Then BEFORE clicking submit increment date by at least 1 day to allow nextTreatment to work
+
+         IN PRODUCTION: date: new Date().setHours(0,0,0,0),
       */
-      date: new Date('2024-01-05').setHours(0,0,0,0),
+      date: new Date('2024-01-09').setHours(0,0,0,0),
       arrayOfBottles: Injections
    }
    
