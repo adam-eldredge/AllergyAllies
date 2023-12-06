@@ -132,15 +132,15 @@ Some known issues:
 *PROJECT STRUCTURE* <br>
 
 - Front-End
- - Source code for pages is in 'screens'
- - User.js can be used to access the current User's information
- - Most screens are split into Patient vs. Provider screens, depending on whether or not they are designed for the patient mobile app or the provider web app
- - Injection, maintenance bottle numbers, and practice survey screens were created with SurveyJS - Don't think this is compatible with iOS/Android
+         - Source code for pages is in 'screens'
+         - User.js can be used to access the current User's information
+         - Most screens are split into Patient vs. Provider screens, depending on whether or not they are designed for the patient mobile app or the provider web app
+         - Injection, maintenance bottle numbers, and practice survey screens were created with SurveyJS - Don't think this is compatible with iOS/Android
 - Back-End
- - Each collection within the database (ex: patients, providers, protocols, injections, etc.) should have one file in each of the following:
-  - Controllers - Functions to handle data and interactions with the database when a request is made to a specific route
-  - Routes - Specific routes that are associated to functions within the controller
-  - Models - Mongoose schemas for each collection in the database
+         - Each collection within the database (ex: patients, providers, protocols, injections, etc.) should have one file in each of the following:
+                  - Controllers - Functions to handle data and interactions with the database when a request is made to a specific route
+                  - Routes - Specific routes that are associated to functions within the controller
+                  - Models - Mongoose schemas for each collection in the database
 
 
 
