@@ -1,5 +1,5 @@
-import React, { Component, useState } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, StyleSheet, Dimensions, ScrollView } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Carousel from 'react-native-reanimated-carousel';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'

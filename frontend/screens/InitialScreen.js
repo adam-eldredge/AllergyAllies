@@ -1,14 +1,13 @@
-import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, ImageBackground, Alert, ScrollView } from 'react-native'
-import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
-import { useRoute } from '@react-navigation/native';
+import React from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native'
+import { IconButton } from 'react-native-paper';
 
 export default function InitialScreen({navigation}){
       return (
         <View>
             <View style={{ height: 17, backgroundColor: '#063b94' }}></View>
             <ImageBackground
-            source={require('./initialheader.png')}
+            source={require('./Images/initialheader.png')}
             style={{ flex: 1, flexDirection: 'row', flexWrap: 'wrap', backgroundColor: '#95C8FC', }}
             resizeMode= 'fit'>
                 <View>

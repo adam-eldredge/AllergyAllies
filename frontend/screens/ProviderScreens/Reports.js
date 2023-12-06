@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal } from 'react-native';
-import { DataTable, IconButton } from 'react-native-paper';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal } from 'react-native';
+import { DataTable } from 'react-native-paper';
 import axios from 'axios';
-import User from '../User';
-import AuthContext from '../AuthContext';
+import User from '../../User';
+import AuthContext from '../../AuthContext';
 import ProviderMenu from './ProviderMenu';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

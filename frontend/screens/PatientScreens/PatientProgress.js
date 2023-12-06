@@ -1,6 +1,6 @@
 
 import React, {useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet,  ScrollView } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import Carousel from 'react-native-reanimated-carousel';

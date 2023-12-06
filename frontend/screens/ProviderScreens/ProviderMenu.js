@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
-import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
-import AuthContext from '../AuthContext';
-import { useFocusEffect } from '@react-navigation/native';
+import React from 'react'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { IconButton } from 'react-native-paper';
+import AuthContext from '../../AuthContext';
+
 
 const ProviderMenu = ({ navigation }) => {
   const { signOut } = React.useContext(AuthContext);

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import {Text, TextInput, View, Button, ActivityIndicator, StyleSheet,} from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import {Text, View, ActivityIndicator} from 'react-native';
 
 export default function LoadingScreen() {
     return (

@@ -1,6 +1,5 @@
-import React, { useContext, useState } from 'react';
-import { View, Text, TextInput, Button, Dimensions, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 
 export default function PatientSignUpScreen() {
