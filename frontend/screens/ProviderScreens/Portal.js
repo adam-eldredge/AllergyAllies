@@ -1,9 +1,9 @@
-import React, { useContext, Component, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView } from 'react-native';
-import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
-import AuthContext from '../AuthContext';
-import User from '../User';
-import { fetchRecentAlerts, alertMessage, formatDate } from '../utils/alertUtils';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Card, IconButton } from 'react-native-paper';
+import AuthContext from '../../AuthContext';
+import User from '../../User';
+import { fetchRecentAlerts, alertMessage, formatDate } from '../../utils/alertUtils';
 
 export default function Portal({navigation}){
 

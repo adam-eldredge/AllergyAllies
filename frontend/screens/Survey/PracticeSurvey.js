@@ -1,6 +1,5 @@
-import React, { useCallback, useContext, useState } from 'react';
-import { View, Platform, TouchableOpacity, StyleSheet, IconButton } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import React, { useCallback } from 'react';
+import { Platform, StyleSheet } from 'react-native';
 import axios from 'axios';
 
 //comment out these 3 lines to run on mobile

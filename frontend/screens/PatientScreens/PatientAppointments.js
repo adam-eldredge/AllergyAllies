@@ -1,9 +1,7 @@
 
 
-import React, { Component, useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, Image, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView, Platform } from 'react-native'
-import { useRoute } from '@react-navigation/native';
-import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
+import React, { useState, useEffect } from 'react'
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView, Platform } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import User from '../../User';
 import axios from 'axios';
@@ -22,7 +20,6 @@ export default function PatientAppointments({navigation}){
     const [patient, setPatient] = useState();
     const [treatments, setTreatments] = useState();
     const [loading, setLoading] = useState(true);
-    const [activeSlide, setActiveSlide] = useState(0);
     const [futureAppointmentDeadline, setFutureAppointmentDeadline] = useState(null);
     const [daysUntilDeadline, setDaysUntilDeadline] = useState(0);
     const [deadlineOverdue, setDeadlineOverdue] = useState(false)
@@ -193,7 +190,7 @@ export default function PatientAppointments({navigation}){
         <Text style = {styles.overdueSubtext}>{deadlineMsg3}</Text>
         </TouchableOpacity>
 
-        <Image style={{ width: "150%", height: "20%", marginTop: 10, marginLeft: -85, marginBottom: 150}} source={require('../AdPlaceholder.png')} />
+        <Image style={{ width: "150%", height: "20%", marginTop: 10, marginLeft: -85, marginBottom: 150}} source={require('../Images/AdPlaceholder.png')} />
 
     </ScrollView>
 

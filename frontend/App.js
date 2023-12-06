@@ -1,33 +1,32 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, SafeAreaView, Platform} from 'react-native'
+import { StyleSheet, Platform} from 'react-native'
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Portal from './screens/Portal.js';
-import AllAlerts from './screens/AllAlerts.js';
-import Reports from './screens/Reports.js';
+import Portal from './screens/ProviderScreens/Portal.js';
+import AllAlerts from './screens/ProviderScreens/AllAlerts.js';
+import Reports from './screens/ProviderScreens/Reports.js';
 import Injections from './screens/Injection/Injections.js';
 import Maintenance from './screens/Injection/MaintenanceBottleNum.js';
 import PracticeSurvey from './screens/Survey/PracticeSurvey.js';
-import ProviderSignInScreen from './screens/ProviderSignInScreen';
+import ProviderSignInScreen from './screens/ProviderScreens/ProviderSignInScreen.js';
 import LoadingScreen from './screens/LoadingScreen.js';
 import PatientSignUpScreen from './screens/signup/PatientSignUpScreen';
 import ProviderSignUpScreen from './screens/signup/ProviderSignUpScreen.js';
 import practiceEnrollment from './screens/signup/practiceEnrollment.js';
 import PatientHome from './screens/PatientScreens/PatientHome.js';
-import Upcoming from './screens/Upcoming.js';
+import Upcoming from './screens/PatientScreens/Upcoming.js';
 import InitialScreen from './screens/InitialScreen.js';
-import ProviderAccount from './screens/ProviderAccount.js';
 import AuthContext from './AuthContext';
-import ViewPatients from './screens/ViewPatients.js';
+import ViewPatients from './screens/ProviderScreens/ViewPatients.js';
 
 import ViewAllAppointments from './screens/PatientScreens/ViewAllAppointments.js';
-import PatientDetails from './screens/PatientDetails.js';
+import PatientDetails from './screens/ProviderScreens/PatientDetails.js';
 
 import { useMemo, useReducer, useEffect } from 'react';
 //import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 // import * as SecureStore from 'expo-secure-store';
-import jwt_decode from 'jwt-decode';
+
 import InitialMobileScreen from './screens/PatientScreens/InitialMobileScreen.js'
 import InjectionInfo from './screens/PatientScreens/InjectionInfo.js';
 import EditCurrentMedications from './screens/PatientScreens/EditCurrentMedications.js';
@@ -182,7 +181,6 @@ const SignedInDesktopStack = (
       <Stack.Screen name="PracticeEnrollmentScreen" component={practiceEnrollment} options={{ title: 'Practice Enrollment Screen'}} />
       <Stack.Screen name="PracticeSurvey" component={PracticeSurvey} />
       <Stack.Screen name="ViewPatients" component={ViewPatients} options={{ title: 'View Patients'}}/>
-      <Stack.Screen name="ProviderAccount" component={ProviderAccount} options={{title: 'Account'}} />
       <Stack.Screen name="Injections" component={Injections} options={{title: 'Injections'}} />
       <Stack.Screen name="Maintenance" component={Maintenance} options={{title: 'Maintenance'}} />
       <Stack.Screen name="PatientDetails" component={PatientDetails} options={{title: 'Patient Details'}} />

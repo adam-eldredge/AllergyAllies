@@ -29,9 +29,11 @@ async function generateReport(providerID, practiceID, reportType, manual, data) 
 
 async function findMatchingBottle(patient, bottle) {
 
-    const matchingBottle = patient.maintenanceBottleNumber.find(
-        (patientBottle) => patientBottle.nameOfBottle === bottle.nameOfBottle
-    );
+    const matchingBottle = patient.maintenanceBottleNumber.find((patientBottle) => {
+        // Remove quotes from patientBottle.nameOfBottle if present
+        const sanitizedPatientBottleName = patientBottle.nameOfBottle.replace(/^"(.*)"$/, '$1');
+        return sanitizedPatientBottleName === bottle.nameOfBottle;
+    });
 
     return matchingBottle;
 }

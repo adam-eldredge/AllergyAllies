@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Dimensions, View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from 'react-native';
-import AuthContext from '../AuthContext';
+import AuthContext from '../../AuthContext';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import AsyncStorage from "@react-native-async-storage/async-storage";

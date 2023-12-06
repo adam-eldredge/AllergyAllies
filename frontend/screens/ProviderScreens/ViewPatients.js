@@ -1,9 +1,9 @@
-import React, { Component, useContext, useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
-import { DataTable, IconButton } from 'react-native-paper';
+import React, { useContext, useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions } from 'react-native'
+import { DataTable } from 'react-native-paper';
 import { SelectList } from 'react-native-dropdown-select-list'
-import AuthContext from '../AuthContext';
-import User from '../User';
+import AuthContext from '../../AuthContext';
+import User from '../../User';
 import axios from 'axios';
 import ProviderMenu from './ProviderMenu';
 
