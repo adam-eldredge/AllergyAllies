@@ -1,12 +1,9 @@
-import React, { useContext, Component, useState, useEffect } from 'react'
-import { View, Text, Image, Button, ScrollView, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert } from 'react-native'
-import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
-import { useRoute } from '@react-navigation/native';
+import React, { useContext, useState, useEffect } from 'react'
+import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from 'react-native'
 import AuthContext from '../../AuthContext.js';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faPenToSquare } from '@fortawesome/free-solid-svg-icons/faPenToSquare'
 import User from '../../User';
-import { DataTable } from 'react-native-paper';
 import axios from 'axios';
 
 
@@ -70,7 +67,7 @@ export default function PatientProfile({navigation}) {
   const PatientInfoGeneral = () => (
     <View style={styles.profilePhotoContainer}>
       <Image
-        source={require('../profilepic.png')}
+        source={require('../Images/profilepic.png')}
         style={styles.profilePhoto}
       />
       <Text style={styles.name}>{firstName} {lastName}</Text>

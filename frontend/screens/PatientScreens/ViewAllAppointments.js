@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
-import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions, ScrollView } from 'react-native'
 import User from '../../User.js';
 import axios from 'axios';
 

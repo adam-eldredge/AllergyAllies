@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, ImageBackground, Alert, ScrollView } from 'react-native'
-import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
-import { useRoute } from '@react-navigation/native';
+import React from 'react'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { IconButton } from 'react-native-paper';
 
 export default function InitialMobileScreen({navigation}){
       return (

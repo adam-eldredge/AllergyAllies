@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Dimensions, Alert, ScrollView } from 'react-native'
-import { Avatar, Card, Button, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
-import AuthContext from '../AuthContext';
-import {formatDate, alertMessage, fetchRecentAlerts} from '../utils/alertUtils';
-import User from '../User';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
+import { Card, IconButton } from 'react-native-paper';
+import AuthContext from '../../AuthContext';
+import {formatDate, alertMessage, fetchRecentAlerts} from '../../utils/alertUtils';
+import User from '../../User';
 import axios from 'axios';
 import ProviderMenu from './ProviderMenu';
 

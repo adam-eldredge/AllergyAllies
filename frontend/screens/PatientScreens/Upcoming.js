@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
-import { useRoute } from '@react-navigation/native';
-import { Avatar, Card, Menu, IconButton, Provider as PaperProvider } from 'react-native-paper';
+import React from 'react'
+import { View, Text, StyleSheet, Dimensions, ScrollView } from 'react-native'
+import { IconButton } from 'react-native-paper';
 
 //still a hard coded screen, should contain practice office hours and other appointment info
 

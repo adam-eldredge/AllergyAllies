@@ -1,9 +1,6 @@
-import React, { Component, useContext, useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Button, Header, Dimensions, ScrollView } from 'react-native'
-import { DataTable, IconButton } from 'react-native-paper';
-import { SelectList } from 'react-native-dropdown-select-list'
-import AuthContext from '../AuthContext';
-import User from '../User';
+import React, { useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { IconButton } from 'react-native-paper';
 import axios from 'axios';
 
 export default function PatientDetails({ route, navigation }) {
