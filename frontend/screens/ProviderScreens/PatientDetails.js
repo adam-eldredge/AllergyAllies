@@ -62,13 +62,10 @@ export default function PatientDetails({ route, navigation }) {
     */
     const getLastTreatment = async () => {
       let treatment = await axios.get(`http://localhost:5000/api/getLastTreatment/${patient._id}`)  
-      //console.log(patient)
       if(treatment.data[0].attended == false && (patient.treatments.length > 2)){
-        //checkIfCalcTreatment = true;
         treatment = await axios.get(`http://localhost:5000/api/getSecondLastTreatment/${patient._id}`)
       }
 
-      //console.log(treatment.data)
       let practiceBottles = protocol.bottles
       let lT = { bottles: [] }
       // If we get a treatment
@@ -162,7 +159,6 @@ export default function PatientDetails({ route, navigation }) {
     if (practice && protocol && startDate && lastTreatment && percent) { setLoading(false); }
   })
   if (loading) return ('Loading...');
-  //console.log(maintenanceNums)
 
   // Create a section for each vial
   const Vials = () => (
